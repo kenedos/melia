@@ -11,7 +11,7 @@
 { id: 3, className: "Magic", name: "Magic", grade: 2, basicRatio: 100, reinforceRatio: 120, reinforceCostRatio: 400, transcendCostRatio: 110 },
 { id: 4, className: "Rare", name: "Rare", grade: 3, basicRatio: 110, reinforceRatio: 150, reinforceCostRatio: 500, transcendCostRatio: 115 },
 { id: 5, className: "Unique", name: "Unique", grade: 4, basicRatio: 125, reinforceRatio: 200, reinforceCostRatio: 600, transcendCostRatio: 125 },
-{ id: 6, className: "Legend", name: "Legend", grade: 5, basicRatio: 160, reinforceRatio: 250, reinforceCostRatio: 700, transcendCostRatio: 140 },
+{ id: 6, className: "Legend", name: "Legend", grade: 5, basicRatio: 145, reinforceRatio: 250, reinforceCostRatio: 700, transcendCostRatio: 140 },
 { id: 7, className: "Goddess", name: "Goddess", grade: 6, basicRatio: 160, reinforceRatio: 250, reinforceCostRatio: 700, transcendCostRatio: 28 },
 { id: 10, className: "armorMaterial_DEF", name: "Physical DEF ratio by item type", cloth: 1, leather: 1.5, iron: 2, shield: 2, ghost: 1 },
 { id: 11, className: "armorMaterial_MDEF", name: "Magic DEF ratio by item type", cloth: 2, leather: 1.5, iron: 1, shield: 2, ghost: 1 },

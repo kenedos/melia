@@ -1,0 +1,680 @@
+// Melia
+// Database file
+//
+// Map Bonus Drops - Additional item drops for mobs killed in specific maps.
+// Only applies to non-Boss and non-MISC rank mobs.
+// Each item rolls independently per mob kill.
+//
+// Values: mapClassName, items[]
+// Item Values: itemId, chance (percentage), [minAmount], [maxAmount]
+//
+// Example:
+// { mapClassName: "d_firetower_41", items: [
+//     { itemId: 645678, chance: 5.0 },
+//     { itemId: 645679, chance: 2.5, minAmount: 1, maxAmount: 3 }
+// ]}
+//---------------------------------------------------------------------------
+
+[
+// ============================================================================
+// CRYSTAL MINE - Precious Jewels Theme
+// ============================================================================
+{ mapClassName: "d_cmine_01", items: [
+	{ itemId: 649200, chance: 0.130 }, // Amber
+	{ itemId: 649201, chance: 0.112 }, // Fossilized Lizard Amber
+	{ itemId: 649202, chance: 0.140 }, // Topaz
+	{ itemId: 649203, chance: 0.140 }, // Opal
+	{ itemId: 649204, chance: 0.140 }, // Garnet
+	{ itemId: 649205, chance: 0.140 }, // Obsidian
+	{ itemId: 649206, chance: 0.140 }, // Peridot
+	{ itemId: 649207, chance: 0.140 }, // Zircon
+	{ itemId: 649208, chance: 0.140 }, // Pyrite
+	{ itemId: 649209, chance: 0.112 }, // Bloodstone
+	{ itemId: 649210, chance: 0.112 }, // Cryorite
+	{ itemId: 649211, chance: 0.112 }, // Pyrostone
+	{ itemId: 649212, chance: 0.112 }, // Cryostone
+	{ itemId: 649213, chance: 0.084 }, // Pyranium
+	{ itemId: 649214, chance: 0.084 }, // Cryonium
+	{ itemId: 649215, chance: 0.058 }, // Diamond
+	{ itemId: 649216, chance: 0.058 }, // Sapphire
+	{ itemId: 649217, chance: 0.058 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_cmine_02", items: [
+	{ itemId: 649200, chance: 0.130 }, // Amber
+	{ itemId: 649201, chance: 0.120 }, // Fossilized Lizard Amber
+	{ itemId: 649202, chance: 0.150 }, // Topaz
+	{ itemId: 649203, chance: 0.150 }, // Opal
+	{ itemId: 649204, chance: 0.150 }, // Garnet
+	{ itemId: 649205, chance: 0.150 }, // Obsidian
+	{ itemId: 649206, chance: 0.150 }, // Peridot
+	{ itemId: 649207, chance: 0.150 }, // Zircon
+	{ itemId: 649208, chance: 0.150 }, // Pyrite
+	{ itemId: 649209, chance: 0.120 }, // Bloodstone
+	{ itemId: 649210, chance: 0.120 }, // Cryorite
+	{ itemId: 649211, chance: 0.120 }, // Pyrostone
+	{ itemId: 649212, chance: 0.120 }, // Cryostone
+	{ itemId: 649213, chance: 0.090 }, // Pyranium
+	{ itemId: 649214, chance: 0.090 }, // Cryonium
+	{ itemId: 649215, chance: 0.060 }, // Diamond
+	{ itemId: 649216, chance: 0.060 }, // Sapphire
+	{ itemId: 649217, chance: 0.060 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_cmine_6", items: [
+	{ itemId: 649200, chance: 0.330 }, // Amber
+	{ itemId: 649201, chance: 0.248 }, // Fossilized Lizard Amber
+	{ itemId: 649202, chance: 0.330 }, // Topaz
+	{ itemId: 649203, chance: 0.330 }, // Opal
+	{ itemId: 649204, chance: 0.330 }, // Garnet
+	{ itemId: 649205, chance: 0.330 }, // Obsidian
+	{ itemId: 649206, chance: 0.330 }, // Peridot
+	{ itemId: 649207, chance: 0.330 }, // Zircon
+	{ itemId: 649208, chance: 0.330 }, // Pyrite
+	{ itemId: 649209, chance: 0.248 }, // Bloodstone
+	{ itemId: 649210, chance: 0.248 }, // Cryorite
+	{ itemId: 649211, chance: 0.248 }, // Pyrostone
+	{ itemId: 649212, chance: 0.248 }, // Cryostone
+	{ itemId: 649213, chance: 0.166 }, // Pyranium
+	{ itemId: 649214, chance: 0.166 }, // Cryonium
+	{ itemId: 649215, chance: 0.082 }, // Diamond
+	{ itemId: 649216, chance: 0.082 }, // Sapphire
+	{ itemId: 649217, chance: 0.082 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_cmine_8", items: [
+	{ itemId: 649200, chance: 0.364 }, // Amber
+	{ itemId: 649201, chance: 0.272 }, // Fossilized Lizard Amber
+	{ itemId: 649202, chance: 0.364 }, // Topaz
+	{ itemId: 649203, chance: 0.364 }, // Opal
+	{ itemId: 649204, chance: 0.364 }, // Garnet
+	{ itemId: 649205, chance: 0.364 }, // Obsidian
+	{ itemId: 649206, chance: 0.364 }, // Peridot
+	{ itemId: 649207, chance: 0.364 }, // Zircon
+	{ itemId: 649208, chance: 0.364 }, // Pyrite
+	{ itemId: 649209, chance: 0.272 }, // Bloodstone
+	{ itemId: 649210, chance: 0.272 }, // Cryorite
+	{ itemId: 649211, chance: 0.272 }, // Pyrostone
+	{ itemId: 649212, chance: 0.272 }, // Cryostone
+	{ itemId: 649213, chance: 0.182 }, // Pyranium
+	{ itemId: 649214, chance: 0.182 }, // Cryonium
+	{ itemId: 649215, chance: 0.090 }, // Diamond
+	{ itemId: 649216, chance: 0.090 }, // Sapphire
+	{ itemId: 649217, chance: 0.090 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+{ mapClassName: "d_cmine_9", items: [
+	{ itemId: 649200, chance: 0.364 }, // Amber
+	{ itemId: 649201, chance: 0.272 }, // Fossilized Lizard Amber
+	{ itemId: 649202, chance: 0.364 }, // Topaz
+	{ itemId: 649203, chance: 0.364 }, // Opal
+	{ itemId: 649204, chance: 0.364 }, // Garnet
+	{ itemId: 649205, chance: 0.364 }, // Obsidian
+	{ itemId: 649206, chance: 0.364 }, // Peridot
+	{ itemId: 649207, chance: 0.364 }, // Zircon
+	{ itemId: 649208, chance: 0.364 }, // Pyrite
+	{ itemId: 649209, chance: 0.272 }, // Bloodstone
+	{ itemId: 649210, chance: 0.272 }, // Cryorite
+	{ itemId: 649211, chance: 0.272 }, // Pyrostone
+	{ itemId: 649212, chance: 0.272 }, // Cryostone
+	{ itemId: 649213, chance: 0.182 }, // Pyranium
+	{ itemId: 649214, chance: 0.182 }, // Cryonium
+	{ itemId: 649215, chance: 0.090 }, // Diamond
+	{ itemId: 649216, chance: 0.090 }, // Sapphire
+	{ itemId: 649217, chance: 0.090 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// ROYAL MAUSOLEUM - Attribute Points Theme
+// ============================================================================
+{ mapClassName: "d_zachariel_32", items: [
+	{ itemId: 490174, chance: 0.417 }, // 500 Attribute Points
+	{ itemId: 900415, chance: 0.338 }, // 1000 Attribute Points
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_zachariel_33", items: [
+	{ itemId: 490174, chance: 0.450 }, // 500 Attribute Points
+	{ itemId: 900415, chance: 0.361 }, // 1000 Attribute Points
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_zachariel_34", items: [
+	{ itemId: 490174, chance: 0.487 }, // 500 Attribute Points
+	{ itemId: 900415, chance: 0.389 }, // 1000 Attribute Points
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_zachariel_35", items: [
+	{ itemId: 490174, chance: 0.525 }, // 500 Attribute Points
+	{ itemId: 900415, chance: 0.417 }, // 1000 Attribute Points
+	{ itemId: 490311, chance: 0.160 }, // 10000 Attribute Points
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_zachariel_36", items: [
+	{ itemId: 490174, chance: 0.567 }, // 500 Attribute Points
+	{ itemId: 900415, chance: 0.450 }, // 1000 Attribute Points
+	{ itemId: 490311, chance: 0.167 }, // 10000 Attribute Points
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// TENET CHURCH - Headgear Enchant Theme
+// ============================================================================
+{ mapClassName: "d_chapel_57_5", items: [
+	{ itemId: 490035, chance: 0.765 }, // Enchant Scroll
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_chapel_57_6", items: [
+	{ itemId: 490035, chance: 0.782 }, // Enchant Scroll
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_chapel_57_7", items: [
+	{ itemId: 490035, chance: 0.800 }, // Enchant Scroll
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// MAGE TOWER - Monster Albums Theme
+// ============================================================================
+{ mapClassName: "d_firetower_41", items: [
+	{ itemId: 670001, chance: 0.128 }, // Monster Card Album: Red
+	{ itemId: 670002, chance: 0.128 }, // Monster Card Album: Blue
+	{ itemId: 670003, chance: 0.128 }, // Monster Card Album: Green
+	{ itemId: 670004, chance: 0.128 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.047 }, // Enhancement Card Lv1
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_firetower_42", items: [
+	{ itemId: 670001, chance: 0.134 }, // Monster Card Album: Red
+	{ itemId: 670002, chance: 0.134 }, // Monster Card Album: Blue
+	{ itemId: 670003, chance: 0.134 }, // Monster Card Album: Green
+	{ itemId: 670004, chance: 0.134 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.060 }, // Enhancement Card Lv1
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_firetower_43", items: [
+	{ itemId: 670001, chance: 0.142 }, // Monster Card Album: Red
+	{ itemId: 670002, chance: 0.142 }, // Monster Card Album: Blue
+	{ itemId: 670003, chance: 0.142 }, // Monster Card Album: Green
+	{ itemId: 670004, chance: 0.142 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.100 }, // Enhancement Card Lv1
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_firetower_44", items: [
+	{ itemId: 670001, chance: 0.170 }, // Monster Card Album: Red
+	{ itemId: 670002, chance: 0.170 }, // Monster Card Album: Blue
+	{ itemId: 670003, chance: 0.170 }, // Monster Card Album: Green
+	{ itemId: 670004, chance: 0.170 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.131 }, // Enhancement Card Lv1
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_firetower_45", items: [
+	{ itemId: 670001, chance: 0.180 }, // Monster Card Album: Red
+	{ itemId: 670002, chance: 0.180 }, // Monster Card Album: Blue
+	{ itemId: 670003, chance: 0.180 }, // Monster Card Album: Green
+	{ itemId: 670004, chance: 0.180 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.149 }, // Enhancement Card Lv1
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// DEMON PRISON - Card Enhancement Theme
+// ============================================================================
+{ mapClassName: "d_velniasprison_51_1", items: [
+	{ itemId: 646071, chance: 0.400 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.250 }, // Enhancement Card: 500
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_velniasprison_51_2", items: [
+	{ itemId: 646071, chance: 0.476 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.289 }, // Enhancement Card: 500
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_velniasprison_51_3", items: [
+	{ itemId: 646071, chance: 0.650 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.376 }, // Enhancement Card: 500
+	{ itemId: 645631, chance: 0.115 }, // Enhancement Card Lv1 (2000)
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_velniasprison_51_4", items: [
+	{ itemId: 646071, chance: 0.626 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.364 }, // Enhancement Card: 500
+	{ itemId: 645631, chance: 0.154 }, // Enhancement Card Lv1 (2000)
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_velniasprison_51_5", items: [
+	{ itemId: 646071, chance: 0.700 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.400 }, // Enhancement Card: 500
+	{ itemId: 645631, chance: 0.160 }, // Enhancement Card Lv1 (2000)
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// TEVHRIN STALACTITE CAVE - Crystal Mine Ores Theme
+// ============================================================================
+{ mapClassName: "d_limestonecave_52_1", items: [
+	{ itemId: 649009, chance: 0.618 }, // Phydecium
+	{ itemId: 649010, chance: 0.618 }, // Ferinium
+	{ itemId: 649011, chance: 0.618 }, // Portium
+	{ itemId: 649008, chance: 0.618 }, // Chromite
+	{ itemId: 649016, chance: 0.618 }, // Absidium Ore
+	{ itemId: 649015, chance: 0.618 }, // Artilonium
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_limestonecave_52_2", items: [
+	{ itemId: 649009, chance: 0.625 }, // Phydecium
+	{ itemId: 649010, chance: 0.625 }, // Ferinium
+	{ itemId: 649011, chance: 0.625 }, // Portium
+	{ itemId: 649008, chance: 0.625 }, // Chromite
+	{ itemId: 649016, chance: 0.625 }, // Absidium Ore
+	{ itemId: 649015, chance: 0.625 }, // Artilonium
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_limestonecave_52_3", items: [
+	{ itemId: 649009, chance: 0.633 }, // Phydecium
+	{ itemId: 649010, chance: 0.633 }, // Ferinium
+	{ itemId: 649011, chance: 0.633 }, // Portium
+	{ itemId: 649008, chance: 0.633 }, // Chromite
+	{ itemId: 649016, chance: 0.633 }, // Absidium Ore
+	{ itemId: 649015, chance: 0.633 }, // Artilonium
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_limestonecave_52_4", items: [
+	{ itemId: 649009, chance: 0.641 }, // Phydecium
+	{ itemId: 649010, chance: 0.641 }, // Ferinium
+	{ itemId: 649011, chance: 0.641 }, // Portium
+	{ itemId: 649008, chance: 0.641 }, // Chromite
+	{ itemId: 649016, chance: 0.641 }, // Absidium Ore
+	{ itemId: 649015, chance: 0.641 }, // Artilonium
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_limestonecave_52_5", items: [
+	{ itemId: 649009, chance: 0.650 }, // Phydecium
+	{ itemId: 649010, chance: 0.650 }, // Ferinium
+	{ itemId: 649011, chance: 0.650 }, // Portium
+	{ itemId: 649008, chance: 0.650 }, // Chromite
+	{ itemId: 649016, chance: 0.650 }, // Absidium Ore
+	{ itemId: 649015, chance: 0.650 }, // Artilonium
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// KALEJIMAS DETENTION CAMP - Status Potions Theme
+// Cap: 100 stat points max from potions (see item_consume.cs)
+// ============================================================================
+{ mapClassName: "d_prison_78", items: [
+	{ itemId: 640109, chance: 0.642 }, // Status Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_prison_79", items: [
+	{ itemId: 640109, chance: 0.650 }, // Status Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_prison_80", items: [
+	{ itemId: 640109, chance: 0.658 }, // Status Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_prison_81", items: [
+	{ itemId: 640109, chance: 0.670 }, // Status Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_prison_82", items: [
+	{ itemId: 640109, chance: 0.682 }, // Status Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// MONASTERIES - Skill Gem Fragments Theme
+// ============================================================================
+{ mapClassName: "d_abbey_22_4", items: [
+	{ itemId: 11030259, chance: 0.200 }, // Skill Gem Fragment
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_abbey_22_5", items: [
+	{ itemId: 11030259, chance: 0.216 }, // Skill Gem Fragment
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_abbey_39_4", items: [
+	{ itemId: 11030259, chance: 0.232 }, // Skill Gem Fragment
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_abbey_41_6", items: [
+	{ itemId: 11030259, chance: 0.250 }, // Skill Gem Fragment
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// UNDERFORTRESS - Gem Abrasives Theme
+// ============================================================================
+{ mapClassName: "d_underfortress_65", items: [
+	{ itemId: 645637, chance: 1.526 }, // 2-Star Gem Abrasive
+	{ itemId: 645638, chance: 1.014 }, // 3-Star Gem Abrasive
+	{ itemId: 645639, chance: 0.602 }, // 4-Star Gem Abrasive
+	{ itemId: 645640, chance: 0.530 }, // 5-Star Gem Abrasive
+	{ itemId: 645765, chance: 0.438 }, // 7-Star Gem Abrasive
+	{ itemId: 645766, chance: 0.338 }, // 8-Star Gem Abrasive
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_underfortress_66", items: [
+	{ itemId: 645637, chance: 1.628 }, // 2-Star Gem Abrasive
+	{ itemId: 645638, chance: 1.064 }, // 3-Star Gem Abrasive
+	{ itemId: 645639, chance: 0.612 }, // 4-Star Gem Abrasive
+	{ itemId: 645640, chance: 0.534 }, // 5-Star Gem Abrasive
+	{ itemId: 645765, chance: 0.438 }, // 7-Star Gem Abrasive
+	{ itemId: 645766, chance: 0.338 }, // 8-Star Gem Abrasive
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_underfortress_67", items: [
+	{ itemId: 645637, chance: 1.742 }, // 2-Star Gem Abrasive
+	{ itemId: 645638, chance: 1.120 }, // 3-Star Gem Abrasive
+	{ itemId: 645639, chance: 0.624 }, // 4-Star Gem Abrasive
+	{ itemId: 645640, chance: 0.538 }, // 5-Star Gem Abrasive
+	{ itemId: 645765, chance: 0.438 }, // 7-Star Gem Abrasive
+	{ itemId: 645766, chance: 0.338 }, // 8-Star Gem Abrasive
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_underfortress_68", items: [
+	{ itemId: 645637, chance: 1.866 }, // 2-Star Gem Abrasive
+	{ itemId: 645638, chance: 1.182 }, // 3-Star Gem Abrasive
+	{ itemId: 645639, chance: 0.636 }, // 4-Star Gem Abrasive
+	{ itemId: 645640, chance: 0.540 }, // 5-Star Gem Abrasive
+	{ itemId: 645765, chance: 0.438 }, // 7-Star Gem Abrasive
+	{ itemId: 645766, chance: 0.338 }, // 8-Star Gem Abrasive
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_underfortress_69", items: [
+	{ itemId: 645637, chance: 2.002 }, // 2-Star Gem Abrasive
+	{ itemId: 645638, chance: 1.252 }, // 3-Star Gem Abrasive
+	{ itemId: 645639, chance: 0.650 }, // 4-Star Gem Abrasive
+	{ itemId: 645640, chance: 0.546 }, // 5-Star Gem Abrasive
+	{ itemId: 645765, chance: 0.438 }, // 7-Star Gem Abrasive
+	{ itemId: 645766, chance: 0.338 }, // 8-Star Gem Abrasive
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_underfortress_30_1", items: [
+	{ itemId: 645637, chance: 1.866 }, // 2-Star Gem Abrasive
+	{ itemId: 645638, chance: 1.182 }, // 3-Star Gem Abrasive
+	{ itemId: 645639, chance: 0.636 }, // 4-Star Gem Abrasive
+	{ itemId: 645640, chance: 0.540 }, // 5-Star Gem Abrasive
+	{ itemId: 645765, chance: 0.438 }, // 7-Star Gem Abrasive
+	{ itemId: 645766, chance: 0.338 }, // 8-Star Gem Abrasive
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_underfortress_30_2", items: [
+	{ itemId: 645637, chance: 2.002 }, // 2-Star Gem Abrasive
+	{ itemId: 645638, chance: 1.252 }, // 3-Star Gem Abrasive
+	{ itemId: 645639, chance: 0.650 }, // 4-Star Gem Abrasive
+	{ itemId: 645640, chance: 0.546 }, // 5-Star Gem Abrasive
+	{ itemId: 645765, chance: 0.438 }, // 7-Star Gem Abrasive
+	{ itemId: 645766, chance: 0.338 }, // 8-Star Gem Abrasive
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_underfortress_30_3", items: [
+	{ itemId: 645637, chance: 2.152 }, // 2-Star Gem Abrasive
+	{ itemId: 645638, chance: 1.326 }, // 3-Star Gem Abrasive
+	{ itemId: 645639, chance: 0.666 }, // 4-Star Gem Abrasive
+	{ itemId: 645640, chance: 0.550 }, // 5-Star Gem Abrasive
+	{ itemId: 645765, chance: 0.438 }, // 7-Star Gem Abrasive
+	{ itemId: 645766, chance: 0.338 }, // 8-Star Gem Abrasive
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// ASHAQ UNDERGROUND PRISON - Metal Ores Theme
+// ============================================================================
+{ mapClassName: "d_prison_62_1", items: [
+	{ itemId: 649000, chance: 0.200 }, // Copper Ore
+	{ itemId: 649001, chance: 0.200 }, // Iron Ore
+	{ itemId: 649002, chance: 0.200 }, // Steel Ore
+	{ itemId: 649003, chance: 0.200 }, // Titanium Ore
+	{ itemId: 649004, chance: 0.200 }, // Mithril Ore
+	{ itemId: 649005, chance: 0.200 }, // Orichalcum Ore
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_prison_62_2", items: [
+	{ itemId: 649000, chance: 0.200 }, // Copper Ore
+	{ itemId: 649001, chance: 0.200 }, // Iron Ore
+	{ itemId: 649002, chance: 0.200 }, // Steel Ore
+	{ itemId: 649003, chance: 0.200 }, // Titanium Ore
+	{ itemId: 649004, chance: 0.200 }, // Mithril Ore
+	{ itemId: 649005, chance: 0.200 }, // Orichalcum Ore
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_prison_62_3", items: [
+	{ itemId: 649000, chance: 0.200 }, // Copper Ore
+	{ itemId: 649001, chance: 0.200 }, // Iron Ore
+	{ itemId: 649002, chance: 0.200 }, // Steel Ore
+	{ itemId: 649003, chance: 0.200 }, // Titanium Ore
+	{ itemId: 649004, chance: 0.200 }, // Mithril Ore
+	{ itemId: 649005, chance: 0.200 }, // Orichalcum Ore
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// GRAVEYARDS - Elemental Resist Potions Theme
+// ============================================================================
+{ mapClassName: "id_catacomb_01", items: [
+	{ itemId: 640164, chance: 1.240 }, // Fire Property Resistance Potion
+	{ itemId: 640165, chance: 1.240 }, // Ice Property Resistance Potion
+	{ itemId: 640166, chance: 1.240 }, // Poison Property Resistance Potion
+	{ itemId: 640167, chance: 1.240 }, // Earth Property Resistance Potion
+	{ itemId: 640168, chance: 1.240 }, // Lightning Property Resistance Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "id_catacomb_33_1", items: [
+	{ itemId: 640164, chance: 1.364 }, // Fire Property Resistance Potion
+	{ itemId: 640165, chance: 1.364 }, // Ice Property Resistance Potion
+	{ itemId: 640166, chance: 1.364 }, // Poison Property Resistance Potion
+	{ itemId: 640167, chance: 1.364 }, // Earth Property Resistance Potion
+	{ itemId: 640168, chance: 1.364 }, // Lightning Property Resistance Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "id_catacomb_33_2", items: [
+	{ itemId: 640164, chance: 1.500 }, // Fire Property Resistance Potion
+	{ itemId: 640165, chance: 1.500 }, // Ice Property Resistance Potion
+	{ itemId: 640166, chance: 1.500 }, // Poison Property Resistance Potion
+	{ itemId: 640167, chance: 1.500 }, // Earth Property Resistance Potion
+	{ itemId: 640168, chance: 1.500 }, // Lightning Property Resistance Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// RANCID LABYRINTH - HP Increase Potion Theme
+// Cap: 40 uses max (+2000 HP total, see item_consume.cs)
+// ============================================================================
+{ mapClassName: "d_catacomb_80_1", items: [
+	{ itemId: 640087, chance: 1.000 }, // HP Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_catacomb_80_2", items: [
+	{ itemId: 640087, chance: 1.000 }, // HP Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_catacomb_80_3", items: [
+	{ itemId: 640087, chance: 1.000 }, // HP Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// NOVAHA ABBEY - SP Increase Potion Theme
+// Cap: 40 uses max (+800 SP total, see item_consume.cs)
+// ============================================================================
+{ mapClassName: "d_abbey_64_1", items: [
+	{ itemId: 640088, chance: 1.000 }, // SP Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_abbey_64_2", items: [
+	{ itemId: 640088, chance: 1.000 }, // SP Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_abbey_64_3", items: [
+	{ itemId: 640088, chance: 1.000 }, // SP Increase Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// FANTASY LIBRARY - Powders Theme
+// ============================================================================
+{ mapClassName: "d_fantasylibrary_48_1", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 640484, chance: 0.250 }, //  Weight Increase 1000 Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_fantasylibrary_48_2", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 640484, chance: 0.250 }, //  Weight Increase 1000 Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_fantasylibrary_48_3", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 640484, chance: 0.250 }, //  Weight Increase 1000 Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_fantasylibrary_48_4", items: [
+	{ itemId: 649025, chance: 0.750 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.500 }, // Sierra Powder
+	{ itemId: 640484, chance: 0.250 }, //  Weight Increase 1000 Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_fantasylibrary_48_5", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 640484, chance: 0.250 }, //  Weight Increase 1000 Potion
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+// ============================================================================
+// Hunting Grounds - Ominous Theme
+// ============================================================================
+{ mapClassName: "d_limestonecave_73_1", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 649017, chance: 0.750 }, // Ominous Spirit Fragment
+	{ itemId: 649018, chance: 0.500 }, // Ominous Spirit Piece
+	{ itemId: 649019, chance: 0.250 }, // Ominous Spirit Mineral
+	{ itemId: 649004, chance: 0.300 }, // Mithril Ore
+	{ itemId: 649207, chance: 0.200 }, // Zircon
+	{ itemId: 649006, chance: 0.200 }, // Ithildin Ore
+	{ itemId: 649203, chance: 0.200 }, // Opal
+	{ itemId: 649216, chance: 0.200 }, // Sapphire
+	{ itemId: 649217, chance: 0.200 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_prison_75_1", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 649017, chance: 0.750 }, // Ominous Spirit Fragment
+	{ itemId: 649018, chance: 0.500 }, // Ominous Spirit Piece
+	{ itemId: 649019, chance: 0.250 }, // Ominous Spirit Mineral
+	{ itemId: 649004, chance: 0.300 }, // Mithril Ore
+	{ itemId: 649207, chance: 0.200 }, // Zircon
+	{ itemId: 649006, chance: 0.200 }, // Ithildin Ore
+	{ itemId: 649203, chance: 0.200 }, // Opal
+	{ itemId: 649216, chance: 0.200 }, // Sapphire
+	{ itemId: 649217, chance: 0.200 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_startower_76_1", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 649017, chance: 0.750 }, // Ominous Spirit Fragment
+	{ itemId: 649018, chance: 0.500 }, // Ominous Spirit Piece
+	{ itemId: 649019, chance: 0.250 }, // Ominous Spirit Mineral
+	{ itemId: 649004, chance: 0.300 }, // Mithril Ore
+	{ itemId: 649207, chance: 0.200 }, // Zircon
+	{ itemId: 649006, chance: 0.200 }, // Ithildin Ore
+	{ itemId: 649203, chance: 0.200 }, // Opal
+	{ itemId: 649216, chance: 0.200 }, // Sapphire
+	{ itemId: 649217, chance: 0.200 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_startower_76_2", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 649017, chance: 0.750 }, // Ominous Spirit Fragment
+	{ itemId: 649018, chance: 0.500 }, // Ominous Spirit Piece
+	{ itemId: 649019, chance: 0.250 }, // Ominous Spirit Mineral
+	{ itemId: 649004, chance: 0.300 }, // Mithril Ore
+	{ itemId: 649207, chance: 0.200 }, // Zircon
+	{ itemId: 649006, chance: 0.200 }, // Ithildin Ore
+	{ itemId: 649203, chance: 0.200 }, // Opal
+	{ itemId: 649216, chance: 0.200 }, // Sapphire
+	{ itemId: 649217, chance: 0.200 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_velniasprison_77_1", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 649017, chance: 0.750 }, // Ominous Spirit Fragment
+	{ itemId: 649018, chance: 0.500 }, // Ominous Spirit Piece
+	{ itemId: 649019, chance: 0.250 }, // Ominous Spirit Mineral
+	{ itemId: 649004, chance: 0.300 }, // Mithril Ore
+	{ itemId: 649207, chance: 0.200 }, // Zircon
+	{ itemId: 649006, chance: 0.200 }, // Ithildin Ore
+	{ itemId: 649203, chance: 0.200 }, // Opal
+	{ itemId: 649216, chance: 0.200 }, // Sapphire
+	{ itemId: 649217, chance: 0.200 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_cathedral_78_1", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 649017, chance: 0.750 }, // Ominous Spirit Fragment
+	{ itemId: 649018, chance: 0.500 }, // Ominous Spirit Piece
+	{ itemId: 649019, chance: 0.250 }, // Ominous Spirit Mineral
+	{ itemId: 649004, chance: 0.300 }, // Mithril Ore
+	{ itemId: 649207, chance: 0.200 }, // Zircon
+	{ itemId: 649006, chance: 0.200 }, // Ithildin Ore
+	{ itemId: 649203, chance: 0.200 }, // Opal
+	{ itemId: 649216, chance: 0.200 }, // Sapphire
+	{ itemId: 649217, chance: 0.200 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_zachariel_79_1", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 649017, chance: 0.750 }, // Ominous Spirit Fragment
+	{ itemId: 649018, chance: 0.500 }, // Ominous Spirit Piece
+	{ itemId: 649019, chance: 0.250 }, // Ominous Spirit Mineral
+	{ itemId: 649004, chance: 0.300 }, // Mithril Ore
+	{ itemId: 649207, chance: 0.200 }, // Zircon
+	{ itemId: 649006, chance: 0.200 }, // Ithildin Ore
+	{ itemId: 649203, chance: 0.200 }, // Opal
+	{ itemId: 649216, chance: 0.200 }, // Sapphire
+	{ itemId: 649217, chance: 0.200 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_zachariel_79_2", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 649017, chance: 0.750 }, // Ominous Spirit Fragment
+	{ itemId: 649018, chance: 0.500 }, // Ominous Spirit Piece
+	{ itemId: 649019, chance: 0.250 }, // Ominous Spirit Mineral
+	{ itemId: 649004, chance: 0.300 }, // Mithril Ore
+	{ itemId: 649207, chance: 0.200 }, // Zircon
+	{ itemId: 649006, chance: 0.200 }, // Ithildin Ore
+	{ itemId: 649203, chance: 0.200 }, // Opal
+	{ itemId: 649216, chance: 0.200 }, // Sapphire
+	{ itemId: 649217, chance: 0.200 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+{ mapClassName: "d_underaqueduct", items: [
+	{ itemId: 649025, chance: 0.850 }, // Nucle Powder
+	{ itemId: 649026, chance: 0.350 }, // Sierra Powder
+	{ itemId: 649017, chance: 0.750 }, // Ominous Spirit Fragment
+	{ itemId: 649018, chance: 0.500 }, // Ominous Spirit Piece
+	{ itemId: 649019, chance: 0.250 }, // Ominous Spirit Mineral
+	{ itemId: 649004, chance: 0.300 }, // Mithril Ore
+	{ itemId: 649207, chance: 0.200 }, // Zircon
+	{ itemId: 649006, chance: 0.200 }, // Ithildin Ore
+	{ itemId: 649203, chance: 0.200 }, // Opal
+	{ itemId: 649216, chance: 0.200 }, // Sapphire
+	{ itemId: 649217, chance: 0.200 }, // Ruby
+	{ itemId: 645783, chance: 0.500 }  // blessed shard
+]},
+
+
+]

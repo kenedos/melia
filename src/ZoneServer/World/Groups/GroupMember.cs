@@ -32,8 +32,6 @@ namespace Melia.Zone.World.Groups
 		public JobId VisualJobId { get; set; }
 		public int JobLevel { get; set; }
 		public int ServerGroup { get; set; } = 1001;
-		public JobId ActiveJobId { get; set; }
-		public string JobCircles { get; set; }
 
 		public abstract Properties Properties { get; }
 		public short Channel { get; set; }
@@ -59,13 +57,11 @@ namespace Melia.Zone.World.Groups
 				Position = character.Position,
 				Stance = character.Stance,
 				IsOnline = character.Connection?.LoggedIn ?? false,
-				ActiveJobId = character.JobId,
-				JobCircles = character.Jobs.GetCircleString(),
+				VisualJobId = character.VisualJobId,
 			};
 			var i = 0;
 			foreach (var job in character.Jobs.GetList())
 			{
-				member.VisualJobId = job.Id;
 				switch (i)
 				{
 					case 0:
@@ -81,7 +77,7 @@ namespace Melia.Zone.World.Groups
 						member.FourthJobId = job.Id;
 						break;
 				}
-
+				i++;
 			}
 			return member;
 		}
@@ -107,13 +103,11 @@ namespace Melia.Zone.World.Groups
 				Position = character.Position,
 				Stance = character.Stance,
 				IsOnline = character.Connection?.LoggedIn ?? false,
-				ActiveJobId = character.JobId,
-				JobCircles = character.Jobs.GetCircleString(),
+				VisualJobId = character.VisualJobId,
 			};
 			var i = 0;
 			foreach (var job in character.Jobs.GetList())
 			{
-				member.VisualJobId = job.Id;
 				switch (i)
 				{
 					case 0:
@@ -129,7 +123,7 @@ namespace Melia.Zone.World.Groups
 						member.FourthJobId = job.Id;
 						break;
 				}
-
+				i++;
 			}
 			return member;
 		}
@@ -163,7 +157,5 @@ namespace Melia.Zone.World.Groups
 		public int JobLevel { get; set; }
 		public int ServerGroup { get; set; }
 		public short Channel { get; set; }
-		public JobId ActiveJobId { get; set; }
-		public string JobCircles { get; set; }
 	}
 }

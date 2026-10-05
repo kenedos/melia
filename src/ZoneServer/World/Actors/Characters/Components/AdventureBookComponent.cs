@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
+using Yggdrasil.Logging;
 
 namespace Melia.Zone.World.Actors.Characters.Components
 {
@@ -21,6 +22,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly SortedList<int, SortedList<int, int>> _monstersDrops = new();
 		private readonly SortedList<int, AdventureBookItemEntry> _items = new();
 		private readonly SortedList<int, int> _fishing = new();
+		private readonly SortedList<int, int> _jobs = new();
+		private readonly SortedList<int, int> _dungeons = new();
+		private readonly SortedList<int, int> _personalShops = new();
 		public AdventureBookComponent(Character character) : base(character)
 		{
 		}
@@ -32,6 +36,12 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					lock (_monstersKilled) return _monstersKilled;
 				case AdventureBookType.Fishing:
 					lock (_fishing) return _fishing;
+				case AdventureBookType.Job:
+					lock (_jobs) return _jobs;
+				case AdventureBookType.Dungeon:
+					lock (_dungeons) return _dungeons;
+				case AdventureBookType.PersonalShop:
+					lock (_personalShops) return _personalShops;
 				default:
 					return (SortedList<int, int>)Enumerable.Empty<SortedList<int, int>>();
 			}
@@ -48,6 +58,12 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					lock (_monstersKilled) return _monstersKilled.ToArray();
 				case AdventureBookType.Fishing:
 					lock (_fishing) return _fishing.ToArray();
+				case AdventureBookType.Job:
+					lock (_jobs) return _jobs.ToArray();
+				case AdventureBookType.Dungeon:
+					lock (_dungeons) return _dungeons.ToArray();
+				case AdventureBookType.PersonalShop:
+					lock (_personalShops) return _personalShops.ToArray();
 				default:
 					return Array.Empty<KeyValuePair<int, int>>();
 			}
@@ -110,6 +126,12 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					lock (_monstersKilled) return !_monstersKilled.ContainsKey(id);
 				case AdventureBookType.Fishing:
 					lock (_fishing) return !_fishing.ContainsKey(id);
+				case AdventureBookType.Job:
+					lock (_jobs) return !_jobs.ContainsKey(id);
+				case AdventureBookType.Dungeon:
+					lock (_dungeons) return !_dungeons.ContainsKey(id);
+				case AdventureBookType.PersonalShop:
+					lock (_personalShops) return !_personalShops.ContainsKey(id);
 				case AdventureBookType.ItemObtained:
 				case AdventureBookType.ItemCrafted:
 				case AdventureBookType.ItemUsed:
@@ -118,6 +140,62 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			return true;
 		}
+
+		public void AddJob(int id, int amount = 1, bool silently = false)
+		{
+			lock (_jobs)
+			{
+				if (!_jobs.ContainsKey(id))
+					_jobs.Add(id, amount);
+				else
+					_jobs[id] += amount;
+			}
+
+			if (!silently)
+				this.UpdateJobCountProperty();
+		}
+
+		public void AddDungeon(int id, int amount = 1, bool silently = false)
+		{
+			lock (_dungeons)
+			{
+				if (!_dungeons.ContainsKey(id))
+					_dungeons.Add(id, amount);
+				else
+					_dungeons[id] += amount;
+
+				if (!silently)
+					Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.Dungeon, _dungeons);
+			}
+		}
+
+		public void AddPersonalShop(int id, int amount, bool silently = false)
+		{
+			lock (_personalShops)
+			{
+				if (!_personalShops.ContainsKey(id))
+					_personalShops.Add(id, amount);
+				else
+					_personalShops[id] += amount;
+			}
+		}
+
+		public void UpdateJobCountProperty()
+		{
+			int count;
+			lock (_jobs)
+				count = _jobs.Count;
+			this.Character.SetAccountProperty("AdventureBookJobCount", count);
+		}
+
+		public void SynchronizeJobCountProperty()
+		{
+			int count;
+			lock (_jobs)
+				count = _jobs.Count;
+			this.Character.SetAccountProperty("AdventureBookJobCount", count);
+		}
+
 		public void AddMonsterKill(int id, int amount = 1, bool silently = false)
 		{
 			lock (_monstersKilled)
@@ -233,6 +311,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.MonsterDrop, _monstersDrops);
 			lock (_items)
 				Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.ItemObtained, _items);
+			lock (_dungeons)
+				Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.Dungeon, _dungeons);
 		}
 	}
 

@@ -1,18 +1,17 @@
-﻿// ===================================================================
+// ===================================================================
 // CharacterCombat.cs - Combat and health management
 // ===================================================================
 using System;
 using System.Collections.Generic;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
 using Melia.Zone.Buffs.Handlers;
 using Melia.Zone.Buffs.Handlers.Common;
 using Melia.Zone.Buffs.Handlers.Scout.Assassin;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
+using Melia.Zone.Packages.Laima.Skills.Wizards.Sage;
 using Melia.Zone.Scripting.AI;
-using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -31,7 +30,6 @@ namespace Melia.Zone.World.Actors.Characters
 		{
 			this.ModifyHp(this.MaxHp);
 			this.ModifySp(this.MaxSp);
-			this.ModifyStamina(this.MaxStamina);
 		}
 
 		/// <summary>
@@ -114,49 +112,13 @@ namespace Melia.Zone.World.Actors.Characters
 		#endregion
 
 		#region Combat Methods
-		private static readonly TimeSpan WarpChannelDuration = TimeSpan.FromSeconds(3);
-		private static readonly TimeSpan WarpInterruptHold = TimeSpan.FromSeconds(6);
-
-		private DateTime _warpChannelStart = DateTime.MinValue;
-		private bool _warpInterrupted;
-
-		/// <summary>
-		/// Marks the start of the client's warp animation.
-		/// </summary>
-		public void BeginWarpChannel()
-		{
-			_warpChannelStart = GameClock.Now;
-			_warpInterrupted = false;
-		}
-
-		/// <summary>
-		/// Cancels the client's warp animation if it is still running.
-		/// </summary>
-		private void InterruptWarpChannel()
-		{
-			if (_warpInterrupted || GameClock.Now - _warpChannelStart > WarpChannelDuration)
-				return;
-
-			_warpInterrupted = true;
-			Send.ZC_SKILL_DISABLE(this);
-			Send.ZC_SET_POS(this, this.Position);
-			Send.ZC_MOVE_STOP(this, this.Position);
-		}
-
-		/// <summary>
-		/// Returns true if the warp the client is sending was interrupted
-		/// by a hit.
-		/// </summary>
-		public bool WasWarpInterrupted()
-		{
-			return _warpInterrupted && GameClock.Now - _warpChannelStart < WarpInterruptHold;
-		}
-
 		/// <summary>
 		/// Makes character take damage and kills them if their HP reached 0.
 		/// </summary>
 		public virtual bool TakeDamage(float damage, ICombatEntity attacker)
 		{
+			var sageBlinkInputDamage = damage;
+
 			if (this.IsDead)
 				return true;
 
@@ -168,27 +130,28 @@ namespace Melia.Zone.World.Actors.Characters
 				BuffId.InfernalShadow_CasterNoDamage_Buff))
 				return false;
 
+			if (damage > 0 && this.Components.Get<StateLockComponent>()?.IsStateActive(StateType.SageRupture) == true)
+				damage *= 1.30f;
+
 			if (damage > 0 && this.IsBuffActive(BuffId.SitRest))
 				this.RemoveBuff(BuffId.SitRest);
 
 			if (damage > 0)
 			{
-				this.InterruptWarpChannel();
 				this.Components.Get<CombatComponent>().TryInterruptCasting(out _);
 				this.Components.Get<TimeActionComponent>().End(TimeActionResult.CancelledByHit);
 			}
 
 			this.Components.Get<CombatComponent>().SetAttackState(true);
-
-			// An Equipment Maintenance bonus on armor is spent by being hit.
-			if (damage > 0)
-				SquireSkillHelper.ConsumeMaintenance(this, true);
+			var sageBlinkHpBefore = this.Properties.GetFloat(PropertyName.HP);
 
 			this.ModifyHpSafe(-damage, out _, out _);
 
+			SageBlinkHelper.RecordDamage(attacker, this, sageBlinkInputDamage, Math.Max(0f, sageBlinkHpBefore - this.Properties.GetFloat(PropertyName.HP)));
+
 			this.Components.Get<CombatComponent>()?.RegisterHit(attacker, damage);
 
-			if (this.Hp < this.MaxHp / 2)
+			if (this is not DummyCharacter && this.Hp < this.MaxHp / 2)
 				this.ShowHelp("TUTO_RECOVERY");
 			if (this.Hp == 0)
 			{
@@ -213,9 +176,6 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public virtual void Kill(ICombatEntity killer)
 		{
-			// Must be read before the duel ends below, which clears the duel state.
-			var isWearExempt = EquipDurabilityHelper.IsWearExempt(this);
-
 			this.Properties.SetFloat(PropertyName.HP, 0);
 			this.Buffs.RemoveAll(b => b.Data.RemoveOnDeath);
 
@@ -251,17 +211,14 @@ namespace Melia.Zone.World.Actors.Characters
 				ZoneServer.Instance.World.BountyManager.ClaimBounty(killerCharacter, this);
 			}
 
-			this.ModifyHpSafe(0, out _, out var hpPriority);
-			Send.ZC_UPDATE_ALL_STATUS(this, hpPriority);
-
-			this.ScheduleDeathBroadcast();
+			Send.ZC_DEAD(this);
 
 			if (this.IsDueling)
 				ZoneServer.Instance.World.Duels.EndDuel(this.Connection.ActiveDuel, killer);
 			this.Tracks.Cancel();
 
 			// Durability damage on death
-			if (!isWearExempt)
+			if (!this.Map.IsGTW && !this.Map.IsCity)
 			{
 				foreach (var equip in this.Inventory.GetEquip().Values)
 				{
@@ -272,34 +229,6 @@ namespace Melia.Zone.World.Actors.Characters
 			}
 
 			_resurrectDialogTimer = ResurrectDialogDelay;
-		}
-
-		/// <summary>
-		/// Broadcasts the character's death packet right away, whether it was
-		/// due yet or not. Used to make sure a death is announced before the
-		/// character leaves the map or comes back to life.
-		/// </summary>
-		public void FlushDeathBroadcast()
-			=> this.FlushDeathBroadcast(true);
-
-		/// <summary>
-		/// Broadcasts the character's death packet, optionally only once it's
-		/// due, and returns whether it was sent.
-		/// </summary>
-		/// <param name="force"></param>
-		private bool FlushDeathBroadcast(bool force)
-		{
-			if (!this.TryClaimDeathBroadcast(force))
-				return false;
-
-			// A revival during the grace window leaves nothing to announce.
-			if (!this.IsDead)
-				return false;
-
-			Send.ZC_DEAD(this);
-			this.IsDeathAnnounced = true;
-
-			return true;
 		}
 
 		/// <summary>
@@ -315,9 +244,6 @@ namespace Melia.Zone.World.Actors.Characters
 					return;
 				}
 			}
-
-			// The client must see the death before the revival.
-			this.FlushDeathBroadcast();
 
 			this.IsResurrecting = true;
 
@@ -337,16 +263,8 @@ namespace Melia.Zone.World.Actors.Characters
 					var startHp = this.Properties.GetFloat(PropertyName.MHP) * 0.25f;
 					this.Heal(startHp, 0);
 
-					if (this.HasVisitedCity())
-					{
-						var location = this.GetCityReturnLocation();
-						this.Warp(location);
-					}
-					else
-					{
-						var barracks = ZoneServer.Instance.Conf.Barracks;
-						this.Warp(barracks.StartMap, barracks.StartPosition);
-					}
+					var location = this.GetCityReturnLocation();
+					this.Warp(location);
 					break;
 				}
 				case ResurrectOptions.TryAgain:
@@ -361,9 +279,6 @@ namespace Melia.Zone.World.Actors.Characters
 			Send.ZC_RESURRECT_SAVE_POINT_ACK(this);
 			Send.ZC_RESURRECT(this);
 			this.IsResurrecting = false;
-			this.IsDeathAnnounced = false;
-
-			ZoneServer.Instance.ServerEvents.PlayerResurrected.Raise(new PlayerEventArgs(this));
 
 			if (_companionsToReactivate != null)
 			{

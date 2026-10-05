@@ -32,7 +32,7 @@ namespace Melia.Zone.World.Actors.Monsters
 				this.Map = this.Owner.Map;
 				this.OwnerHandle = this.Owner.Handle;
 				this.AssociatedHandle = this.Owner.Handle;
-				this.Position = this.Owner.Position.GetRandomInRange2D(15, GameRandom.Get());
+				this.Position = this.Owner.Position.GetRandomInRange2D(15, RandomProvider.Get());
 				if (canMove)
 					this.Components.Add(new MovementComponent(this));
 				if (hasAi)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -483,9 +483,6 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			private NavMeshCell[] _cells;
 			private List<NavMeshPortal>[] _portalsByCell;
 
-			[ThreadStatic]
-			private static List<int> CandidateBuffer;
-
 			/// <summary>
 			/// Creates new instance.
 			/// </summary>
@@ -503,30 +500,26 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			/// </summary>
 			public bool TryGetCellIndex(Position pos, out int cellIndex)
 			{
-				cellIndex = -1;
-
 				if (_cells == null)
+				{
+					cellIndex = -1;
 					return false;
+				}
 
-				var candidates = CandidateBuffer ??= new List<int>();
-				_ground.GetCellCandidates(pos, candidates);
-
+				cellIndex = -1;
 				var closestHeightDelta = float.MaxValue;
 
-				foreach (var candidateIndex in candidates)
+				for (var i = 0; i < _cells.Length; ++i)
 				{
-					if (candidateIndex >= _cells.Length)
-						continue;
-
-					if (!Contains2D(_cells[candidateIndex], pos))
-						continue;
-
-					var heightDelta = Math.Abs(_cells[candidateIndex].Center.Y - pos.Y);
-
-					if (heightDelta < closestHeightDelta)
+					if (Contains2D(_cells[i], pos))
 					{
-						closestHeightDelta = heightDelta;
-						cellIndex = candidateIndex;
+						var heightDelta = Math.Abs(_cells[i].Center.Y - pos.Y);
+
+						if (heightDelta < closestHeightDelta)
+						{
+							closestHeightDelta = heightDelta;
+							cellIndex = i;
+						}
 					}
 				}
 
@@ -588,9 +581,6 @@ namespace Melia.Zone.World.Maps.Pathfinding
 				for (var i = 0; i < _data.Cells.Length; ++i)
 				{
 					var cell = _data.Cells[i];
-					if (cell?.Indices == null || cell.Indices.Length == 0)
-						continue;
-
 					var vertices = new Position[cell.Indices.Length];
 					var center = new Position();
 
@@ -690,9 +680,6 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			/// <returns></returns>
 			private static bool Contains2D(NavMeshCell cell, Position point)
 			{
-				if (cell.Vertices == null)
-					return false;
-
 				var isInside = false;
 
 				for (int i = 0, j = cell.Vertices.Length - 1; i < cell.Vertices.Length; j = i++)

@@ -11,9 +11,7 @@ using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
-using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
-using Yggdrasil.Geometry.Shapes;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -59,13 +57,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("F_sys_target_boss##0.5", 2f),
 			};
 
-			if (!caster.Position.InRange2D(target.Position, 300))
-				return;
-
-			var falls = new List<Task>();
-			foreach (var position in GetScatteredPositions(GetLeadPosition(target, 1100, caster), 6, 90, 45))
-				falls.Add(MissileFall(caster, skill, originPos.GetNearestPositionWithinDistance(position, 200f), config));
-			await Task.WhenAll(falls);
+			for (var i = 0; i < 6; i++)
+			{
+				var position = originPos.GetNearestPositionWithinDistance(target.Position, 200f);
+				await MissileFall(caster, skill, position, config);
+			}
 		}
 	}
 
@@ -86,7 +82,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), Position.Zero);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
@@ -96,12 +92,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashArea = new CircleF(originPos.GetRelative(farPos, distance: 47f, angle: 4f), 30f);
-			var hitDelay = 1700;
-			var aniTime = 1900;
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 30, angle: 90);
+			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
+			var hitDelay = 1300;
+			var aniTime = 1300;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}
 
@@ -122,7 +119,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -130,10 +126,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			_ = MonsterSkillFollowMovePath(caster, skill, (1500, 0f, 90f), (2700, 307f, 0f));
-
 			var startingPosition = originPos;
-			var endingPosition = caster.Map.Ground.GetLastValidPosition(originPos, originPos.GetRelative(farPos, distance: 200f));
+			var endingPosition = caster.Map.Ground.GetLastValidPosition(originPos, originPos.GetRelative(farPos, distance: 30));
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
 				ArrowEffect = new EffectConfig("F_sys_arrow_monster", 1f),
@@ -150,6 +144,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitCount = 1,
 				HitDuration = 40f,
 			});
+
+			caster.Position = endingPosition;
+			Send.ZC_SET_POS(caster, endingPosition);
 		}
 	}
 

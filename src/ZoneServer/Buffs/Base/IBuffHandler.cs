@@ -1,5 +1,4 @@
 ﻿using System;
-using Melia.Shared.Game.Const;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -11,6 +10,14 @@ namespace Melia.Zone.Buffs.Base
 	/// </summary>
 	public interface IBuffHandler
 	{
+		/// <summary>
+		/// Callback for when the buff is started or overbuffed. Not called
+		/// once the max overbuff count is reached.
+		/// </summary>
+		/// <param name="buff"></param>
+		[Obsolete("Use OnActivate instead.")]
+		void OnStart(Buff buff);
+
 		/// <summary>
 		/// Callback for when the buff is activated, either by starting or
 		/// overbuffing it. Not called once the max overbuff count is reached.
@@ -111,28 +118,11 @@ namespace Melia.Zone.Buffs.Base
 	public interface IBuffOnCastStartHandler { void OnCastStart(Buff buff, ICombatEntity caster, Skill skill); }
 
 	/// <summary>
-	/// Called when the entity starts using a skill, before any of its hits
-	/// are dealt.
-	/// </summary>
-	public interface IBuffOnSkillUseHandler { void OnSkillUse(Buff buff, ICombatEntity caster, Skill skill); }
-
-	/// <summary>
 	/// Called on the target after a SkillHitInfo is created, allowing
 	/// modification of the HitInfo (e.g., changing HitType to Endure
 	/// for stagger immunity).
 	/// </summary>
 	public interface IBuffOnHitInfoCreatedHandler { void OnHitInfoCreated(Buff buff, SkillHitInfo skillHitInfo); }
-
-	/// <summary>
-	/// Called on the buff that made its target resist an incoming debuff.
-	/// </summary>
-	public interface IBuffOnDebuffResistedHandler { void OnDebuffResisted(Buff buff, BuffId buffId, IActor caster); }
-
-	/// <summary>
-	/// Called on the target's other active buffs when a debuff is newly
-	/// applied to it.
-	/// </summary>
-	public interface IBuffOnDebuffAppliedHandler { void OnDebuffApplied(Buff buff, Buff debuff); }
 
 	/// <summary>
 	/// Called on the target before a knockback is applied.
@@ -145,4 +135,13 @@ namespace Melia.Zone.Buffs.Base
 	/// Return KnockResult.Prevent to block the knockdown.
 	/// </summary>
 	public interface IBuffBeforeKnockdownHandler { KnockResult OnBeforeKnockdown(Buff buff, ICombatEntity attacker, ICombatEntity target); }
+
+	/// <summary>
+	/// Handles hit information created by an entity that has this buff.
+	/// This hook is intended for offensive effects that modify outgoing damage.
+	/// </summary>
+	public interface IBuffOnAttackHitInfoCreatedHandler
+	{
+		void OnAttackHitInfoCreated(Buff buff, SkillHitInfo skillHitInfo);
+	}
 }

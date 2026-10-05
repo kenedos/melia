@@ -16,7 +16,9 @@ using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Dungeons;
 using Melia.Zone.World.Dungeons.Stages;
+using Melia.Zone.World.Quests.Daily;
 using Melia.Zone.World.Quests.Objectives;
+using Melia.Zone.World.Quests.Weekly;
 using Yggdrasil.Logging;
 using static Melia.Shared.Util.TaskHelper;
 
@@ -443,10 +445,18 @@ namespace Melia.Zone.Scripting
 			if (character?.Map == null)
 				return;
 
-			if (!ZoneServer.Instance.Data.InstanceDungeonDb.TryGetByMapClassName(character.Map.ClassName, out var dungeonData))
-			{
+			var dungeonIdVar = character.Variables.Perm.GetInt(AutoMatchZoneManager.DungeonIdVarName);
+
+			InstanceDungeonData dungeonData = null;
+
+			if (dungeonIdVar > 0)
+				ZoneServer.Instance.Data.InstanceDungeonDb.TryFind(dungeonIdVar, out dungeonData);
+
+			if (dungeonData == null)
+				ZoneServer.Instance.Data.InstanceDungeonDb.TryGetByMapClassName(character.Map.ClassName, out dungeonData);
+
+			if (dungeonData == null)
 				return;
-			}
 
 			if (dungeonData.Map == null)
 			{
@@ -485,7 +495,6 @@ namespace Melia.Zone.Scripting
 
 			// If the character is on the dungeon map but has no instance mapping
 			// and no dungeon ID, they're reconnecting after completion — warp out
-			var dungeonIdVar = character.Variables.Perm.GetInt(AutoMatchZoneManager.DungeonIdVarName);
 			if (dungeonIdVar == 0 && character.Map.ClassName == this.MapName)
 			{
 				Log.Info("DungeonScript: Character '{0}' reconnected on dungeon map with no active instance. Warping out.", character.Name);
@@ -646,9 +655,9 @@ namespace Melia.Zone.Scripting
 		/// </summary>
 		private async Task JoinInstance(Character character, InstanceDungeon instance)
 		{
-			while (character.IsWarping && character.Map != null) await Task.Delay(50);
+			while (character.IsWarping && character.Map != null)
+				await Task.Delay(50);
 
-			// Don't join destroyed instances
 			if (instance.State == InstanceState.Destroyed)
 			{
 				_instancesByCharacter.TryRemove(character.DbId, out _);
@@ -659,14 +668,17 @@ namespace Melia.Zone.Scripting
 				return;
 			}
 
-			// If dungeon hasn't started yet (pre-created instance), start it
+			if (character.Map == null || character.Map.Id != instance.MapId || !character.IsOnline)
+				return;
+
+			instance.RegisterCharacterEntry(character);
+
 			if (!instance.IsStarted)
 			{
 				await this.StartPreCreatedInstance(character, instance);
 				return;
 			}
 
-			// Dungeon already running - this is a rejoin
 			await this.RejoinInstance(character, instance);
 		}
 
@@ -702,8 +714,25 @@ namespace Melia.Zone.Scripting
 					await Task.Delay(50);
 			}
 
+			Log.Info(
+	"[DungeonEntryDebug] BEFORE StartDungeon: Character='{0}', Instance='{1}', DungeonId={2}, IsStarted={3}.",
+	character.Name,
+	instance.Id,
+	instance.DungeonId,
+	instance.IsStarted
+);
+
 			// Start the dungeon (only the first caller will actually start it due to IsStarted check)
 			await instance.StartDungeon(this);
+
+
+			Log.Info(
+				"[DungeonEntryDebug] AFTER StartDungeon: Character='{0}', Instance='{1}', DungeonId={2}, IsStarted={3}.",
+				character.Name,
+				instance.Id,
+				instance.DungeonId,
+				instance.IsStarted
+			);
 
 			// Set up this character for the dungeon
 			character.SetPosition(instance.StartPosition);
@@ -1209,10 +1238,58 @@ namespace Melia.Zone.Scripting
 			var characters = instance.Characters.ToList();
 
 			this.OnDungeonComplete(instance);
-
 			foreach (var character in characters)
 			{
 				if (character == null) continue;
+
+				DailyDungeonObjective.ReportCompletion(character);
+				WeeklyDungeonObjective.ReportCompletion(character);
+
+				Log.Debug(
+					"[ADVENTURE DUNGEON DEBUG] Character={0}, DungeonId={1}, DungeonType={2}, DungeonClass={3}",
+					character.Name,
+					instance.DungeonId,
+					instance.InstanceDungeonData.DungeonType,
+					instance.InstanceDungeonData.ClassName
+				);
+
+				var dungeonSnapshotBefore = character.AdventureBook.GetListSnapshot(AdventureBookType.Dungeon);
+
+				Log.Debug(
+					"[ADVENTURE DUNGEON DEBUG] BEFORE AddDungeon Character={0}, Entries={1}",
+					character.Name,
+					dungeonSnapshotBefore.Length
+				);
+
+				var isAdventureBookDungeon =
+	instance.InstanceDungeonData.DungeonType == InstanceDungeonType.Indun ||
+	instance.InstanceDungeonData.ClearDungeonItem != null;
+
+				if (isAdventureBookDungeon)
+				{
+					character.AdventureBook.AddDungeon(instance.DungeonId);
+
+					var dungeonSnapshotAfter = character.AdventureBook.GetListSnapshot(AdventureBookType.Dungeon);
+
+					Log.Debug(
+						"[ADVENTURE DUNGEON DEBUG] AFTER AddDungeon Character={0}, DungeonId={1}, Entries={2}, DungeonType={3}, ClearDungeonItem={4}",
+						character.Name,
+						instance.DungeonId,
+						dungeonSnapshotAfter.Length,
+						instance.InstanceDungeonData.DungeonType,
+						instance.InstanceDungeonData.ClearDungeonItem?.ClassName ?? "None"
+					);
+				}
+				else
+				{
+					Log.Debug(
+						"[ADVENTURE DUNGEON DEBUG] SKIPPED AddDungeon Character={0}, DungeonId={1}, DungeonType={2}, ClearDungeonItem={3}",
+						character.Name,
+						instance.DungeonId,
+						instance.InstanceDungeonData.DungeonType,
+						instance.InstanceDungeonData.ClearDungeonItem?.ClassName ?? "None"
+					);
+				}
 
 				// Null-safe connection access
 				if (character.Connection != null)

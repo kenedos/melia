@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -21,11 +20,11 @@ using Melia.Zone.Buffs.Handlers.Scouts.Assassin;
 using Melia.Zone.Database;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
+using Melia.Zone.Packages.Laima.Skills.Wizards.Sage;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.AI;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Skills;
-using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -38,14 +37,13 @@ using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
 using static Melia.Shared.Util.TaskHelper;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.Characters
 {
 	/// <summary>
 	/// Represents a player character.
 	/// </summary>
-	public partial class Character : Actor, ICombatEntity, ICommander, IPropertyObject, IUpdateable, IEffectTarget
+	public partial class Character : Actor, ICombatEntity, ICommander, IPropertyObject, IUpdateable
 	{
 		#region Private Fields
 		private const int MaxMonsterAppearPerTick = 8;
@@ -54,7 +52,6 @@ namespace Melia.Zone.World.Actors.Characters
 		private int _destinationChannelId;
 		private readonly object _warpLock = new();
 		private readonly object _lookAroundLock = new();
-		private readonly object _lookAroundScanLock = new();
 		private readonly object _hpLock = new();
 		private readonly HashSet<IMonster> _visibleMonsters = new();
 		private readonly HashSet<Character> _visibleCharacters = new();
@@ -98,7 +95,7 @@ namespace Melia.Zone.World.Actors.Characters
 		/// <summary>
 		/// Returns when the character was last saved.
 		/// </summary>
-		public DateTime LastSaved { get; set; } = GameClock.Now;
+		public DateTime LastSaved { get; set; } = DateTime.UtcNow;
 
 		/// <summary>
 		/// Returns whether the character is travelling between maps.
@@ -304,11 +301,6 @@ namespace Melia.Zone.World.Actors.Characters
 		public PermissionLevel PermissionLevel => this.Connection?.Account?.PermissionLevel ?? PermissionLevel.User;
 
 		/// <summary>
-		/// Returns a list of effects that are attached to the actor.
-		/// </summary>
-		public ConcurrentBag<AttachableEffect> AttachableEffects { get; } = new();
-
-		/// <summary>
 		/// Returns the character's party id.
 		/// </summary>
 		public long PartyId { get; set; }
@@ -325,6 +317,12 @@ namespace Melia.Zone.World.Actors.Characters
 		#endregion
 
 		#region Components & Managers
+		/// <summary>
+		/// Maps the property shop name received from the client to the
+		/// actual server-side property shop opened for this character.
+		/// </summary>
+		public Dictionary<string, string> PropertyShopAliases { get; } = new Dictionary<string, string>();
+
 		/// <summary>
 		/// Returns a reference to the character's job list.
 		/// </summary>
@@ -451,11 +449,6 @@ namespace Melia.Zone.World.Actors.Characters
 		public PersonalStorage PersonalStorage { get; }
 
 		/// <summary>
-		/// Returns the character's Pardoner offering box.
-		/// </summary>
-		public OblationStorage OblationBox { get; }
-
-		/// <summary>
 		/// Returns the character's team storage.
 		/// </summary>
 		public TeamStorage TeamStorage => this.Connection.Account.TeamStorage;
@@ -549,7 +542,6 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Properties = new CharacterProperties(this);
 			this.Etc = new PCEtc(this);
 			this.PersonalStorage = new PersonalStorage(this);
-			this.OblationBox = new OblationStorage(this);
 			this.AddSessionObjects();
 		}
 
@@ -623,15 +615,10 @@ namespace Melia.Zone.World.Actors.Characters
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
-			if (this.IsDeathBroadcastPending)
-				this.FlushDeathBroadcast(false);
-
 			this.Components.Update(elapsed);
+			SageBlinkHelper.Update(this);
 			this.UpdateResurrection(elapsed);
-			PardonerSkillHelper.UpdateFullBoxTimer(this);
-			ShopBuilder.UpdateShopDistance(this);
 			this.Properties.FlushCompanionPropertyUpdates();
-			this.FlushDueStackPickups();
 		}
 
 		/// <summary>
@@ -728,54 +715,227 @@ namespace Melia.Zone.World.Actors.Characters
 		/// spawns it on the current map at a given position.
 		/// </summary>
 		/// <param name="position"></param>
-		public Character Clone(Position position)
+		public Character Clone(Position position, bool isSageBlink = false)
 		{
 			var dummyCharacter = new DummyCharacter();
 
 			dummyCharacter.Owner = this;
+			dummyCharacter.Variables.Temp.SetBool("Sage.Blink.Clone", isSageBlink);
+			dummyCharacter.Variables.Temp.SetBool("Melia.Clone.InheritOwnerProperties", true);
 			dummyCharacter.Name = this.Name;
 			dummyCharacter.TeamName = this.TeamName;
 			dummyCharacter.JobId = this.JobId;
+			dummyCharacter.VisualJobId = this.VisualJobId;
 			dummyCharacter.Gender = this.Gender;
 			dummyCharacter.Hair = this.Hair;
 			dummyCharacter.SkinColor = this.SkinColor;
 			dummyCharacter.MapId = this.MapId;
+			dummyCharacter.SetFaction(this.Faction);
 
 			dummyCharacter.Position = position;
 			dummyCharacter.Direction = this.Direction;
 			dummyCharacter.VisibleEquip = this.VisibleEquip;
 
-			foreach (var item in this.Inventory.GetEquip())
-			{
-				var newItem = new Item(item.Value.Id, item.Value.Amount);
-				dummyCharacter.Inventory.SetEquipSilent(item.Key, newItem);
-			}
-
-			foreach (var job in this.Jobs.GetList())
-			{
-				dummyCharacter.Jobs.AddSilent(new Job(dummyCharacter, job.Id));
-			}
-
-			foreach (var skill in this.Skills.GetList())
-			{
-				var newSkill = new Skill(dummyCharacter, skill.Id, skill.Level);
-				dummyCharacter.Skills.AddSilent(newSkill);
-			}
+			this.CopyJobsToClone(dummyCharacter);
+			this.CopySkillsToClone(dummyCharacter);
+			this.CopyEquipmentToClone(dummyCharacter);
+			this.CopyCardsToClone(dummyCharacter);
+			this.CopyBaseStatsToClone(dummyCharacter);
 
 			dummyCharacter.InitProperties();
-			dummyCharacter.Properties.Stamina = (int)this.Properties.GetFloat(PropertyName.MaxSta);
+
+			dummyCharacter.Exp = this.Exp;
+			dummyCharacter.TotalExp = this.TotalExp;
+			dummyCharacter.MaxExp = this.MaxExp;
+
+			if (!isSageBlink)
+				this.CopyAbilitiesToClone(dummyCharacter);
+
+			if (!isSageBlink)
+				dummyCharacter.Inventory.ProcessCardScripts();
+
+			dummyCharacter.Properties.InvalidateAll();
+			dummyCharacter.Properties.Stamina = (int)dummyCharacter.Properties.GetFloat(PropertyName.MaxSta);
 			dummyCharacter.UpdateStance();
-			dummyCharacter.ModifyHpSafe(this.MaxHp, out var hp, out var priority);
+
+			var maximumHp = dummyCharacter.Properties.GetFloat(PropertyName.MHP);
+			var currentHp = dummyCharacter.Properties.GetFloat(PropertyName.HP);
+			var missingHp = maximumHp - currentHp;
+
+			if (missingHp > 0)
+				dummyCharacter.ModifyHpSafe(missingHp, out _, out _);
 
 			this.Map.AddCharacter(dummyCharacter);
 
 			Send.ZC_ENTER_PC(this.Connection, dummyCharacter);
 			Send.ZC_OWNER(this, dummyCharacter);
 			Send.ZC_UPDATED_PCAPPEARANCE(dummyCharacter);
-
 			Send.ZC_NORMAL.HeadgearVisibilityUpdate(dummyCharacter);
 
+			if (!isSageBlink)
+				this.CopyBuffsToClone(dummyCharacter);
+
+			dummyCharacter.Properties.InvalidateAll();
+
 			return dummyCharacter;
+		}
+
+		private void CopyJobsToClone(DummyCharacter clone)
+		{
+			foreach (var job in this.Jobs.GetList())
+			{
+				var clonedJob = new Job(
+					clone,
+					job.Id,
+					job.TotalExp,
+					job.Circle,
+					job.SkillPoints)
+				{
+					SelectionDate = job.SelectionDate,
+					AdvancementDate = job.AdvancementDate
+				};
+
+				clone.Jobs.AddSilent(clonedJob);
+			}
+		}
+
+		private void CopySkillsToClone(DummyCharacter clone)
+		{
+			foreach (var skill in this.Skills.GetList())
+			{
+				var clonedSkill = new Skill(
+					clone,
+					skill.Id,
+					skill.Level);
+
+				clone.Skills.AddSilent(clonedSkill);
+			}
+		}
+
+		private void CopyEquipmentToClone(DummyCharacter clone)
+		{
+			foreach (var equippedItem in this.Inventory.GetEquip())
+			{
+				if (equippedItem.Value is DummyEquipItem)
+					continue;
+
+				var clonedItem = new Item(equippedItem.Value);
+
+				clone.Inventory.SetEquipSilent(
+					equippedItem.Key,
+					clonedItem);
+			}
+		}
+
+		private void CopyCardsToClone(DummyCharacter clone)
+		{
+			foreach (var equippedCard in this.Inventory.GetCards())
+			{
+				var clonedCard = new Item(equippedCard.Value);
+
+				clone.Inventory.AddSilentCard(
+					equippedCard.Key,
+					clonedCard);
+			}
+		}
+
+		private void CopyBaseStatsToClone(DummyCharacter clone)
+		{
+			var propertyNames = new[]
+			{
+		PropertyName.Lv,
+		PropertyName.StatByLevel,
+		PropertyName.StatByBonus,
+		PropertyName.UsedStat,
+		PropertyName.STR_STAT,
+		PropertyName.CON_STAT,
+		PropertyName.INT_STAT,
+		PropertyName.MNA_STAT,
+		PropertyName.DEX_STAT
+	};
+
+			foreach (var propertyName in propertyNames)
+			{
+				if (!this.Properties.TryGetFloat(propertyName, out var value))
+					continue;
+
+				clone.Properties.SetFloat(propertyName, value);
+			}
+		}
+
+		private void CopyAbilitiesToClone(DummyCharacter clone)
+		{
+			foreach (var ability in this.Abilities.GetList())
+			{
+				var clonedAbility = new Ability(
+					ability.Id,
+					ability.Level)
+				{
+					Active = ability.Active
+				};
+
+				foreach (var variable in ability.Vars.GetList())
+					clonedAbility.Vars.Set(variable.Key, variable.Value);
+
+				clone.Abilities.AddSilent(clonedAbility);
+			}
+		}
+
+		private void CopyBuffsToClone(DummyCharacter clone)
+		{
+			var activeBuffs = this.Buffs
+				.GetList()
+				.Where(buff =>
+					buff != null &&
+					buff.Data.Type == BuffType.Buff &&
+					buff.Id != BuffId.Bunshin_Buff)
+				.ToList();
+
+			foreach (var sourceBuff in activeBuffs)
+			{
+				var duration = sourceBuff.HasDuration
+					? sourceBuff.RemainingDuration
+					: TimeSpan.Zero;
+
+				if (sourceBuff.HasDuration && duration <= TimeSpan.Zero)
+					continue;
+
+				var buffCaster = sourceBuff.Caster == this
+					? clone
+					: sourceBuff.Caster;
+
+				var stackCount = Math.Max(
+					1,
+					sourceBuff.OverbuffCounter);
+
+				for (var stack = 0; stack < stackCount; stack++)
+				{
+					clone.Buffs.Start(
+						sourceBuff.Id,
+						sourceBuff.NumArg1,
+						sourceBuff.NumArg2,
+						duration,
+						buffCaster,
+						sourceBuff.SkillId,
+						clonedBuff =>
+						{
+							clonedBuff.NumArg3 = sourceBuff.NumArg3;
+							clonedBuff.NumArg4 = sourceBuff.NumArg4;
+							clonedBuff.NumArg5 = sourceBuff.NumArg5;
+							clonedBuff.Source = sourceBuff.Source;
+
+							foreach (var variable in sourceBuff.Vars.GetList())
+							{
+								if (variable.Key.StartsWith("Melia.Modifier."))
+									continue;
+
+								clonedBuff.Vars.Set(
+									variable.Key,
+									variable.Value);
+							}
+						});
+				}
+			}
 		}
 
 		private static readonly BuffId[] OobeBuffIds = new[]

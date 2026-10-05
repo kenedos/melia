@@ -1,10 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
-using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -16,7 +15,7 @@ namespace Melia.Zone.Buffs.Handlers
 	/// shared damage.
 	/// </summary>
 	[BuffHandler(BuffId.Link)]
-	public class Link : BuffHandler
+	public class Link : BuffHandler, IBuffCombatDefenseAfterCalcHandler
 	{
 		/// <summary>
 		/// Applies link to the specified targets.
@@ -83,17 +82,14 @@ namespace Melia.Zone.Buffs.Handlers
 		/// <summary>
 		/// Applies the buff's effect during the combat calculations.
 		/// </summary>
+		/// <param name="buff"></param>
 		/// <param name="attacker"></param>
 		/// <param name="target"></param>
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Link)]
-		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
-			if (!target.TryGetBuff(BuffId.Link, out var buff))
-				return;
-
 			if (!buff.Vars.TryGet<List<int>>("Melia.Link.Members", out var memberHandles))
 				return;
 

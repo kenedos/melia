@@ -12,6 +12,8 @@
 		Unknown3 = 7,
 		Achievement = 8,
 		Job = 9,
+		Dungeon = 10,
+		PersonalShop = 11,
 	}
 
 	/// <summary>

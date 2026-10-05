@@ -66,7 +66,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 150, 30, 0, 3, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 150, 30, 0, 3, 5, hits);
 		}
 	}
 
@@ -147,7 +147,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitCount = 1,
 				GroundEffect = new EffectConfig("None", 0.5f),
 			});
-			await skill.Wait(TimeSpan.FromMilliseconds(400));
 			_ = MissileThrow(skill, caster, positions[3], new MissileConfig
 			{
 				Effect = new EffectConfig("I_maggotegg_atk_mash#B_chimney R2 02", 0.25f),
@@ -188,12 +187,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("None", 0.5f),
 			});
 
-			await skill.Wait(TimeSpan.FromMilliseconds(2200));
-			for (var i = 0; i < 3; i++)
-				MonsterSkillCreateMob(skill, caster, "maggot", positions[i], 0f, "", "BasicMonster_ATK", 0, 40f, "None", "");
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 
-			await skill.Wait(TimeSpan.FromMilliseconds(300));
-			for (var i = 3; i < 6; i++)
+			for (var i = 0; i < 6; i++)
 				MonsterSkillCreateMob(skill, caster, "maggot", positions[i], 0f, "", "BasicMonster_ATK", 0, 40f, "None", "");
 		}
 	}
@@ -229,41 +225,81 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 
 			var bones = new[] { "L1", "R2", "L3", "R1", "L2", "R3" };
-			var throws = new List<Task>();
-			for (var wave = 0; wave < 2; wave++)
-			{
-				if (wave > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(500));
-				if (!caster.Position.InRange2D(target.Position, 300))
-					break;
 
-				var positions = GetScatteredPositions(GetLeadPosition(target, 1000, caster), 6, 110, 40);
-				for (var i = 0; i < positions.Count; i++)
-					throws.Add(this.Throw(caster, skill, originPos.GetNearestPositionWithinDistance(positions[i], 250f), bones[i]));
+			for (var i = 0; i < 5; i++)
+			{
+				var hits = new List<SkillHitInfo>();
+				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 2);
+				await MissileThrow(skill, caster, position, new MissileConfig
+				{
+					Effect = new EffectConfig($"I_force045_green#B_chimney {bones[i]} 02", 1f),
+					EndEffect = new EffectConfig("F_ground004_yellow", 0.7f),
+					Range = 20f,
+					FlyTime = 1f,
+					DelayTime = 0f,
+					Gravity = 500f,
+					Speed = 1f,
+					HitTime = 1000f,
+					HitCount = 1,
+					GroundEffect = new EffectConfig("None", 0.8f),
+					GroundDelay = 0,
+					EffectMoveDelay = 0,
+					InnerRange = 0,
+				}, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 10000f, 1, 25, -1, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 20000f, 1, 25, -1, hits);
 			}
-			await Task.WhenAll(throws);
-		}
 
-		private async Task Throw(ICombatEntity caster, Skill skill, Position position, string bone)
-		{
-			var hits = new List<SkillHitInfo>();
-			await MissileThrow(skill, caster, position, new MissileConfig
+			await skill.Wait(TimeSpan.FromMilliseconds(100));
+
 			{
-				Effect = new EffectConfig($"I_force045_green#B_chimney {bone} 02", 1f),
-				EndEffect = new EffectConfig("F_ground004_yellow", 0.7f),
-				Range = 20f,
-				FlyTime = 1f,
-				DelayTime = 0f,
-				Gravity = 500f,
-				Speed = 1f,
-				HitTime = 1000f,
-				HitCount = 1,
-				GroundEffect = new EffectConfig("None", 0.8f),
-				GroundDelay = 0,
-				EffectMoveDelay = 0,
-			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 10000f, 1, 25, -1, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 20000f, 1, 25, -1, hits);
+				var hits = new List<SkillHitInfo>();
+				var pos = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 2);
+				await MissileThrow(skill, caster, pos, new MissileConfig
+				{
+					Effect = new EffectConfig($"I_force045_green#B_chimney {bones[5]} 02", 1f),
+					EndEffect = new EffectConfig("F_ground004_yellow", 0.7f),
+					Range = 20f,
+					FlyTime = 1f,
+					DelayTime = 0f,
+					Gravity = 500f,
+					Speed = 1f,
+					HitTime = 1000f,
+					HitCount = 1,
+					GroundEffect = new EffectConfig("None", 0.8f),
+					GroundDelay = 0,
+					EffectMoveDelay = 0,
+					InnerRange = 0,
+				}, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 10000f, 1, 25, -1, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 20000f, 1, 25, -1, hits);
+			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(400));
+
+			for (var i = 0; i < 6; i++)
+			{
+				var hits = new List<SkillHitInfo>();
+				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 2);
+				await MissileThrow(skill, caster, position, new MissileConfig
+				{
+					Effect = new EffectConfig($"I_force045_green#B_chimney {bones[i]} 02", 1f),
+					EndEffect = new EffectConfig("F_ground004_yellow", 0.7f),
+					Range = 20f,
+					FlyTime = 1f,
+					DelayTime = 0f,
+					Gravity = 500f,
+					Speed = 1f,
+					HitTime = 1000f,
+					HitCount = 1,
+					GroundEffect = new EffectConfig("None", 0.8f),
+					GroundDelay = 0,
+					EffectMoveDelay = 0,
+					InnerRange = 0,
+				}, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 10000f, 1, 25, -1, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 20000f, 1, 25, -1, hits);
+			}
 		}
 	}
 
@@ -335,7 +371,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 80, 10, 0, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 80, 10, 0, 1, 5, hits);
 		}
 	}
 }

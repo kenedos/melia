@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +26,6 @@ using Yggdrasil.Geometry;
 using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Maps
 {
@@ -53,8 +51,6 @@ namespace Melia.Zone.World.Maps
 		public const int VisibleRange = 500;
 		private const int MaxMonsterAddsPerTick = 5;
 		private static readonly TimeSpan EntityUpdateGracePeriod = TimeSpan.FromMinutes(5);
-		private static readonly TimeSpan WakeUpGracePeriod = TimeSpan.FromSeconds(30);
-		private static readonly TimeSpan ItemMergeDelay = TimeSpan.FromSeconds(30);
 		#endregion
 
 		#region Collections
@@ -68,15 +64,9 @@ namespace Melia.Zone.World.Maps
 		protected readonly object _obstaclesLock = new();
 
 		private readonly ConcurrentQueue<IMonster> _addMonsters = new();
-		private readonly ConcurrentQueue<(ItemMonster Item, DateTime DueTime)> _pendingItemMerges = new();
 		private int _characterCount;
 		private DateTime _lastPlayerLeftTime = DateTime.MinValue;
-		private DateTime _createdTime = GameClock.LocalNow;
-
-		// Guards the dormancy state transitions against the character
-		// add/remove paths, which run on the network threads while the
-		// dormancy check runs on the heartbeat.
-		private readonly object _dormancyLock = new();
+		private DateTime _createdTime = DateTime.Now;
 		protected readonly Dictionary<int, PropertyOverrides> _monsterPropertyOverrides = new();
 		protected readonly List<SpawnBuffEntry> _spawnBuffs = new();
 
@@ -98,12 +88,6 @@ namespace Melia.Zone.World.Maps
 
 		[ThreadStatic]
 		private static HashSet<IZoneConnection> _broadcastSentConnections;
-
-		[ThreadStatic]
-		private static List<ICombatEntity> _broadcastViewerBuffer;
-
-		[ThreadStatic]
-		private static HashSet<IZoneConnection> _broadcastViewerConnections;
 
 		#endregion
 
@@ -135,8 +119,6 @@ namespace Melia.Zone.World.Maps
 		public bool IsCity { get; set; }
 		public bool IsTOSHeroZone => this.Data?.Tags.Has(SkillTag.ExpertSkill) ?? false;
 		public bool IsInstance => this.Data?.Type == MapType.Instance;
-		public bool IsDungeon => this.Data?.Type == MapType.Dungeon;
-		public bool IsField => this.Data?.Type == MapType.Field;
 		public bool TeleportDisabled { get; internal set; }
 		public bool IsDormant { get; private set; }
 
@@ -206,10 +188,24 @@ namespace Melia.Zone.World.Maps
 				return;
 			}
 
-			if (this.IsDormancyEligible() && TryAcquireDormancySlot())
+			if (!this.HasCharacters && !this.IsCity && !this.IsInstance)
 			{
-				if (this.EnterDormancy())
+				var eligible = false;
+
+				// Player left recently — enter dormancy after grace period
+				if (_lastPlayerLeftTime != DateTime.MinValue && (DateTime.Now - _lastPlayerLeftTime) >= EntityUpdateGracePeriod)
+					eligible = true;
+
+				// Map never had a player — eligible immediately on startup
+				// (throttle still spreads the actual unload work over time)
+				else if (_lastPlayerLeftTime == DateTime.MinValue)
+					eligible = true;
+
+				if (eligible && TryAcquireDormancySlot())
+				{
+					this.EnterDormancy();
 					return;
+				}
 			}
 
 			this.Disappearances();
@@ -245,27 +241,19 @@ namespace Melia.Zone.World.Maps
 					monstersAdded++;
 			}
 
-			// Queue newly dropped items for merging after a delay, so
-			// items don't instantly vanish into a stack the moment
-			// they hit the ground.
+			// Batch-merge items after all additions for this tick,
+			// so drops that exceed the threshold are merged all at
+			// once rather than progressively across multiple ticks.
 			if (newItemMonsters != null)
 			{
 				foreach (var itemMonster in newItemMonsters)
-					_pendingItemMerges.Enqueue((itemMonster, GameClock.LocalNow + ItemMergeDelay));
-			}
-
-			// Process due item merges, batching all items that became
-			// due this tick so they're merged together at once.
-			while (_pendingItemMerges.TryPeek(out var pending) && pending.DueTime <= GameClock.LocalNow)
-			{
-				if (!_pendingItemMerges.TryDequeue(out pending))
-					break;
-
-				bool exists;
-				lock (_monsters)
-					exists = _monsters.ContainsKey(pending.Item.Handle);
-				if (exists && !pending.Item.PickedUp)
-					this.TryMergeNearbyItems(pending.Item);
+				{
+					bool exists;
+					lock (_monsters)
+						exists = _monsters.ContainsKey(itemMonster.Handle);
+					if (exists)
+						this.TryMergeNearbyItems(itemMonster);
+				}
 			}
 
 			lock (_updateEntities)
@@ -273,7 +261,7 @@ namespace Melia.Zone.World.Maps
 				// Collect updateables - update monsters if players are on
 				// the map or if players left recently (grace period for
 				// mobs to return to spawn, despawn via lifetime, etc.)
-				var withinGracePeriod = _lastPlayerLeftTime != DateTime.MinValue && (GameClock.LocalNow - _lastPlayerLeftTime) < EntityUpdateGracePeriod;
+				var withinGracePeriod = _lastPlayerLeftTime != DateTime.MinValue && (DateTime.Now - _lastPlayerLeftTime) < EntityUpdateGracePeriod;
 				if (this.HasCharacters || withinGracePeriod)
 				{
 					lock (_monsters)
@@ -309,9 +297,7 @@ namespace Melia.Zone.World.Maps
 
 		private void Disappearances()
 		{
-			// The same clock DisappearTime is set on, so a lifetime measured
-			// in game time is not compared against wall-clock time.
-			var now = GameClock.LocalNow;
+			var now = DateTime.Now;
 
 			// Process monster disappearances (like base Melia)
 			var toDisappear = new List<IMonster>();
@@ -368,21 +354,19 @@ namespace Melia.Zone.World.Maps
 
 		private void UpdateVisibility()
 		{
-			// Also called from AddPad on any thread; a pass already running covers it.
-			if (!Monitor.TryEnter(_updateVisibleCharacters))
-				return;
-
-			lock (_characters)
+			lock (_updateVisibleCharacters)
 			{
-				foreach (var character in _characters.Values)
-					_updateVisibleCharacters.Add(character);
+				lock (_characters)
+				{
+					foreach (var character in _characters.Values)
+						_updateVisibleCharacters.Add(character);
+				}
+
+				foreach (var character in _updateVisibleCharacters)
+					character.LookAround();
+
+				_updateVisibleCharacters.Clear();
 			}
-
-			foreach (var character in _updateVisibleCharacters)
-				character.LookAround();
-
-			_updateVisibleCharacters.Clear();
-			Monitor.Exit(_updateVisibleCharacters);
 		}
 
 		#endregion
@@ -390,114 +374,63 @@ namespace Melia.Zone.World.Maps
 		#region Dormancy
 
 		/// <summary>
-		/// Returns whether the map may currently transition into dormancy.
-		/// </summary>
-		private bool IsDormancyEligible()
-		{
-			if (this.IsDormant || this.HasCharacters || this.IsCity || this.IsInstance)
-				return false;
-
-			var now = GameClock.LocalNow;
-
-			// Never unload right after a wake-up, so a map that just
-			// received a player can't be pulled out from under them
-			// before they're fully registered.
-			if ((now - _createdTime) < WakeUpGracePeriod)
-				return false;
-
-			// Player left recently — enter dormancy after grace period
-			if (_lastPlayerLeftTime != DateTime.MinValue)
-				return (now - _lastPlayerLeftTime) >= EntityUpdateGracePeriod;
-
-			// Map never had a player — eligible immediately on startup
-			// (throttle still spreads the actual unload work over time)
-			return true;
-		}
-
-		/// <summary>
 		/// Removes all spawner-managed mobs and pads from the map,
 		/// notifies their spawners, and marks the map as dormant.
-		/// NPCs, cities, and instance maps are not affected. Returns
-		/// false if the map became ineligible before the transition
-		/// could be made.
+		/// NPCs, cities, and instance maps are not affected.
 		/// </summary>
-		private bool EnterDormancy()
+		private void EnterDormancy()
 		{
-			List<Mob> mobsToRemove;
-			List<Pad> padsToRemove;
-			Dictionary<ISpawner, int> spawnerCounts;
+			if (this.IsDormant)
+				return;
 
-			lock (_dormancyLock)
+			// Collect spawner-managed mobs (not NPCs or warps)
+			var mobsToRemove = new List<Mob>();
+			lock (_monsters)
 			{
-				// Re-check under the lock, a character may have entered
-				// between the eligibility check and here.
-				if (!this.IsDormancyEligible())
-					return false;
-
-				// Collect spawner-managed mobs (not NPCs or warps)
-				mobsToRemove = new List<Mob>();
-				lock (_monsters)
+				foreach (var monster in _monsters.Values)
 				{
-					foreach (var monster in _monsters.Values)
-					{
-						if (monster is Mob mob && monster is not Npc)
-							mobsToRemove.Add(mob);
-					}
+					if (monster is Mob mob && monster is not Npc)
+						mobsToRemove.Add(mob);
 				}
-
-				// Group by spawner so we can notify each one
-				spawnerCounts = new Dictionary<ISpawner, int>();
-				foreach (var mob in mobsToRemove)
-					CountForSpawner(spawnerCounts, mob);
-
-				// Drain pending monster queue. These were accepted by
-				// AddMonster and are counted by their spawners, so they
-				// have to be reported as removed just like live mobs.
-				while (_addMonsters.TryDequeue(out var pending))
-				{
-					if (pending is Mob pendingMob)
-						CountForSpawner(spawnerCounts, pendingMob);
-				}
-
-				padsToRemove = new List<Pad>();
-				lock (_pads)
-					padsToRemove.AddRange(_pads.Values);
-
-				this.IsDormant = true;
 			}
 
+			// Group by spawner so we can notify each one
+			var spawnerCounts = new Dictionary<ISpawner, int>();
+			foreach (var mob in mobsToRemove)
+			{
+				if (mob.Spawner is ISpawner spawner)
+				{
+					spawnerCounts.TryGetValue(spawner, out var count);
+					spawnerCounts[spawner] = count + 1;
+				}
+			}
+
+			// Remove the mobs
 			foreach (var mob in mobsToRemove)
 				this.RemoveMonster(mob);
 
+			// Notify spawners of the removal counts
 			foreach (var kvp in spawnerCounts)
 				kvp.Key.NotifyDormancy(kvp.Value);
 
+			// Remove all pads
+			var padsToRemove = new List<Pad>();
+			lock (_pads)
+				padsToRemove.AddRange(_pads.Values);
+
 			foreach (var pad in padsToRemove)
 				this.RemovePad(pad);
+
+			// Drain pending monster queue
+			while (_addMonsters.TryDequeue(out _)) { }
+
+			this.IsDormant = true;
 
 			lock (_dormancyLogLock)
 			{
 				_dormancyBatchCount++;
 				_dormancyBatchMobs += mobsToRemove.Count;
 			}
-
-			return true;
-		}
-
-		/// <summary>
-		/// Adds the monster to its spawner's removal tally, if it has one.
-		/// </summary>
-		/// <param name="spawnerCounts"></param>
-		/// <param name="mob"></param>
-		private static void CountForSpawner(Dictionary<ISpawner, int> spawnerCounts, Mob mob)
-		{
-			// Dead mobs awaiting disappearance were already subtracted
-			// from their spawner's amount when they died.
-			if (mob.IsDead || mob.Spawner is not ISpawner spawner)
-				return;
-
-			spawnerCounts.TryGetValue(spawner, out var count);
-			spawnerCounts[spawner] = count + 1;
 		}
 
 		/// <summary>
@@ -507,7 +440,7 @@ namespace Melia.Zone.World.Maps
 		{
 			this.IsDormant = false;
 			_lastPlayerLeftTime = DateTime.MinValue;
-			_createdTime = GameClock.LocalNow;
+			_createdTime = DateTime.Now;
 
 			Log.Info("Map '{0}' waking up.", this.ClassName);
 		}
@@ -566,34 +499,15 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public void AddCharacter(Character character)
 		{
+			if (this.IsDormant)
+				this.WakeUp();
+
 			character.Map = this;
 
-			if (this.IsCity && character is not DummyCharacter)
-				character.MarkVisitedCity();
+			lock (_characters)
+				_characters[character.Handle] = character;
 
-			// The character has to be counted before the map is woken,
-			// otherwise the heartbeat can observe an awake map with no
-			// characters on it and immediately unload it again.
-			lock (_dormancyLock)
-			{
-				bool added;
-				lock (_characters)
-				{
-					added = !_characters.ContainsKey(character.Handle);
-					_characters[character.Handle] = character;
-				}
-
-				// Dummies always accompany their owner, counting them
-				// would keep the map awake after the owner left.
-				if (added && character is not DummyCharacter)
-				{
-					Interlocked.Increment(ref _characterCount);
-					_lastPlayerLeftTime = DateTime.MinValue;
-				}
-
-				if (this.IsDormant)
-					this.WakeUp();
-			}
+			Interlocked.Increment(ref _characterCount);
 
 			if (character is ICombatEntity combatEntity)
 			{
@@ -602,6 +516,8 @@ namespace Melia.Zone.World.Maps
 
 				_spatialIndex?.Insert(combatEntity);
 			}
+
+			_lastPlayerLeftTime = DateTime.MinValue;
 
 			ZoneServer.Instance.UpdateServerInfo();
 			ZoneServer.Instance.ServerEvents.PlayerEnteredMap.Raise(new PlayerEventArgs(character));
@@ -613,30 +529,10 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public void RemoveCharacter(Character character)
 		{
-			// Flush any pickups still waiting on their merge delay so
-			// they aren't lost when the character leaves the map.
-			character.FlushAllStackPickups();
+			lock (_characters)
+				_characters.Remove(character.Handle);
 
-			// Announce a still-pending death before the character leaves the map.
-			character.FlushDeathBroadcast();
-
-			// Only adjust the count if the character was actually on the
-			// map. An unconditional decrement lets any double-removal
-			// desync the count and unload the map under live players.
-			lock (_dormancyLock)
-			{
-				bool removed;
-				lock (_characters)
-					removed = _characters.Remove(character.Handle);
-
-				if (removed && character is not DummyCharacter)
-				{
-					Interlocked.Decrement(ref _characterCount);
-
-					if (!this.HasCharacters)
-						_lastPlayerLeftTime = GameClock.LocalNow;
-				}
-			}
+			Interlocked.Decrement(ref _characterCount);
 
 			lock (_combatEntities)
 				_combatEntities.Remove(character.Handle);
@@ -645,6 +541,9 @@ namespace Melia.Zone.World.Maps
 
 			ZoneServer.Instance.ServerEvents.PlayerLeftMap.Raise(new PlayerEventArgs(character));
 			character.Map = null;
+
+			if (!this.HasCharacters)
+				_lastPlayerLeftTime = DateTime.Now;
 
 			ZoneServer.Instance.UpdateServerInfo();
 			PlayerLeaves?.Invoke(character);
@@ -661,20 +560,15 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public Character GetCharacter(Func<Character, bool> predicate)
 		{
-			var characters = RentSnapshot(_characters, out var count);
-			Character result = null;
-
-			for (var i = 0; i < count; i++)
+			lock (_characters)
 			{
-				if (predicate(characters[i]))
+				foreach (var character in _characters.Values)
 				{
-					result = characters[i];
-					break;
+					if (predicate(character))
+						return character;
 				}
 			}
-
-			ReturnSnapshot(characters);
-			return result;
+			return null;
 		}
 
 		/// <summary>
@@ -697,17 +591,8 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public Character[] GetCharacters(Func<Character, bool> predicate)
 		{
-			var characters = RentSnapshot(_characters, out var count);
-			var result = new List<Character>(count);
-
-			for (var i = 0; i < count; i++)
-			{
-				if (predicate(characters[i]))
-					result.Add(characters[i]);
-			}
-
-			ReturnSnapshot(characters);
-			return result.ToArray();
+			lock (_characters)
+				return _characters.Values.Where(predicate).ToArray();
 		}
 
 		/// <summary>
@@ -721,7 +606,16 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisibleCharacters(Character character, List<Character> result)
-			=> this.CollectVisibleCharacters(character, result);
+		{
+			lock (_characters)
+			{
+				foreach (var otherCharacter in _characters.Values)
+				{
+					if (otherCharacter != character && character.CanSee(otherCharacter))
+						result.Add(otherCharacter);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Adds all characters visible to the given character to the result set.
@@ -729,63 +623,42 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisibleCharacters(Character character, HashSet<Character> result)
-			=> this.CollectVisibleCharacters(character, result);
-
-		/// <summary>
-		/// Adds all characters visible to the given character to the result
-		/// collection, checking visibility outside of the character lock.
-		/// </summary>
-		/// <param name="character"></param>
-		/// <param name="result"></param>
-		private void CollectVisibleCharacters(Character character, ICollection<Character> result)
 		{
-			var characters = RentSnapshot(_characters, out var count);
-
-			for (var i = 0; i < count; i++)
+			lock (_characters)
 			{
-				var otherCharacter = characters[i];
-
-				if (otherCharacter != character && character.CanSee(otherCharacter))
-					result.Add(otherCharacter);
+				foreach (var otherCharacter in _characters.Values)
+				{
+					if (otherCharacter != character && character.CanSee(otherCharacter))
+						result.Add(otherCharacter);
+				}
 			}
-
-			ReturnSnapshot(characters);
 		}
 		#endregion
 
 		#region Monster Management
 		/// <summary>
-		/// Adds a monster to the map, queued for the next update tick
-		/// unless it's added immediately. Returns false if the monster was
-		/// rejected because the map is dormant.
+		/// Queues a monster to be added to the map on the next update tick.
 		/// </summary>
-		/// <param name="monster"></param>
-		/// <param name="immediate">
-		/// Adds the monster at once instead of through the per-tick queue,
-		/// for actors something references by handle right after creation,
-		/// such as a cutscene's cast.
-		/// </param>
-		public bool AddMonster(IMonster monster, bool immediate = false)
+		public void AddMonster(IMonster monster)
 		{
 			// Only block spawner-managed mobs on dormant maps. NPCs,
 			// treasure chests, minigame entities, and other non-spawner
 			// mobs are allowed through so they can be queued for when
 			// the map wakes up.
 			if (this.IsDormant && monster is Mob mob && mob.Spawner != null)
-				return false;
+				return;
 
 			// Dormant maps skip UpdateEntities, so the queue never drains.
 			// Add non-spawner monsters (NPCs, warps, etc.) directly so
 			// their Map reference is set and lookups like HandleInteWarp
 			// see a valid map id before a player ever wakes the map.
-			if (immediate || this.IsDormant)
+			if (this.IsDormant)
 			{
 				this.AddMonsterInternal(monster);
-				return true;
+				return;
 			}
 
 			_addMonsters.Enqueue(monster);
-			return true;
 		}
 
 		private void AddMonsterInternal(IMonster monster)
@@ -814,17 +687,17 @@ namespace Melia.Zone.World.Maps
 		}
 
 		/// <summary>
-		/// Attempts to merge an item with nearby items of the same type on
-		/// the ground, called once ItemMergeDelay has passed since the item
-		/// dropped. If 5+ of the same stackable item exist within 30 units
-		/// on the same layer/owner, they are consolidated into a single
-		/// stack at the average position, capped at MaxStack.
+		/// Attempts to merge a newly dropped item with nearby items of the
+		/// same type on the ground. If 5+ of the same stackable item exist
+		/// within 30 units on the same layer/owner, they are consolidated
+		/// into a single stack at the average position, capped at MaxStack.
 		/// </summary>
 		private void TryMergeNearbyItems(ItemMonster newItem)
 		{
 			if (!newItem.Item.IsStackable)
 				return;
 
+			var itemId = newItem.Item.Id;
 			var layer = newItem.Layer;
 			var pos = newItem.Position;
 			var ownerId = newItem.Item.OwnerCharacterId;
@@ -840,7 +713,7 @@ namespace Melia.Zone.World.Maps
 				{
 					if (monster == newItem || monster is not ItemMonster im)
 						continue;
-					if (im.PickedUp || !im.Item.CanStackWith(newItem.Item) || im.Layer != layer || im.Item.OwnerCharacterId != ownerId)
+					if (im.PickedUp || im.Item.Id != itemId || im.Layer != layer || im.Item.OwnerCharacterId != ownerId)
 						continue;
 					if (!im.Position.InRange2D(pos, itemMergeRange))
 						continue;
@@ -880,11 +753,6 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public void RemoveMonster(IMonster monster)
 		{
-			// Announce a still-pending death while the monster is on the
-			// map, so its death packets and drops aren't lost.
-			if (monster is Mob dyingMob)
-				dyingMob.FlushDeathBroadcast();
-
 			monster.Components.Get<TriggerComponent>()?.OnRemovingFromMap();
 			monster.Components.Get<MovementComponent>()?.RemoveMarker();
 
@@ -910,52 +778,6 @@ namespace Melia.Zone.World.Maps
 
 			if (monster is Mob mob)
 				mob.Cleanup();
-		}
-
-		/// <summary>
-		/// Releases the capacity the entity tables still hold for entities that
-		/// have been removed, so what is left enumerates in the order it was
-		/// added.
-		/// </summary>
-		/// <remarks>
-		/// A removed entry leaves a hole its table hands to the next entity
-		/// added, so after a churn of adds and removes the tables enumerate in
-		/// an order set by that churn rather than by the current contents.
-		/// Anything reading them in order - a target sweep that keeps the first
-		/// n candidates at equal distance - then depends on what the map held
-		/// before.
-		/// </remarks>
-		public void CompactEntityTables()
-		{
-			lock (_combatEntities)
-				_combatEntities.TrimExcess();
-
-			lock (_characters)
-				_characters.TrimExcess();
-
-			lock (_monsters)
-				_monsters.TrimExcess();
-
-			lock (_pads)
-				_pads.TrimExcess();
-		}
-
-		/// <summary>
-		/// Drops the additions that are still queued, so nothing a cleared
-		/// map had in flight appears on it afterwards.
-		/// </summary>
-		/// <remarks>
-		/// Monster additions are throttled per tick, so a map that stops
-		/// updating while a burst is still queued keeps it until it updates
-		/// again, whenever that is and whatever it is doing by then.
-		/// </remarks>
-		public void ClearPendingEntities()
-		{
-			while (_addMonsters.TryDequeue(out _))
-			{ }
-
-			while (_pendingItemMerges.TryDequeue(out _))
-			{ }
 		}
 
 		/// <summary>
@@ -1041,22 +863,21 @@ namespace Melia.Zone.World.Maps
 		public List<ICombatEntity> GetAttackableEntitiesInRange(ICombatEntity attacker, Position position, float radius)
 		{
 			var result = new List<ICombatEntity>();
-			var entities = RentSnapshot(_combatEntities, out var count);
 
-			for (var i = 0; i < count; i++)
+			lock (_combatEntities)
 			{
-				var entity = entities[i];
+				foreach (var entity in _combatEntities.Values)
+				{
+					if (!entity.Position.InRange2D(position, radius))
+						continue;
 
-				if (!entity.Position.InRange2D(position, radius))
-					continue;
+					if (!attacker.CanDamage(entity))
+						continue;
 
-				if (!attacker.CanDamage(entity))
-					continue;
-
-				result.Add(entity);
+					result.Add(entity);
+				}
 			}
 
-			ReturnSnapshot(entities);
 			return result;
 		}
 
@@ -1065,8 +886,16 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public IMonster GetMonster(Func<IMonster, bool> predicate)
 		{
-			this.TryGetMonster(predicate, out var monster);
-			return monster;
+			lock (_monsters)
+			{
+				foreach (var monster in _monsters.Values)
+				{
+					if (predicate(monster))
+						return monster;
+				}
+			}
+
+			return null;
 		}
 
 		/// <summary>
@@ -1078,22 +907,21 @@ namespace Melia.Zone.World.Maps
 		public List<ICombatEntity> GetAttackableEntitiesIn(ICombatEntity attacker, IShapeF shape)
 		{
 			var result = new List<ICombatEntity>();
-			var entities = RentSnapshot(_combatEntities, out var count);
 
-			for (var i = 0; i < count; i++)
+			lock (_combatEntities)
 			{
-				var entity = entities[i];
+				foreach (var entity in _combatEntities.Values)
+				{
+					if (!attacker.CanDamage(entity))
+						continue;
 
-				if (!attacker.CanDamage(entity))
-					continue;
+					if (!shape.IsInside(entity.Position))
+						continue;
 
-				if (!entity.IsCoveredBy(shape))
-					continue;
-
-				result.Add(entity);
+					result.Add(entity);
+				}
 			}
 
-			ReturnSnapshot(entities);
 			return result;
 		}
 
@@ -1113,20 +941,20 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public bool TryGetMonster(Func<IMonster, bool> predicate, out IMonster monster)
 		{
-			var monsters = RentSnapshot(_monsters, out var count);
-			monster = null;
-
-			for (var i = 0; i < count; i++)
+			lock (_monsters)
 			{
-				if (predicate(monsters[i]))
+				foreach (var m in _monsters.Values)
 				{
-					monster = monsters[i];
-					break;
+					if (predicate(m))
+					{
+						monster = m;
+						return true;
+					}
 				}
 			}
 
-			ReturnSnapshot(monsters);
-			return monster != null;
+			monster = null;
+			return false;
 		}
 
 		/// <summary>
@@ -1178,27 +1006,23 @@ namespace Melia.Zone.World.Maps
 		public List<IMonster> GetMonsters(Func<IMonster, bool> predicate)
 		{
 			var result = new List<IMonster>();
-			var monsters = RentSnapshot(_monsters, out var count);
 
-			for (var i = 0; i < count; i++)
+			lock (_monsters)
 			{
-				if (predicate(monsters[i]))
-					result.Add(monsters[i]);
+				foreach (var monster in _monsters.Values)
+				{
+					if (predicate(monster))
+						result.Add(monster);
+				}
 			}
 
-			ReturnSnapshot(monsters);
 			return result;
 		}
 
 		/// <summary>
 		/// Returns all monsters visible to the given character.
 		/// </summary>
-		public List<IMonster> GetVisibleMonsters(Character character)
-		{
-			var result = new List<IMonster>();
-			this.GetVisibleMonsters(character, result);
-			return result;
-		}
+		public List<IMonster> GetVisibleMonsters(Character character) => this.GetMonsters(character.CanSee);
 
 		/// <summary>
 		/// Adds all monsters visible to the given character to the result list.
@@ -1206,7 +1030,16 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisibleMonsters(Character character, List<IMonster> result)
-			=> this.CollectVisibleMonsters(character, result);
+		{
+			lock (_monsters)
+			{
+				foreach (var monster in _monsters.Values)
+				{
+					if (character.CanSee(monster))
+						result.Add(monster);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Adds all monsters visible to the given character to the result set.
@@ -1214,57 +1047,16 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisibleMonsters(Character character, HashSet<IMonster> result)
-			=> this.CollectVisibleMonsters(character, result);
-
-		/// <summary>
-		/// Adds all monsters visible to the given character to the result
-		/// collection, checking visibility outside of the monster lock.
-		/// </summary>
-		/// <remarks>
-		/// CanSee runs conditional NPC predicates that take the character's
-		/// quest lock, which is held while quest updates query the map.
-		/// </remarks>
-		/// <param name="character"></param>
-		/// <param name="result"></param>
-		private void CollectVisibleMonsters(Character character, ICollection<IMonster> result)
 		{
-			var monsters = RentSnapshot(_monsters, out var count);
-
-			for (var i = 0; i < count; i++)
+			lock (_monsters)
 			{
-				var monster = monsters[i];
-
-				if (character.CanSee(monster))
-					result.Add(monster);
-			}
-
-			ReturnSnapshot(monsters);
-		}
-
-		/// <summary>
-		/// Copies the table's values into a pooled array under the table's
-		/// lock, so callers can run predicates on them without holding it.
-		/// </summary>
-		/// <param name="table"></param>
-		/// <param name="count"></param>
-		/// <returns></returns>
-		private static TValue[] RentSnapshot<TValue>(Dictionary<int, TValue> table, out int count)
-		{
-			lock (table)
-			{
-				count = table.Count;
-				var snapshot = ArrayPool<TValue>.Shared.Rent(Math.Max(1, count));
-				table.Values.CopyTo(snapshot, 0);
-				return snapshot;
+				foreach (var monster in _monsters.Values)
+				{
+					if (character.CanSee(monster))
+						result.Add(monster);
+				}
 			}
 		}
-
-		/// <summary>
-		/// Returns a snapshot rented with RentSnapshot to the pool.
-		/// </summary>
-		/// <param name="snapshot"></param>
-		private static void ReturnSnapshot<TValue>(TValue[] snapshot)
-			=> ArrayPool<TValue>.Shared.Return(snapshot, clearArray: true);
 
 		/// <summary>
 		/// Returns all pads visible to the given character.
@@ -1277,7 +1069,16 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisiblePads(Character character, List<Pad> result)
-			=> this.CollectVisiblePads(character, result);
+		{
+			lock (_pads)
+			{
+				foreach (var pad in _pads.Values)
+				{
+					if (character.CanSee(pad))
+						result.Add(pad);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Adds all pads visible to the given character to the result set.
@@ -1285,25 +1086,15 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisiblePads(Character character, HashSet<Pad> result)
-			=> this.CollectVisiblePads(character, result);
-
-		/// <summary>
-		/// Adds all pads visible to the given character to the result
-		/// collection, checking visibility outside of the pad lock.
-		/// </summary>
-		/// <param name="character"></param>
-		/// <param name="result"></param>
-		private void CollectVisiblePads(Character character, ICollection<Pad> result)
 		{
-			var pads = RentSnapshot(_pads, out var count);
-
-			for (var i = 0; i < count; i++)
+			lock (_pads)
 			{
-				if (character.CanSee(pads[i]))
-					result.Add(pads[i]);
+				foreach (var pad in _pads.Values)
+				{
+					if (character.CanSee(pad))
+						result.Add(pad);
+				}
 			}
-
-			ReturnSnapshot(pads);
 		}
 
 		/// <summary>
@@ -1377,14 +1168,10 @@ namespace Melia.Zone.World.Maps
 
 		#region Pad Management
 		/// <summary>
-		/// Adds a pad to the map and activates its trigger. Magic pads
-		/// suppressed by an enemy's blocking pad are dropped instead.
+		/// Adds a pad to the map and activates its trigger.
 		/// </summary>
 		public void AddPad(Pad pad)
 		{
-			if (this.IsMagicPadBlocked(pad))
-				return;
-
 			pad.Map = this;
 
 			lock (_pads)
@@ -1392,34 +1179,6 @@ namespace Melia.Zone.World.Maps
 
 			this.UpdateVisibility();
 			pad.Components.Get<TriggerComponent>()?.OnAddedToMap();
-		}
-
-		/// <summary>
-		/// Returns true if the given pad is a magic pad standing inside a
-		/// pad that blocks magic for one of its creator's enemies.
-		/// </summary>
-		/// <param name="pad"></param>
-		private bool IsMagicPadBlocked(Pad pad)
-		{
-			if (!pad.IsMagic || pad.Creator == null)
-				return false;
-
-			lock (_pads)
-			{
-				foreach (var other in _pads.Values)
-				{
-					if (!other.BlocksMagicPads || other.Layer != pad.Layer)
-						continue;
-
-					if (!other.Creator.IsEnemy(pad.Creator))
-						continue;
-
-					if (other.Area?.IsInside(pad.Position) ?? false)
-						return true;
-				}
-			}
-
-			return false;
 		}
 
 		/// <summary>
@@ -1468,15 +1227,14 @@ namespace Melia.Zone.World.Maps
 		public Pad[] GetPads(Func<Pad, bool> func)
 		{
 			var result = new List<Pad>();
-			var pads = RentSnapshot(_pads, out var count);
-
-			for (var i = 0; i < count; i++)
+			lock (_pads)
 			{
-				if (func(pads[i]))
-					result.Add(pads[i]);
+				foreach (var pad in _pads.Values)
+				{
+					if (func(pad))
+						result.Add(pad);
+				}
 			}
-
-			ReturnSnapshot(pads);
 			return result.ToArray();
 		}
 
@@ -1629,7 +1387,10 @@ namespace Melia.Zone.World.Maps
 			var result = new List<ICombatEntity>();
 			foreach (var e in candidates)
 			{
-				if (e.IsCoveredBy(position, radius) && attacker.CanDamage(e))
+				var effectiveRadius = radius + e.AgentRadius + e.HitRadiusBonus;
+				var dx = e.Position.X - position.X;
+				var dz = e.Position.Z - position.Z;
+				if (dx * dx + dz * dz <= effectiveRadius * effectiveRadius && attacker.CanDamage(e))
 				{
 					if (e.IsHighFlying())
 						continue;
@@ -1674,7 +1435,11 @@ namespace Melia.Zone.World.Maps
 
 			foreach (var e in candidates)
 			{
-				if (e.IsCoveredBy(position, radius) && attacker.CanDamage(e))
+				var effectiveRadius = radius + e.AgentRadius + e.HitRadiusBonus;
+				var dx = e.Position.X - position.X;
+				var dz = e.Position.Z - position.Z;
+
+				if (dx * dx + dz * dz <= effectiveRadius * effectiveRadius && attacker.CanDamage(e))
 				{
 					if (e.IsHighFlying())
 						continue;
@@ -1739,7 +1504,7 @@ namespace Melia.Zone.World.Maps
 			{
 				if (!attacker.CanDamage(e))
 					continue;
-				if (!e.IsCoveredBy(shape))
+				if (!shape.IsInsideOrInRange(e.Position, e.AgentRadius + e.HitRadiusBonus))
 					continue;
 				if (e.IsHighFlying())
 					continue;
@@ -1795,7 +1560,7 @@ namespace Melia.Zone.World.Maps
 					continue;
 				if (!attacker.CanDamage(e))
 					continue;
-				if (!e.IsCoveredBy(shape))
+				if (!shape.IsInsideOrInRange(e.Position, e.AgentRadius + e.HitRadiusBonus))
 					continue;
 				if (e.IsHighFlying())
 					continue;
@@ -1853,7 +1618,7 @@ namespace Melia.Zone.World.Maps
 			{
 				if (!entity.IsAlly(ally) || entity == ally || entity.IsDead)
 					continue;
-				if (!entity.IsCoveredBy(shape))
+				if (!shape.IsInsideOrInRange(entity.Position, entity.AgentRadius + entity.HitRadiusBonus))
 					continue;
 				result.Add(entity);
 			}
@@ -1909,7 +1674,7 @@ namespace Melia.Zone.World.Maps
 			{
 				if (!entity.IsDeadAlly(ally) || entity == ally)
 					continue;
-				if (!entity.IsCoveredBy(shape))
+				if (!shape.IsInsideOrInRange(entity.Position, entity.AgentRadius + entity.HitRadiusBonus))
 					continue;
 				result.Add(entity);
 			}
@@ -1976,33 +1741,34 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				var monsters = RentSnapshot(_monsters, out var monsterCount);
-				for (var i = 0; i < monsterCount; i++)
+				lock (_monsters)
 				{
-					var monster = monsters[i];
-					var radius = (monster as ICombatEntity)?.AgentRadius ?? 0;
-					if (monster is TActor actor && area.IsInsideOrInRange(actor.Position, radius) && (predicate?.Invoke(actor) ?? true))
-						buffer.Add(actor);
+					foreach (var monster in _monsters.Values)
+					{
+						var radius = (monster as ICombatEntity)?.AgentRadius ?? 0;
+						if (monster is TActor actor && area.IsInsideOrInRange(actor.Position, radius) && (predicate?.Invoke(actor) ?? true))
+							buffer.Add(actor);
+					}
 				}
-				ReturnSnapshot(monsters);
 
-				var characters = RentSnapshot(_characters, out var characterCount);
-				for (var i = 0; i < characterCount; i++)
+				lock (_characters)
 				{
-					var character = characters[i];
-					if (character is TActor actor && area.IsInsideOrInRange(actor.Position, ((ICombatEntity)character).AgentRadius) && (predicate?.Invoke(actor) ?? true))
-						buffer.Add(actor);
+					foreach (var character in _characters.Values)
+					{
+						if (character is TActor actor && area.IsInsideOrInRange(actor.Position, ((ICombatEntity)character).AgentRadius) && (predicate?.Invoke(actor) ?? true))
+							buffer.Add(actor);
+					}
 				}
-				ReturnSnapshot(characters);
 			}
 
-			var pads = RentSnapshot(_pads, out var padCount);
-			for (var i = 0; i < padCount; i++)
+			lock (_pads)
 			{
-				if (pads[i] is TActor actor && area.IsInside(actor.Position) && (predicate?.Invoke(actor) ?? true))
-					buffer.Add(actor);
+				foreach (var pad in _pads.Values)
+				{
+					if (pad is TActor actor && area.IsInside(actor.Position) && (predicate?.Invoke(actor) ?? true))
+						buffer.Add(actor);
+				}
 			}
-			ReturnSnapshot(pads);
 		}
 
 
@@ -2300,15 +2066,14 @@ namespace Melia.Zone.World.Maps
 		public List<WarpMonster> GetWarps(Func<WarpMonster, bool> predicate)
 		{
 			var result = new List<WarpMonster>();
-			var monsters = RentSnapshot(_monsters, out var count);
-
-			for (var i = 0; i < count; i++)
+			lock (_monsters)
 			{
-				if (monsters[i] is WarpMonster warp && (predicate == null || predicate(warp)))
-					result.Add(warp);
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is WarpMonster warp && (predicate == null || predicate(warp)))
+						result.Add(warp);
+				}
 			}
-
-			ReturnSnapshot(monsters);
 			return result;
 		}
 
@@ -2335,15 +2100,14 @@ namespace Melia.Zone.World.Maps
 		public List<MonsterInName> GetNpcs(Func<MonsterInName, bool> predicate)
 		{
 			var result = new List<MonsterInName>();
-			var monsters = RentSnapshot(_monsters, out var count);
-
-			for (var i = 0; i < count; i++)
+			lock (_monsters)
 			{
-				if (monsters[i] is MonsterInName npc && (predicate == null || predicate(npc)))
-					result.Add(npc);
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is MonsterInName npc && (predicate == null || predicate(npc)))
+						result.Add(npc);
+				}
 			}
-
-			ReturnSnapshot(monsters);
 			return result;
 		}
 
@@ -2508,59 +2272,6 @@ namespace Melia.Zone.World.Maps
 					continue;
 
 				if (character.Layer != source.Layer)
-					continue;
-
-				var conn = character.Connection;
-				if (conn == null)
-					continue;
-
-				if (!sentConnections.Add(conn))
-					continue;
-
-				conn.Send(packet);
-			}
-		}
-
-		/// <summary>
-		/// Broadcasts a packet to all characters within visible range of the
-		/// source actor, skipping clients that haven't been sent the source
-		/// yet and therefore can't resolve its handle.
-		/// </summary>
-		/// <param name="packet"></param>
-		/// <param name="source"></param>
-		public virtual void BroadcastToViewers(Packet packet, IActor source)
-		{
-			var sentConnections = _broadcastViewerConnections ??= new HashSet<IZoneConnection>();
-			sentConnections.Clear();
-
-			var queryBuffer = _broadcastViewerBuffer ??= new List<ICombatEntity>();
-			queryBuffer.Clear();
-
-			if (_spatialIndex != null)
-			{
-				_spatialIndex.QueryCircle(source.Position, VisibleRange, queryBuffer);
-			}
-			else
-			{
-				lock (_characters)
-				{
-					foreach (var character in _characters.Values)
-						queryBuffer.Add(character);
-				}
-			}
-
-			foreach (var entity in queryBuffer)
-			{
-				if (entity is not Character character)
-					continue;
-
-				if (character.Layer != source.Layer)
-					continue;
-
-				if (!character.Position.InRange2D(source.Position, VisibleRange))
-					continue;
-
-				if (!character.IsActorVisible(source))
 					continue;
 
 				var conn = character.Connection;

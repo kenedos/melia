@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +20,6 @@ using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 using static Melia.Zone.Skills.Helpers.SkillTargetHelper;
 using static Melia.Zone.Skills.Helpers.SkillUtilHelper;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.Skills.Handlers.Common.MagicalGirl
 {
@@ -42,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Common.MagicalGirl
 
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
@@ -50,7 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Common.MagicalGirl
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
-			await GameClock.Delay(TimeSpan.FromMilliseconds(2500));
+			await Task.Delay(TimeSpan.FromMilliseconds(2500));
 			caster.StartBuff(BuffId.change_magicalgirl_red_Buff, 1f, 0f, TimeSpan.FromMilliseconds(900000f), caster);
 		}
 	}

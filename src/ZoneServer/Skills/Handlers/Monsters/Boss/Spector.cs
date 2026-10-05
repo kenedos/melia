@@ -46,7 +46,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 600;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 6000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 6000f, 1, 100, -1, hits);
 		}
 	}
 
@@ -244,46 +244,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("F_sys_target_monster", 1f),
 			};
 
-			if (!caster.Position.InRange2D(target.Position, 250))
-				return;
-
-			var center = originPos.GetNearestPositionWithinDistance(GetLeadPosition(target, 1200, caster), skill.Properties[PropertyName.MaxR] + 50);
-			_ = MissileThrow(skill, caster, center, missileConfig);
-
-			var arrowConfig = new ArrowConfig
+			var position = GetRelativePosition(PosType.TargetHeight, caster, target);
+			await MissileThrow(skill, caster, position, missileConfig);
+			for (var i = 0; i < 4; i++)
 			{
-				ArrowEffect = EffectConfig.None,
-				ArrowSpacing = 30f,
-				ArrowSpacingTime = 0.01f,
-				ArrowLifeTime = 1f,
-				PositionDelay = 1200f,
-				HitEffect = new EffectConfig("I_explosion006_blue", 1f),
-				Range = 15f,
-				KnockdownPower = 100f,
-				Delay = 0f,
-				HitEffectSpacing = 20f,
-				HitTimeSpacing = 0.05f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				KnockType = (KnockType)1,
-			};
-
-			await skill.Wait(TimeSpan.FromMilliseconds(1200));
-
-			var baseDir = originPos.GetDirection(farPos);
-			var points = new[] { 72f, -72f, 144f, 0f, -144f, 72f };
-			var lines = new List<Task>();
-			for (var i = 0; i < points.Length - 1; i++)
-			{
-				if (i > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(200));
-
-				var start = center.GetRelative(baseDir.AddDegreeAngle(points[i]), 75f);
-				var end = center.GetRelative(baseDir.AddDegreeAngle(points[i + 1]), 75f);
-				lines.Add(EffectHitArrow(skill, caster, start, end, arrowConfig));
+				position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+				await skill.Wait(TimeSpan.FromMilliseconds(300));
+				await MissileThrow(skill, caster, position, missileConfig);
 			}
-
-			await Task.WhenAll(lines);
 		}
 	}
 
@@ -332,24 +300,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			if (!caster.Position.InRange2D(target.Position, 250))
-				return;
-
-			var positions = GetScatteredPositions(GetLeadPosition(target, 1700, caster), 6, 90, 45);
-			var blasts = new List<Task>();
-			for (var i = 0; i < positions.Count; i++)
-			{
-				if (i > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(100));
-				blasts.Add(this.Blast(caster, skill, originPos.GetNearestPositionWithinDistance(positions[i], skill.Properties[PropertyName.MaxR] + 50), hitConfig));
-			}
-			await Task.WhenAll(blasts);
-		}
-
-		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
-		{
 			var hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
+			for (var i = 0; i < 6; i++)
+			{
+				var position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+				await EffectAndHit(skill, caster, position, hitConfig, hits);
+				if (i < 5)
+					await skill.Wait(TimeSpan.FromMilliseconds(100));
+			}
 			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 5000f, 1, 5, -1, hits);
 		}
 	}
@@ -379,13 +337,16 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
-			var config = new ArrowConfig
+			var hits = new List<SkillHitInfo>();
+			var startingPosition = originPos.GetRelative(farPos, distance: 0);
+			var endingPosition = originPos.GetRelative(farPos, distance: 200f);
+			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
 				ArrowEffect = new EffectConfig("F_sys_arrow_monster", 0.7f),
 				ArrowSpacing = 25f,
 				ArrowSpacingTime = 0.05f,
 				ArrowLifeTime = 0.05f,
-				PositionDelay = 1700f,
+				PositionDelay = 10f,
 				HitEffect = new EffectConfig("F_smoke047", 0.8f),
 				Range = 12f,
 				KnockdownPower = 0f,
@@ -394,46 +355,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitTimeSpacing = 0.05f,
 				HitCount = 1,
 				HitDuration = 1000f,
-			};
-
-			var lines = new List<Task>();
-			var lineHits = new List<List<SkillHitInfo>>();
-			var burstHits = new List<SkillHitInfo>();
-			lineHits.Add(burstHits);
-			lines.Add(this.Burst(caster, skill, originPos.GetRelative(farPos, distance: 15f), burstHits));
-			foreach (var (startAngle, endAngle) in new[] { (25f, 40f), (0f, 0f), (-25f, -40f) })
-			{
-				var hits = new List<SkillHitInfo>();
-				lineHits.Add(hits);
-				var startingPosition = originPos.GetRelative(farPos, distance: 30f, angle: startAngle);
-				var endingPosition = originPos.GetRelative(farPos, distance: 200f, angle: endAngle);
-				lines.Add(EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits));
-			}
-			await Task.WhenAll(lines);
-
-			foreach (var hits in lineHits)
-				SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 5000f, 1, 5, -1, hits);
-		}
-
-		private async Task Burst(ICombatEntity caster, Skill skill, Position position, List<SkillHitInfo> hits)
-		{
-			await skill.Wait(TimeSpan.FromMilliseconds(1600));
-			await EffectAndHit(skill, caster, position, new EffectHitConfig
-			{
-				GroundEffect = EffectConfig.None,
-				PositionDelay = 0,
-				Effect = new EffectConfig("F_rize004_dark", 1f),
-				Range = 40f,
-				KnockdownPower = 100f,
-				Delay = 300f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 1,
-				VerticalAngle = 60f,
-				InnerRange = 0,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 5000f, 1, 5, -1, hits);
 		}
 	}
 

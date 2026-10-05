@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 1150;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}
 
@@ -77,28 +77,28 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 2500;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 100, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 0, angle: 70f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 100;
+			hitDelay = 2600;
 			aniTime = 100;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 100, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 0, angle: 70f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 100;
+			hitDelay = 2700;
 			aniTime = 100;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 100, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 0, angle: 70f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 100;
+			hitDelay = 2800;
 			aniTime = 100;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 100, -1, hits);
 		}
 	}
 
@@ -118,7 +118,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -144,7 +144,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 100, -1, hits);
 			position = originPos.GetRelative(farPos, distance: 20);
 			hits = new List<SkillHitInfo>();
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
@@ -163,7 +163,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 0f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 100, -1, hits);
 		}
 	}
 
@@ -183,7 +183,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), Position.Zero);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
@@ -199,10 +199,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 2600;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 2000f, 1, 100, -1, hits);
 
-			var startingPosition = originPos.GetRelative(farPos, distance: 30f);
-			var endingPosition = originPos.GetRelative(farPos, distance: 210f);
+			var startingPosition = originPos;
+			var endingPosition = originPos.GetNearestPositionWithinDistance(target.Position, 150f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
 				ArrowEffect = EffectConfig.None,

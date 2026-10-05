@@ -56,6 +56,11 @@ namespace Melia.Zone.Database
 		public string TeamName { get; set; }
 
 		/// <summary>
+		/// Gets or sets the account's team EXP, which is shared across all characters.
+		/// </summary>
+		public int TeamExp { get; set; }
+
+		/// <summary>
 		/// The account's authority level, used to determine if a character
 		/// can use a specific GM command.
 		/// </summary>

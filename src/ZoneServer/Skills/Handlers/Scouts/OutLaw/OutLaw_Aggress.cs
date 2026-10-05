@@ -61,7 +61,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 				if (hitTarget.IsBuffActive(BuffId.ProvocationImmunity_Debuff))
 					continue;
 
-				hitTarget.StartBuff(BuffId.Aggress_Debuff, skill.Level, unhingeLevel, duration, caster, skill.Id);
+				hitTarget.StartBuff(BuffId.Aggress_Debuff, skill.Level, unhingeLevel, duration, caster);
 				hitTarget.StartBuff(BuffId.ProvocationImmunity_Debuff, skill.Level, 0, duration, caster);
 
 				if (hitTarget.Components.TryGet<AiComponent>(out var component))

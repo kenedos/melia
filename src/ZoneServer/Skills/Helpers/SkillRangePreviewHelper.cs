@@ -21,26 +21,21 @@ namespace Melia.Zone.Skills.Helpers
 		/// </summary>
 		public static void ShowRangePreview(ICombatEntity caster, Skill skill, IShapeF area, TimeSpan? duration = null)
 		{
-			if (!IsPreviewEnabled(caster))
+			if (caster is not Character character)
+			{
+				if (caster is not Mob || caster is Companion)
+					return;
+			}
+			else if (!character.Variables.Temp.GetBool("Melia.RangePreview"))
+			{
 				return;
+			}
 
 			var effectiveDuration = duration ?? (skill.Data.ShootTime < SkillConstants.MaxShootTimeForPreview
 				? skill.Data.ShootTime
 				: SkillConstants.DefaultDebugShapeDuration);
 
 			Debug.ShowShape(caster.Map, area, effectiveDuration);
-		}
-
-		/// <summary>
-		/// Returns whether the caster should be shown range previews.
-		/// </summary>
-		/// <param name="caster"></param>
-		private static bool IsPreviewEnabled(ICombatEntity caster)
-		{
-			if (caster is not Character character)
-				return caster is Mob mob && mob is not Companion && mob.MonsterType != RelationType.Friendly;
-
-			return character.Variables.Temp.GetBool("Melia.RangePreview");
 		}
 
 		/// <summary>
@@ -54,11 +49,12 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
-		/// Same as GetPreviewArea but uses SplashDamage's effective hit radius.
+		/// Same as GetPreviewArea but floors the range to the caster's body
+		/// radius, matching SplashDamage's effective hit area.
 		/// </summary>
 		public static IShapeF GetPreviewArea(ICombatEntity caster, Position position, float range, float innerRange = 0)
 		{
-			range = SkillDamageHelper.GetEffectiveSplashRange(caster, position, range);
+			range = Math.Max(range, SizeTypeRadius.GetRadius(caster.EffectiveSize));
 			return GetPreviewArea(position, range, innerRange);
 		}
 	}

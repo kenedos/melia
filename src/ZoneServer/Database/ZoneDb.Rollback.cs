@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -418,7 +418,6 @@ namespace Melia.Zone.Database
 					cmd.Set("snapshotId", snapshotId);
 					cmd.Set("jobId", (int)job.Id);
 					cmd.Set("circle", (int)job.Circle);
-					cmd.Set("jobRank", job.Rank);
 					cmd.Set("skillPoints", job.SkillPoints);
 					cmd.Set("totalExp", job.TotalExp);
 					cmd.Set("selectionDate", job.SelectionDate);
@@ -776,7 +775,6 @@ namespace Melia.Zone.Database
 								{ "characterId", characterId },
 								{ "jobId", reader.GetInt32("jobId") },
 								{ "circle", reader.GetInt32("circle") },
-								{ "jobRank", reader.GetInt32("jobRank") },
 								{ "skillPoints", reader.GetInt32("skillPoints") },
 								{ "totalExp", reader.GetInt64("totalExp") },
 								{ "selectionDate", reader.GetDateTime("selectionDate") },

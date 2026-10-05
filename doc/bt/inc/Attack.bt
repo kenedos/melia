@@ -28,8 +28,8 @@ typedef struct
 
 	short resultType;
 
-    byte isHit;
-    byte hitDelay;
+    byte b3;
+    byte b4;
     byte b7;
     byte b8;
 }
@@ -61,9 +61,11 @@ typedef struct
             byte b1;
             break;
     
-        // Negative; a magnitude above the target's stored shield zeroes it on the client.
+        // Part of many packets. Weirdly, the float
+        // is often times negative, but it is always
+        // a valid float.
         case 3:
-            float shieldDamage;
+            float f1;
             break;
     }
 }
@@ -76,8 +78,6 @@ string readVariableHitInfo(VariableHitInfo &val)
     return result;
 }
 
-// Seen carrying a ZC_SYNC_EXEC that fires effects queued up in a
-// preceding sync block once the hit lands.
 typedef struct (int size)
 {
     short op <hidden=true>;
@@ -97,11 +97,6 @@ string readAdditionalPacket(AdditionalPacket &val)
 // Every SkillHitInfo appears to contain information about one hit
 // that happened on a target. Unfortunately its structure is flexible,
 // which makes analysis pretty difficult. Most of this data is guessed.
-//
-// Hits are ordered frame-major, by hitFrameIndex and then targetIndex.
-// The C_FORCE_EFT effects in a skill's bytool data each name one frame
-// index and send their bullet at the hits carrying it, so a frame
-// without a hit leaves its bullet without a target to fly at.
 typedef struct
 {
 	byte b9;
@@ -117,9 +112,7 @@ typedef struct
     short hitDelay; // See DefaultHitDelay in skill data
 	byte hitEffect;
 	byte b7;
-	byte targetIndex; // Index of this hit's target within its hit frame
-	byte hitFrameIndex; // Index of the Frame in the bytool HitList this hit belongs to
-	short s3;
+	int i2;
 	int forceId;
     short s1;
     short s2;

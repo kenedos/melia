@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
@@ -90,7 +89,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 				return;
 			}
 
-			var target = targets.PickRandom();
+			var target = targets.Random();
 
 			target.StopMove();
 			target.AddState(StateType.Captured);

@@ -1,0 +1,1469 @@
+﻿============================================================
+MAP: d_abbey_22_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_abbey_22_4.cs
+MONSTER: Boor = 58856
+MONSTER: Half_Mangosting = 58859
+MONSTER: Hohen_Mage_Black = 58857
+MONSTER: Mangosting = 58858
+MONSTER: Nook = 58855
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: d_abbey_22_5
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_abbey_22_5.cs
+MONSTER: Drooper = 58860
+MONSTER: Harugal_Black = 58863
+MONSTER: Hohen_Mage_Black = 58857
+MONSTER: Hohen_Orben_Black = 58862
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: d_abbey_39_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_abbey_39_4.cs
+MONSTER: Kowak_Orange = 57355
+MONSTER: Malstatue = 57681
+MONSTER: Pumpflap = 57665
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Velaphid_Red = 57676
+
+============================================================
+MAP: d_abbey_41_6
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_abbey_41_6.cs
+MONSTER: Nuo_Red = 57984
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Ticen_Bow_Red = 57959
+MONSTER: Ticen_Mage_Red = 57961
+MONSTER: Ticen_Red = 57957
+
+============================================================
+MAP: d_abbey_64_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_abbey_64_1.cs
+MONSTER: Beeteroxia = 58053
+MONSTER: Carcashu_Green = 57341
+MONSTER: LapeArcher = 58016
+MONSTER: Melatanun = 57467
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Velwriggler_Mage_Red = 57674
+
+============================================================
+MAP: d_abbey_64_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_abbey_64_2.cs
+MONSTER: Crocoman = 57493
+MONSTER: LapeArcher = 58016
+MONSTER: Lapezard = 57845
+MONSTER: Lapfighter = 57846
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Sec_Whip_Vine_Ra = 58115
+
+============================================================
+MAP: d_abbey_64_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_abbey_64_3.cs
+MONSTER: Hepatica_Green = 401481
+MONSTER: Humming_Bud_Purple = 58103
+MONSTER: Lapeman = 57856
+MONSTER: Lapemiter = 57844
+MONSTER: Lapflammer = 57847
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: d_catacomb_80_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_catacomb_80_1.cs
+MONSTER: Fisherman_Red = 400344
+MONSTER: Goblin2_Hammer = 57636
+MONSTER: GoblinWarrior_Blue = 400207
+MONSTER: Kowak = 41451
+MONSTER: Kowak_Orange = 57355
+MONSTER: Melatanun = 57467
+MONSTER: Panto_Rspear = 47484
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Rudas_Loxodon = 57023
+MONSTER: Tree_Root_Mole_Pink = 57459
+MONSTER: Triffid = 57492
+
+============================================================
+MAP: d_catacomb_80_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_catacomb_80_2.cs
+MONSTER: Egnome_Yellow = 57315
+MONSTER: Gazing_Golem_Yellow = 57313
+MONSTER: Infroholder_Mage_Green = 57887
+MONSTER: Kepari_Mage = 57618
+MONSTER: Mirtislampa = 41253
+MONSTER: Moya = 47469
+MONSTER: Mushroom_Boy_Green = 400442
+MONSTER: Mushroom_Ent_Green = 400463
+MONSTER: NightMaiden_Bow_Red = 57940
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Wendigo_Archer_Blue = 57874
+MONSTER: Wendigo_Magician_Blue = 57870
+MONSTER: Yognome_Yellow = 57316
+
+============================================================
+MAP: d_catacomb_80_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_catacomb_80_3.cs
+MONSTER: Cronewt_Blue = 57953
+MONSTER: Cronewt_Bow_Blue = 57954
+MONSTER: Cronewt_Mage_Blue = 57955
+MONSTER: Elma = 57691
+MONSTER: Hohen_Gulak = 57720
+MONSTER: Infroholder_Red = 57884
+MONSTER: Nuka = 57690
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Siaulav_Blue = 57897
+MONSTER: Siaulav_Bow_Blue = 57900
+MONSTER: Siaulav_Mage_Blue = 57899
+MONSTER: Socket_Green = 57926
+MONSTER: Socket_Mage_Green = 57929
+
+============================================================
+MAP: d_cathedral_78_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_cathedral_78_1.cs
+MONSTER: ERD_Candlespider = 58674
+MONSTER: ERD_Egnome = 58680
+MONSTER: ERD_Elet = 58673
+MONSTER: ERD_Fire_Dragon_Purple = 58678
+MONSTER: ERD_Galok = 58670
+MONSTER: ERD_Glizardon = 58677
+MONSTER: ERD_InfroRocktor = 58679
+MONSTER: ERD_Malstatue = 58675
+MONSTER: ERD_Nuo = 58672
+MONSTER: ERD_Pawnd = 58669
+MONSTER: ERD_Pawndel = 58668
+MONSTER: ERD_Shredded = 58676
+MONSTER: ERD_Shtayim = 58681
+MONSTER: ERD_Zombiegirl2 = 58671
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: d_chapel_57_5
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_chapel_57_5.cs
+MONSTER: Glizardon = 57021
+MONSTER: New_Desmodus = 11110
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Yognome = 57207
+MONSTER: Zombiegirl2_Chpel = 57270
+
+============================================================
+MAP: d_chapel_57_6
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_chapel_57_6.cs
+MONSTER: Corylus = 57022
+MONSTER: Galok = 57018
+MONSTER: Pawnd = 57213
+MONSTER: Pawndel = 57028
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: d_chapel_57_7
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_chapel_57_7.cs
+MONSTER: Colitile = 57048
+MONSTER: Egnome = 57026
+MONSTER: Infroholder_Bow = 57599
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Spector_Gh = 400662
+
+============================================================
+MAP: d_cmine_01
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_cmine_01.cs
+MONSTER: Bat = 41418
+MONSTER: Goblin_Miners = 11125
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: StonOrca = 41295
+MONSTER: Whip_Vine_Ra = 47442
+
+============================================================
+MAP: d_cmine_02
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_cmine_02.cs
+MONSTER: Bat = 41418
+MONSTER: Bubbe_Mage_Normal = 47453
+MONSTER: Goblin_Archer = 11160
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Shredded = 41256
+MONSTER: Yekubite = 41257
+
+============================================================
+MAP: d_cmine_6
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_cmine_6.cs
+MONSTER: Bubbe_Mage_Priest = 47456
+MONSTER: GoblinWarrior = 400209
+MONSTER: Quartz_Weaver = 41409
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: d_cmine_8
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_cmine_8.cs
+MONSTER: Crystal_Lump = 103006
+MONSTER: FD_Bubbe_Chaser = 57463
+MONSTER: FD_Bubbe_Mage_Fire = 57464
+MONSTER: Golemlet_Blue = 58516
+
+============================================================
+MAP: d_cmine_9
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_cmine_9.cs
+MONSTER: FD_Bat_Big = 57733
+MONSTER: FD_Bubbe_Fighter = 57466
+MONSTER: FD_Bubbe_Mage_Ice = 57465
+MONSTER: FD_Stoulet_Mage = 57731
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: d_fantasylibrary_48_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_fantasylibrary_48_1.cs
+MONSTER: Bookmark_Mimic = 58866
+MONSTER: Claro = 58865
+MONSTER: Oscuro = 58864
+MONSTER: Page_Mimic = 58867
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: d_fantasylibrary_48_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_fantasylibrary_48_2.cs
+MONSTER: Aclis_Angel = 58868
+MONSTER: Levada = 58870
+MONSTER: Luna_Angel = 58869
+MONSTER: Marte_Book = 58871
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: d_fantasylibrary_48_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_fantasylibrary_48_3.cs
+MONSTER: Boogie_Box = 58875
+MONSTER: Crobasia = 58873
+MONSTER: Gear = 58400
+MONSTER: Rootcrystal_03 = 45134
+MONSTER: Rotacion = 58874
+
+============================================================
+MAP: d_fantasylibrary_48_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_fantasylibrary_48_4.cs
+MONSTER: Lampal = 58406
+MONSTER: Lapindal = 58404
+MONSTER: Lapinel = 58417
+MONSTER: Rootcrystal_03 = 45134
+MONSTER: Wisnol = 58403
+
+============================================================
+MAP: d_fantasylibrary_48_5
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_fantasylibrary_48_5.cs
+MONSTER: Creto = 58877
+MONSTER: Cretobiang = 58876
+MONSTER: Flamel = 58401
+MONSTER: Lapindion = 58407
+MONSTER: Llapindal_Ribbon = 58405
+MONSTER: Rootcrystal_03 = 45134
+MONSTER: Wis = 58402
+
+============================================================
+MAP: d_firetower_41
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_firetower_41.cs
+MONSTER: Armory = 41303
+MONSTER: Fire_Dragon = 401621
+MONSTER: Flight_Hope = 47397
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Rubblem = 57040
+MONSTER: Rudasjack = 57668
+
+============================================================
+MAP: d_firetower_42
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_firetower_42.cs
+MONSTER: Belegg = 57051
+MONSTER: Blindlem = 57042
+MONSTER: Chromadog = 47461
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Slime_Elite = 47402
+MONSTER: Slime_Elite_Big = 57744
+MONSTER: Tower_Of_Firepuppet = 47398
+
+============================================================
+MAP: d_firetower_43
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_firetower_43.cs
+MONSTER: Arma = 47394
+MONSTER: Flask_Mage = 57617
+MONSTER: InfroRocktor_Red = 57053
+MONSTER: Pyran = 57670
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: TerraNymph_Mage = 57643
+
+============================================================
+MAP: d_firetower_44
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_firetower_44.cs
+MONSTER: Flask = 47396
+MONSTER: Minivern = 57050
+MONSTER: Minivern_Elite = 57743
+MONSTER: New_Desmodus_Black = 57220
+MONSTER: Pyran = 57670
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Wizards_Marmotte = 47401
+
+============================================================
+MAP: d_firetower_45
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_firetower_45.cs
+MONSTER: Dimmer = 47395
+MONSTER: Fire_Dragon_Purple = 401623
+MONSTER: Minivern = 57050
+MONSTER: Minivern_Elite = 57743
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Tower_Of_Firepuppet_Black = 47399
+
+============================================================
+MAP: d_limestonecave_52_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_limestonecave_52_1.cs
+MONSTER: Flak_Green = 58475
+MONSTER: Rockoff = 58439
+MONSTER: Rockon = 58437
+MONSTER: Rootcrystal_04 = 45135
+MONSTER: Tala_Sorcerer = 58433
+
+============================================================
+MAP: d_limestonecave_52_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_limestonecave_52_2.cs
+MONSTER: Flamme_Mage_Green = 58470
+MONSTER: Flamme_Priest_Green = 58469
+MONSTER: Rootcrystal_04 = 45135
+MONSTER: Tala_Combat = 58434
+MONSTER: Warleader_Tala = 58435
+
+============================================================
+MAP: d_limestonecave_52_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_limestonecave_52_3.cs
+MONSTER: Bavon_Green = 58467
+MONSTER: Rocktanon = 58438
+MONSTER: Rootcrystal_04 = 45135
+MONSTER: Rubblem_Green = 58468
+MONSTER: Tala_Sorcerer = 58433
+
+============================================================
+MAP: d_limestonecave_52_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_limestonecave_52_4.cs
+MONSTER: Flamag_Green = 58472
+MONSTER: Flamme_Archer_Green = 58473
+MONSTER: Rocktanon = 58438
+MONSTER: Rootcrystal_04 = 45135
+MONSTER: Warleader_Tala = 58435
+MONSTER: Zolem_Green = 58471
+
+============================================================
+MAP: d_limestonecave_52_5
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_limestonecave_52_5.cs
+MONSTER: Flamil_Green = 58476
+MONSTER: Rockoff_Orange = 58440
+MONSTER: Rocktanon = 58438
+MONSTER: Rondo = 47481
+MONSTER: Rootcrystal_04 = 45135
+MONSTER: Schlesien_Heavycavarly = 400861
+MONSTER: Warleader_Tala = 58435
+MONSTER: Wood_Goblin_Green = 58474
+
+============================================================
+MAP: d_limestonecave_73_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_limestonecave_73_1.cs
+MONSTER: ERD_Chafperor = 58707
+MONSTER: ERD_Corylus = 58706
+MONSTER: ERD_Groll = 58704
+MONSTER: ERD_Lizardman = 58703
+MONSTER: ERD_Loftlem = 58700
+MONSTER: ERD_StonOrca = 58705
+MONSTER: ERD_Tanu = 58701
+MONSTER: ERD_Vesper = 58702
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: d_prison_62_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_prison_62_1.cs
+MONSTER: Dumaro_Blue = 57991
+MONSTER: Goblin_Miners_Blue = 11127
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Sec_Yekubite = 58094
+MONSTER: Wendigo_Blue = 58002
+
+============================================================
+MAP: d_prison_62_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_prison_62_2.cs
+MONSTER: Goblin_Spear_Blue = 11124
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Sec_Escape_Wendigo = 58111
+MONSTER: Sec_Goblin_Archer_Blue = 58092
+
+============================================================
+MAP: d_prison_62_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_prison_62_3.cs
+MONSTER: GoblinWarrior_Blue = 400207
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Sec_Bubbe_Mage_Priest = 58098
+MONSTER: Sec_Goblin_Archer_Blue = 58092
+
+============================================================
+MAP: d_prison_75_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_prison_75_1.cs
+MONSTER: ERD_Chromadog = 58639
+MONSTER: ERD_Colifly_Black = 58637
+MONSTER: ERD_Escape_Wendigo = 58635
+MONSTER: ERD_Hook = 58645
+MONSTER: ERD_InfroRocktor_Red = 58642
+MONSTER: ERD_New_Desmodus_Black = 58643
+MONSTER: ERD_Socket = 58638
+MONSTER: ERD_Socket_Bow = 58640
+MONSTER: ERD_Stoulet = 58636
+MONSTER: ERD_Stoulet_Bow = 58634
+MONSTER: ERD_Stoulet_Mage = 58641
+MONSTER: ERD_Zigri = 58644
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: d_prison_78
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_prison_78.cs
+MONSTER: Elet_Blue = 57981
+MONSTER: NightMaiden_Mage_Red = 57939
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: TerraNymph_Brown = 58015
+
+============================================================
+MAP: d_prison_79
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_prison_79.cs
+MONSTER: Nuo_Purple = 57983
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Socket_Bow_Red = 57932
+MONSTER: TerraNymph_Mage_Blue = 57951
+
+============================================================
+MAP: d_prison_80
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_prison_80.cs
+MONSTER: Defender_Spider_Blue = 57989
+MONSTER: NightMaiden_Bow_Red = 57940
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Socket_Mage_Red = 57930
+
+============================================================
+MAP: d_prison_81
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_prison_81.cs
+MONSTER: Elma_Blue = 57987
+MONSTER: Nuka_Blue = 57985
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: TerraNymph_Bow_Brown = 57952
+
+============================================================
+MAP: d_prison_82
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_prison_82.cs
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Templeslave_Mage_Blue = 57883
+MONSTER: Templeslave_Sword_Blue = 57881
+MONSTER: Wendigo_Bow_White = 57871
+
+============================================================
+MAP: d_startower_76_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_startower_76_1.cs
+MONSTER: ERD_Bagworm = 58653
+MONSTER: ERD_Bavon = 58651
+MONSTER: ERD_Belegg = 58649
+MONSTER: ERD_Bubbe_Mage_Ice = 58652
+MONSTER: ERD_Defender_Spider_Blue = 58648
+MONSTER: ERD_Flask_Blue = 58647
+MONSTER: ERD_Hogma_Warrior = 58654
+MONSTER: ERD_Slime_Dark_Blue = 58646
+MONSTER: ERD_Tombsinker = 58650
+MONSTER: ERD_Zinutekas = 58655
+MONSTER: Rootcrystal_02 = 45133
+
+============================================================
+MAP: d_startower_76_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_startower_76_2.cs
+MONSTER: ERD_Big_Cockatries_Red = 59018
+MONSTER: ERD_Hohen_Orben_Green = 59016
+MONSTER: ERD_Hohen_Orben_Red = 59017
+MONSTER: ERD_Hook_Remain = 59011
+MONSTER: ERD_Jukotail = 59015
+MONSTER: ERD_Nuo_Purple = 59022
+MONSTER: ERD_Operor = 59012
+MONSTER: ERD_Quartz_Weaver = 59021
+MONSTER: ERD_Rafflesia_Green = 59014
+MONSTER: ERD_Ragged_Bird = 59020
+MONSTER: ERD_TerraNymph = 59013
+MONSTER: ERD_Tiny = 59010
+MONSTER: ERD_Truffle = 59019
+MONSTER: Rootcrystal_02 = 45133
+
+============================================================
+MAP: d_thorn_19
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_thorn_19.cs
+MONSTER: Groll = 41445
+MONSTER: Operor = 41267
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Thornball = 400721
+MONSTER: Truffle = 400881
+MONSTER: Velwriggler = 57033
+MONSTER: Whip_Vine = 401221
+
+============================================================
+MAP: d_thorn_21
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_thorn_21.cs
+MONSTER: Ammon = 41266
+MONSTER: Bagworm = 401701
+MONSTER: Chafperor = 41268
+MONSTER: Infroholder_Mage = 57598
+MONSTER: Matsum = 400381
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: d_thorn_22
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_thorn_22.cs
+MONSTER: Flower_Blue = 400181
+MONSTER: Meleech = 41285
+MONSTER: RavineLerva = 41269
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Wood_Goblin = 41290
+
+============================================================
+MAP: d_thorn_23
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_thorn_23.cs
+MONSTER: Cronewt = 57036
+MONSTER: Duckey = 57035
+MONSTER: InfroHoglan = 57037
+MONSTER: Infroholder = 41298
+MONSTER: Raider = 41288
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: d_thorn_39_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_thorn_39_1.cs
+MONSTER: Chafperor_Mage = 57652
+MONSTER: Infrogalas_Mage = 57653
+MONSTER: Pandroceum = 57679
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: TreeGool = 41264
+MONSTER: Wood_Lwa = 57660
+
+============================================================
+MAP: d_thorn_39_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_thorn_39_2.cs
+MONSTER: Big_Cockatries_Green = 401642
+MONSTER: Chafperor = 41268
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Tombstone_Turtle = 41197
+MONSTER: Velwriggler_Mage_Green = 57675
+
+============================================================
+MAP: d_thorn_39_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_thorn_39_3.cs
+MONSTER: Cire_Mage = 57650
+MONSTER: Hepatica_Green = 401481
+MONSTER: Loftlem_Green = 57664
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Stonacorn = 57682
+
+============================================================
+MAP: d_underfortress_30_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_underfortress_30_1.cs
+MONSTER: Colifly_Yellow = 57399
+MONSTER: Minos_Bow_Orange = 57923
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Wendigo_Archer_Blue = 57874
+
+============================================================
+MAP: d_underfortress_30_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_underfortress_30_2.cs
+MONSTER: Colifly_Bow_Black = 57934
+MONSTER: Colifly_Mage_Black = 57933
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Saltisdaughter_Green = 57935
+
+============================================================
+MAP: d_underfortress_30_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_underfortress_30_3.cs
+MONSTER: Candlespider_Blue = 401422
+MONSTER: Colimen_Brown = 57948
+MONSTER: Colimen_Mage_Brown = 57949
+MONSTER: Rootcrystal_04 = 45135
+
+============================================================
+MAP: d_underfortress_65
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_underfortress_65.cs
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Socket_Bow_Purple = 57931
+MONSTER: Socket_Red = 57927
+MONSTER: Ticen_Blue = 57956
+MONSTER: Ticen_Bow_Blue = 57958
+
+============================================================
+MAP: d_underfortress_66
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_underfortress_66.cs
+MONSTER: Chafperor_Mage_Purple = 57963
+MONSTER: Chafperor_Purple = 57962
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Ticen_Mage_Blue = 57960
+
+============================================================
+MAP: d_underfortress_67
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_underfortress_67.cs
+MONSTER: Dandel_White = 57326
+MONSTER: Rambear_Bow_Brown = 57965
+MONSTER: Rambear_Brown = 57964
+MONSTER: Rambear_Mage_Brown = 57966
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: d_underfortress_68
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_underfortress_68.cs
+MONSTER: Deadbornscab_Mage_Red = 57896
+MONSTER: Deadbornscab_Red = 57895
+MONSTER: Infroholder_Green = 57885
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: d_underfortress_69
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_underfortress_69.cs
+MONSTER: Flask_Blue = 57876
+MONSTER: Kepari_Green = 57877
+MONSTER: Kepari_Mage_Green = 57880
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Templeslave_Blue = 57882
+
+============================================================
+MAP: d_velniasprison_51_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_velniasprison_51_1.cs
+MONSTER: Egnome_Yellow = 57315
+MONSTER: Gazing_Golem_Yellow = 57313
+MONSTER: Moya_Yellow = 57319
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Yognome_Yellow = 57316
+
+============================================================
+MAP: d_velniasprison_51_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_velniasprison_51_2.cs
+MONSTER: Defender_Spider = 57692
+MONSTER: Elet = 57688
+MONSTER: Harugal = 57714
+MONSTER: Nuka = 57690
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: d_velniasprison_51_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_velniasprison_51_3.cs
+MONSTER: Hohen_Barkle = 57717
+MONSTER: Hohen_Mane = 57715
+MONSTER: Hohen_Orben = 57719
+MONSTER: Hohen_Ritter = 57716
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: d_velniasprison_51_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_velniasprison_51_4.cs
+MONSTER: Elma = 57691
+MONSTER: Harugal = 57714
+MONSTER: Mushroom_Ent_Green = 400463
+MONSTER: Nuo = 57689
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: d_velniasprison_51_5
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_velniasprison_51_5.cs
+MONSTER: Harugal = 57714
+MONSTER: Hohen_Barkle = 57717
+MONSTER: Hohen_Gulak = 57720
+MONSTER: Hohen_Mage = 57718
+MONSTER: Hohen_Orben = 57719
+MONSTER: Hohen_Ritter = 57716
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: d_velniasprison_77_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_velniasprison_77_1.cs
+MONSTER: ERD_Charcoal_Walker = 58661
+MONSTER: ERD_Charog = 58660
+MONSTER: ERD_Geppetto = 58665
+MONSTER: ERD_GoblinWarrior_Red = 58667
+MONSTER: ERD_Hallowventor = 58664
+MONSTER: ERD_Harugal = 58662
+MONSTER: ERD_NightMaiden = 58656
+MONSTER: ERD_NightMaiden_Bow = 58658
+MONSTER: ERD_NightMaiden_Mage = 58657
+MONSTER: ERD_Shardstatue = 58666
+MONSTER: ERD_Tower_Of_Firepuppet_Black = 58663
+MONSTER: ERD_Wizards_Marmotte = 58659
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: d_zachariel_32
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_zachariel_32.cs
+MONSTER: Karas = 41274
+MONSTER: Moving_Trap = 401121
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Stoulet = 41307
+MONSTER: Varv = 47347
+MONSTER: Zinutekas = 401301
+MONSTER: Zinutekas_Elite = 57740
+
+============================================================
+MAP: d_zachariel_33
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_zachariel_33.cs
+MONSTER: Beetle = 401081
+MONSTER: Beetle_Elite = 57741
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Tombsinker = 41277
+MONSTER: Vesper = 41273
+MONSTER: Wolf_Statue = 401241
+
+============================================================
+MAP: d_zachariel_34
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_zachariel_34.cs
+MONSTER: Echad = 41275
+MONSTER: Echad_Bow = 57593
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Shtayim = 41276
+MONSTER: Wolf_Statue_Mage = 57010
+MONSTER: Wolf_Statue_Mage_Pollution = 57054
+
+============================================================
+MAP: d_zachariel_35
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_zachariel_35.cs
+MONSTER: Dog_Of_King = 41198
+MONSTER: Karas_Mage = 57592
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Schlesien_Guard = 400841
+MONSTER: Wolf_Statue_Bow = 57611
+
+============================================================
+MAP: d_zachariel_36
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_zachariel_36.cs
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Schlesien_Claw = 400801
+MONSTER: Schlesien_Darkmage = 400821
+MONSTER: Schlesien_Heavycavarly = 400861
+
+============================================================
+MAP: d_zachariel_79_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_zachariel_79_1.cs
+MONSTER: ERD_Beetle = 58709
+MONSTER: ERD_Chupacabra_Desert = 58715
+MONSTER: ERD_Echad = 58713
+MONSTER: ERD_Lemur = 58718
+MONSTER: ERD_Moving_Trap = 58716
+MONSTER: ERD_NightMaiden_Mage_Red = 58710
+MONSTER: ERD_Sauga_S = 58708
+MONSTER: ERD_Upent = 58719
+MONSTER: ERD_Varv = 58714
+MONSTER: ERD_Wolf_Statue = 58717
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: d_zachariel_79_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\d_zachariel_79_2.cs
+MONSTER: ERD_Blindlem = 58729
+MONSTER: ERD_Colimen_Brown = 58727
+MONSTER: ERD_Dog_Of_King = 58731
+MONSTER: ERD_Echad_Bow = 58726
+MONSTER: ERD_Glyquare = 58722
+MONSTER: ERD_Rubblem = 58728
+MONSTER: ERD_Schlesien_Claw = 58721
+MONSTER: ERD_Schlesien_Darkmage = 58720
+MONSTER: ERD_Schlesien_Heavycavarly = 58723
+MONSTER: ERD_Tiny_Blue = 58725
+MONSTER: ERD_Tiny_Mage_Brown = 58730
+MONSTER: ERD_Wolf_Statue_Mage = 58724
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: f_3cmlake_83
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_3cmlake_83.cs
+MONSTER: Rajatadpole = 41308
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Sec_Merog_Wizzard = 58105
+MONSTER: Sec_Merog_Wogu = 58106
+
+============================================================
+MAP: f_3cmlake_84
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_3cmlake_84.cs
+MONSTER: Rajapearlite_Purple = 58101
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Slime_Dark_Blue = 58104
+MONSTER: Sowpent = 57686
+
+============================================================
+MAP: f_bracken_42_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_bracken_42_1.cs
+MONSTER: Doyor_Blue = 58484
+MONSTER: Folibu_Yellow = 58486
+MONSTER: Gosaru_Blue = 58487
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Tanu = 47472
+MONSTER: Tanu_Blue = 58485
+
+============================================================
+MAP: f_bracken_63_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_bracken_63_1.cs
+MONSTER: Ferrot = 58018
+MONSTER: Folibu = 58019
+MONSTER: Leafnut = 47488
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_bracken_63_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_bracken_63_2.cs
+MONSTER: Kanchobird = 58021
+MONSTER: Lapasape_Mage = 57640
+MONSTER: Loktanun = 58100
+MONSTER: Ponpon = 58020
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_bracken_63_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_bracken_63_3.cs
+MONSTER: Blossom_Beetle = 58850
+MONSTER: Bush_Beetle = 58849
+MONSTER: Ellogua = 41444
+MONSTER: Gosaru = 58017
+MONSTER: Raffly = 400521
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_farm_47_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_farm_47_1.cs
+MONSTER: Geppetto_White = 57328
+MONSTER: Pino_White = 57329
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_farm_47_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_farm_47_2.cs
+MONSTER: Ashrong = 57488
+MONSTER: Cronewt_Mage = 57645
+MONSTER: Dandel_Orange = 57327
+MONSTER: Kepari_Mage = 57618
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_farm_47_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_farm_47_3.cs
+MONSTER: Cronewt_Bow = 57646
+MONSTER: Ellom_Violet = 57502
+MONSTER: Kepo_Seed_Violet = 57503
+MONSTER: Operor_White = 57330
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_farm_49_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_farm_49_1.cs
+MONSTER: Lizardman_Orange = 57351
+MONSTER: Rambear_Bow = 57656
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Spion_Blue = 57910
+MONSTER: Spion_Bow_Blue = 57912
+MONSTER: Spion_Mage_Blue = 57913
+MONSTER: Tama_Orange = 57352
+
+============================================================
+MAP: f_farm_49_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_farm_49_2.cs
+MONSTER: Cyst = 41265
+MONSTER: Flying_Flog_Green = 401462
+MONSTER: Pendinmire_Paviesa = 58253
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Stub_Tree_Orange = 57357
+
+============================================================
+MAP: f_flash_29_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_flash_29_1.cs
+MONSTER: Infroholder_Bow_Red = 57886
+MONSTER: Minos_Mage_Green = 57922
+MONSTER: Minos_Orange = 57920
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: f_flash_58
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_flash_58.cs
+MONSTER: Infroholder_Mage_Green = 57887
+MONSTER: Infroholder_Red = 57884
+MONSTER: Rootcrystal_03 = 45134
+MONSTER: Socket_Purple = 57925
+
+============================================================
+MAP: f_flash_59
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_flash_59.cs
+MONSTER: Goblin2_Wand1 = 57632
+MONSTER: Jukopus_Gray = 400063
+MONSTER: Rambear = 47462
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_flash_60
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_flash_60.cs
+MONSTER: Bavon = 47471
+MONSTER: Moya = 47469
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Saltisdaughter_Mage = 57628
+
+============================================================
+MAP: f_flash_61
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_flash_61.cs
+MONSTER: Denden = 47478
+MONSTER: Goblin2_Sword = 57635
+MONSTER: Moyabu = 47470
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_flash_63
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_flash_63.cs
+MONSTER: Goblin2_Hammer = 57636
+MONSTER: Goblin2_Wand3 = 57634
+MONSTER: Lemur = 47306
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_flash_64
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_flash_64.cs
+MONSTER: Lemuria = 47307
+MONSTER: Repusbunny = 41299
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Rubabos = 47464
+MONSTER: Saltisdaughter_Bow = 57629
+
+============================================================
+MAP: f_gele_57_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_gele_57_1.cs
+MONSTER: Grummer = 47530
+MONSTER: Npanto_Baby = 57571
+MONSTER: Panto_Javelin_Gele = 57275
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Zignuts = 47473
+
+============================================================
+MAP: f_gele_57_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_gele_57_2.cs
+MONSTER: Leafly = 47532
+MONSTER: Mally = 47529
+MONSTER: Mon_Goat_Totem_Q = 107026
+MONSTER: Npanto_Hand = 57570
+MONSTER: Npanto_Staff = 57573
+MONSTER: Npanto_Sword = 57574
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Spion_Bow = 57609
+
+============================================================
+MAP: f_gele_57_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_gele_57_3.cs
+MONSTER: Banshee = 400101
+MONSTER: Deadbornscab_Mage = 57602
+MONSTER: Firent = 57017
+MONSTER: Humming_Bud = 47531
+MONSTER: Puragi_Green = 400303
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Zigri_Brown = 400322
+
+============================================================
+MAP: f_gele_57_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_gele_57_4.cs
+MONSTER: Colifly_Bow = 57626
+MONSTER: Mallardu = 47528
+MONSTER: Npanto_Archer = 57572
+MONSTER: Panto_Javelin_Elite = 57259
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Seedmia = 57016
+MONSTER: Zombiegirl2_Brown = 57568
+
+============================================================
+MAP: f_huevillage_58_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_huevillage_58_2.cs
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Rudas_Loxodon = 57023
+MONSTER: Ultanun = 47463
+MONSTER: Zibu_Maize = 57030
+
+============================================================
+MAP: f_huevillage_58_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_huevillage_58_3.cs
+MONSTER: Caro = 47486
+MONSTER: Doyor = 47479
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Tiny_Bow = 57607
+MONSTER: Tipio = 47480
+MONSTER: Upent = 57019
+
+============================================================
+MAP: f_huevillage_58_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_huevillage_58_4.cs
+MONSTER: Beeteros = 57024
+MONSTER: Beetow = 57027
+MONSTER: Carcashu = 57029
+MONSTER: Mentiwood = 57025
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Tiny_Mage = 57606
+
+============================================================
+MAP: f_katyn_12
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_katyn_12.cs
+MONSTER: Chupacabra_Green = 58206
+MONSTER: Jellyfish_Blue = 400242
+MONSTER: Operor_Blue = 58207
+MONSTER: Puragi = 400301
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Sec_Zombiegirl2_Chpel = 58116
+MONSTER: Zigri = 400321
+
+============================================================
+MAP: f_katyn_13
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_katyn_13.cs
+MONSTER: Arburn_Pokubu_Green = 400084
+MONSTER: Bushspider = 400141
+MONSTER: Fisherman = 400341
+MONSTER: HighBube_Archer = 11090
+MONSTER: HighBube_Spear = 41405
+MONSTER: Rootcrystal_02 = 45133
+
+============================================================
+MAP: f_katyn_13_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_katyn_13_3.cs
+MONSTER: Ellom = 41436
+MONSTER: Ellom_Green = 41437
+MONSTER: InfroRocktor_Red = 57053
+MONSTER: New_Desmodus = 11110
+MONSTER: Pappus_Kepa = 400481
+
+============================================================
+MAP: f_katyn_45_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_katyn_45_1.cs
+MONSTER: Rootcrystal_04 = 45135
+MONSTER: Socket_Mage_Green = 57929
+MONSTER: Stoulet_Bow_Blue = 57919
+MONSTER: Stoulet_Gray = 57915
+
+============================================================
+MAP: f_katyn_45_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_katyn_45_2.cs
+MONSTER: Pappus_Kepa_Purple = 400483
+MONSTER: Puragi_Red = 400304
+MONSTER: Ridimed_Blue = 400542
+MONSTER: Rootcrystal_04 = 45135
+
+============================================================
+MAP: f_katyn_45_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_katyn_45_3.cs
+MONSTER: Fisherman_Blue = 400342
+MONSTER: Jellyfish_Green = 400243
+MONSTER: Mushroom_Boy_Yellow = 400444
+MONSTER: Rootcrystal_04 = 45135
+MONSTER: Sakmoli_Purple = 400564
+
+============================================================
+MAP: f_katyn_7_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_katyn_7_2.cs
+MONSTER: Ellomago = 41443
+MONSTER: Jellyfish_Red = 400244
+MONSTER: Ridimed = 400541
+MONSTER: Rootcrystal_02 = 45133
+MONSTER: Sakmoli = 400561
+
+============================================================
+MAP: f_maple_23_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_maple_23_2.cs
+MONSTER: Caro_Yellow = 58483
+MONSTER: Colimen_Red = 58482
+MONSTER: Grummer_orange = 58481
+MONSTER: Leafnut_Yellow = 58480
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: f_maple_24_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_maple_24_1.cs
+MONSTER: Atti = 58841
+MONSTER: Cloverin = 59233
+MONSTER: Delione = 59239
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Rudas_Elavine = 59230
+
+============================================================
+MAP: f_maple_24_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_maple_24_2.cs
+MONSTER: Kucarry_Numani = 58549
+MONSTER: Kucarry_Zabbi = 58551
+MONSTER: Kucarry_Zeuni = 58552
+MONSTER: Nabu = 58447
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_maple_24_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_maple_24_3.cs
+MONSTER: Blueberrin = 59238
+MONSTER: Charcoal_Walker_Green = 58478
+MONSTER: Cloverin = 59233
+MONSTER: Fragolin = 59240
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_orchard_32_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_orchard_32_4.cs
+MONSTER: Ferret_Archer = 57848
+MONSTER: Ferret_Bearer_Elite = 57849
+MONSTER: Ferret_Folk = 57850
+MONSTER: Ferret_Searcher = 57853
+MONSTER: Ferret_Vendor = 57855
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_orchard_34_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_orchard_34_1.cs
+MONSTER: Corpse_Flower_Green = 401445
+MONSTER: Eldigo_Green = 57453
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Truffle_Red = 58028
+
+============================================================
+MAP: f_orchard_34_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_orchard_34_2.cs
+MONSTER: Ferret_Folk = 57850
+MONSTER: Ferret_Loader = 57851
+MONSTER: Ferret_Patter = 57852
+MONSTER: Ferret_Searcher = 57853
+MONSTER: Ferret_Slinger = 57854
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_orchard_34_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_orchard_34_3.cs
+MONSTER: Flying_Flog_White = 401463
+MONSTER: Mushroom_Ent_Red = 400464
+MONSTER: Rafflesia_Green = 400502
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Siaulav_Bow_Orange = 57901
+
+============================================================
+MAP: f_pilgrimroad_41_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_pilgrimroad_41_2.cs
+MONSTER: Rootcrystal_02 = 45133
+MONSTER: Sec_Banshee_Purple = 58097
+MONSTER: Tiny_Mage_Green = 57905
+
+============================================================
+MAP: f_pilgrimroad_41_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_pilgrimroad_41_3.cs
+MONSTER: Lapasape_Mage_Brown = 57944
+MONSTER: Minos_Bow_Green = 57924
+MONSTER: Minos_Green = 57921
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_pilgrimroad_41_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_pilgrimroad_41_4.cs
+MONSTER: Repusbunny_Bow_Purple = 57894
+MONSTER: Repusbunny_Purple = 57890
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Stub_Tree_Mage = 57616
+
+============================================================
+MAP: f_pilgrimroad_41_5
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_pilgrimroad_41_5.cs
+MONSTER: Deadbornscab_Bow = 57603
+MONSTER: Elma_Red = 57988
+MONSTER: Lapasape_Bow_Brown = 57946
+MONSTER: Nuka_Brown = 57986
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: f_pilgrimroad_49
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_pilgrimroad_49.cs
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Tiny_Bow_Green = 57907
+MONSTER: Tiny_Brown = 57903
+MONSTER: Tiny_Mage = 57606
+
+============================================================
+MAP: f_remains_37
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_remains_37.cs
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Stub_Tree = 401761
+MONSTER: Tama = 41448
+MONSTER: TreeAmbulo = 41249
+
+============================================================
+MAP: f_remains_38
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_remains_38.cs
+MONSTER: InfroBurk = 41310
+MONSTER: Lizardman = 41447
+MONSTER: Long_Arm = 41196
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Stub_Tree_Mage = 57616
+
+============================================================
+MAP: f_remains_39
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_remains_39.cs
+MONSTER: Flying_Flog = 401461
+MONSTER: Gravegolem = 401601
+MONSTER: Hallowventor = 41281
+MONSTER: Hook = 401741
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Zolem = 41287
+
+============================================================
+MAP: f_rokas_24
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_rokas_24.cs
+MONSTER: Big_Cockatries = 401641
+MONSTER: Big_Cockatries_Red = 401643
+MONSTER: Cockatries = 401261
+MONSTER: Dandel = 401401
+MONSTER: Geppetto = 401101
+MONSTER: Hogma_Combat = 47308
+MONSTER: Hogma_Warrior = 41433
+MONSTER: Pino = 401181
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Tontus = 401061
+
+============================================================
+MAP: f_rokas_25
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_rokas_25.cs
+MONSTER: Chupacabra_Desert = 47329
+MONSTER: Lichenclops = 57039
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Zinute = 47327
+
+============================================================
+MAP: f_rokas_26
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_rokas_26.cs
+MONSTER: Dumaro = 57038
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Wendigo = 41446
+MONSTER: Wendigo_Bow = 57621
+MONSTER: Wendigo_Mage = 57619
+
+============================================================
+MAP: f_rokas_27
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_rokas_27.cs
+MONSTER: Loftlem = 57041
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Sauga_S = 401001
+MONSTER: Ticen = 57045
+MONSTER: Tucen = 57046
+
+============================================================
+MAP: f_rokas_28
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_rokas_28.cs
+MONSTER: Hogma_Archer = 41434
+MONSTER: Lauzinute = 47328
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Templeslave_Mage = 57597
+
+============================================================
+MAP: f_rokas_30
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_rokas_30.cs
+MONSTER: Hogma_Guard = 47309
+MONSTER: Hogma_Sorcerer = 41435
+MONSTER: Rootcrystal_05 = 45136
+
+============================================================
+MAP: f_rokas_31
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_rokas_31.cs
+MONSTER: Repusbunny_Mage = 57600
+MONSTER: Rootcrystal_03 = 45134
+MONSTER: Tontulia = 401041
+MONSTER: Warleader_Hogma = 41441
+
+============================================================
+MAP: f_siauliai_11_re
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_siauliai_11_re.cs
+MONSTER: Onion_Red_Elite = 57379
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Sec_Hanaming = 58007
+MONSTER: Sec_Onion_Red = 58088
+MONSTER: Sec_Popolion_Blue = 58009
+MONSTER: Woodin = 41294
+
+============================================================
+MAP: f_siauliai_15_re
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_siauliai_15_re.cs
+MONSTER: Onion_Green = 400005
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Sec_Arburn_Pokubu = 58091
+MONSTER: Sec_Jukopus = 58011
+MONSTER: Sec_Pokubu = 58010
+
+============================================================
+MAP: f_siauliai_46_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_siauliai_46_1.cs
+MONSTER: Infro_Blud = 57044
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Shardstatue = 41258
+MONSTER: Siaulav = 57208
+
+============================================================
+MAP: f_siauliai_46_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_siauliai_46_4.cs
+MONSTER: Honeybean = 57450
+MONSTER: Honeymeli = 57451
+MONSTER: Lantern_Mushroom_Orange = 57423
+MONSTER: Pendinmire = 57217
+MONSTER: Rabbee = 57447
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Siaulamb = 57203
+MONSTER: Siaulogre = 57216
+
+============================================================
+MAP: f_siauliai_47_4
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_siauliai_47_4.cs
+MONSTER: Haming_Orange = 57348
+MONSTER: Popolion_Orange = 400984
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Spion_Mage = 57608
+
+============================================================
+MAP: f_siauliai_50_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_siauliai_50_1.cs
+MONSTER: Charog_Green = 58477
+MONSTER: Chupaluka_Pink = 57353
+MONSTER: Repusbunny_Bow = 57601
+MONSTER: Ridimed_Purple = 400543
+MONSTER: RootCrystal_A = 45110
+MONSTER: Sakmoli_Orange = 400563
+
+============================================================
+MAP: f_siauliai_out
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_siauliai_out.cs
+MONSTER: Goblin_Spear = 11120
+MONSTER: Jukopus = 400061
+MONSTER: Onion_Red = 400003
+MONSTER: Onion_Red_Elite = 57379
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_siauliai_west
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_siauliai_west.cs
+MONSTER: Bokchoy = 400041
+MONSTER: Hanaming = 400941
+MONSTER: InfroRocktor = 41319
+MONSTER: Leaf_Diving = 401501
+MONSTER: Onion = 400001
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_tableland_11_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_tableland_11_1.cs
+MONSTER: Groll_White = 57324
+MONSTER: Repusbunny_Mage_Green = 57891
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Saltisdaughter_Bow_Green = 57937
+MONSTER: Saltisdaughter_Red = 57936
+
+============================================================
+MAP: f_tableland_28_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_tableland_28_1.cs
+MONSTER: Repusbunny_Bow_Green = 57893
+MONSTER: Repusbunny_Green = 57889
+MONSTER: Rootcrystal_03 = 45134
+MONSTER: Saltisdaughter_Mage_Red = 57938
+
+============================================================
+MAP: f_tableland_28_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_tableland_28_2.cs
+MONSTER: Lapasape_Blue = 57941
+MONSTER: Rootcrystal_03 = 45134
+MONSTER: Siaulav_Blue = 57897
+MONSTER: Siaulav_Bow_Blue = 57900
+MONSTER: Siaulav_Mage_Blue = 57899
+
+============================================================
+MAP: f_tableland_70
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_tableland_70.cs
+MONSTER: Cronewt_Blue = 57953
+MONSTER: Hohen_Mage_Blue = 57973
+MONSTER: Hohen_Mane_Purple = 57967
+MONSTER: Lapasape_Bow_Blue = 57945
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: f_tableland_71
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_tableland_71.cs
+MONSTER: Cronewt_Bow_Blue = 57954
+MONSTER: Hohen_Barkle_Blue = 57971
+MONSTER: Hohen_Ritter_Purple = 57969
+MONSTER: Rootcrystal_03 = 45134
+MONSTER: Tiny_Blue = 57902
+
+============================================================
+MAP: f_tableland_72
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_tableland_72.cs
+MONSTER: Cronewt_Mage_Blue = 57955
+MONSTER: Hohen_Orben_Red = 57975
+MONSTER: Lapasape_Brown = 57942
+MONSTER: Rootcrystal_03 = 45134
+MONSTER: Spion_White = 57908
+
+============================================================
+MAP: f_tableland_74
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_tableland_74.cs
+MONSTER: Harugal_Blue = 57979
+MONSTER: Hohen_Gulak_Blue = 57977
+MONSTER: Kepari_Purple = 57878
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Spion_Mage_White = 57914
+MONSTER: Tiny_Mage_Brown = 57904
+
+============================================================
+MAP: f_whitetrees_21_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_whitetrees_21_2.cs
+MONSTER: Charog_Green = 58477
+MONSTER: Kucarry_Balzer = 58553
+MONSTER: Kucarry_Symbani = 58550
+MONSTER: Kucarry_Zeffi = 58554
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: f_whitetrees_22_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_whitetrees_22_3.cs
+MONSTER: Hohen_Gulak_Black = 58851
+MONSTER: Hohen_Mane_Black = 58852
+MONSTER: Rootcrystal_01 = 45132
+MONSTER: Yakmab = 58854
+MONSTER: Yakmambo = 58853
+MONSTER: Yakyak = 58843
+
+============================================================
+MAP: f_whitetrees_23_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_whitetrees_23_1.cs
+MONSTER: Kucarry_Lioni = 58548
+MONSTER: Kucarry_Somy = 58547
+MONSTER: Kucarry_Tot = 58546
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: f_whitetrees_23_3
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_whitetrees_23_3.cs
+MONSTER: Cloverin = 59233
+MONSTER: Fragolin = 59240
+MONSTER: Rafflet = 59234
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: f_whitetrees_56_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\fields\f_whitetrees_56_1.cs
+MONSTER: Bloom = 58566
+MONSTER: Budny = 58565
+MONSTER: Castle_Gardner = 58556
+MONSTER: Florabbi = 58564
+MONSTER: Floron = 58563
+MONSTER: Moringaga = 58450
+MONSTER: Rootcrystal_03 = 45134
+
+============================================================
+MAP: id_catacomb_01
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\id_catacomb_01.cs
+MONSTER: Colifly_Bow_Purple = 57700
+MONSTER: Cronewt_Bow_Brown = 57697
+MONSTER: FD_Candlespider = 57481
+MONSTER: FD_Leaf_Diving_Purple = 57487
+MONSTER: FD_Maggot = 57485
+MONSTER: FD_Mushcarfung = 57484
+MONSTER: Rootcrystal_01 = 45132
+
+============================================================
+MAP: id_catacomb_33_1
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\id_catacomb_33_1.cs
+MONSTER: Drapel = 57685
+MONSTER: Fisherman_Green = 400343
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Sec_Leaf_Diving_Purple = 58125
+MONSTER: Sec_Maggot_Green = 58113
+
+============================================================
+MAP: id_catacomb_33_2
+FILE: D:\project baixada ascension\melia\packages\laima\scripts\zone\content\laima\mobs\dungeons\id_catacomb_33_2.cs
+MONSTER: Rootcrystal_05 = 45136
+MONSTER: Sec_Colitile = 58108
+MONSTER: Sec_Spector_Gh_Purple = 58112
+MONSTER: Sec_Stoulet_Green = 58114
+MONSTER: Slime_Dark_Green = 58102
+

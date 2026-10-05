@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Buffers;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading.Tasks;
 using Melia.Shared.Network.Crypto;
-using Melia.Shared.Util;
 using Yggdrasil.Logging;
 using Yggdrasil.Network.TCP;
 using Yggdrasil.Util;
@@ -62,9 +60,6 @@ namespace Melia.Shared.Network
 		protected readonly TosFramer _framer = new(1024 * 50);
 		protected readonly Codec _crypto = new();
 
-		private static readonly FieldInfo SocketField = typeof(TcpConnection).GetField("_socket", BindingFlags.Instance | BindingFlags.NonPublic);
-		private bool _socketConfigured;
-
 		/// <summary>
 		/// Gets or sets whether the player authenticated themselves.
 		/// </summary>
@@ -86,7 +81,7 @@ namespace Melia.Shared.Network
 		public Connection()
 		{
 			_framer.MessageReceived += this.OnMessageReceived;
-			this.IntegritySeed = GameRandom.Get().Next();
+			this.IntegritySeed = RandomProvider.Get().Next();
 		}
 
 		/// <summary>
@@ -96,9 +91,6 @@ namespace Melia.Shared.Network
 		/// <param name="length"></param>
 		protected override void ReceiveData(byte[] buffer, int length)
 		{
-			if (!_socketConfigured)
-				this.DisableSendCoalescing();
-
 			try
 			{
 				_framer.ReceiveData(buffer, length);
@@ -107,28 +99,6 @@ namespace Melia.Shared.Network
 			{
 				Log.Error("Error while framing data: {0}", ex);
 				this.Close();
-			}
-		}
-
-		/// <summary>
-		/// Disables Nagle's algorithm on the underlying socket, so small
-		/// packets go out immediately instead of being held back waiting
-		/// for more data to coalesce with.
-		/// </summary>
-		private void DisableSendCoalescing()
-		{
-			_socketConfigured = true;
-
-			try
-			{
-				if (SocketField?.GetValue(this) is Socket socket)
-					socket.NoDelay = true;
-				else
-					Log.Warning("Connection: Could not reach the socket, send coalescing left enabled.");
-			}
-			catch (Exception ex)
-			{
-				Log.Warning("Connection: Failed to disable send coalescing. {0}", ex.Message);
 			}
 		}
 

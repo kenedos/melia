@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Melia.Shared.Configuration.Files;
+
 namespace Melia.Shared.Configuration
 {
 	/// <summary>
@@ -72,7 +73,6 @@ namespace Melia.Shared.Configuration
 			this.Packages.Load("system/conf/packages.conf");
 
 			var packageConfDirs = new List<string>();
-
 			foreach (var name in this.Packages.EnabledPackages)
 			{
 				var confDir = Path.Combine("packages", name, "conf").Replace('\\', '/');

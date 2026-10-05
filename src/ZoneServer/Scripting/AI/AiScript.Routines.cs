@@ -23,7 +23,6 @@ using Yggdrasil.Extensions;
 using Yggdrasil.Logging;
 using Yggdrasil.Util;
 using static Melia.Shared.Util.TaskHelper;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.Scripting.AI
 {
@@ -78,7 +77,7 @@ namespace Melia.Zone.Scripting.AI
 
 			for (var i = 0; i < 10; ++i)
 			{
-				destination = this.Entity.Position.GetRandomInRange2D(radius, GameRandom.Get());
+				destination = this.Entity.Position.GetRandomInRange2D(radius, RandomProvider.Get());
 
 				// Give entities a random chance to move past their wander
 				// limit, that decreases with distance, to add some
@@ -94,7 +93,7 @@ namespace Melia.Zone.Scripting.AI
 					{
 						var chance = Math.Clamp(1 - (distance - wanderRange) / (wanderRange * extraRangeRate), 0, 1);
 
-						if (GameRandom.Get().NextDouble() > chance)
+						if (RandomProvider.Get().NextDouble() > chance)
 							continue;
 					}
 				}
@@ -220,14 +219,14 @@ namespace Melia.Zone.Scripting.AI
 					}
 				}
 
-				var now = GameClock.Now;
+				var now = DateTime.UtcNow;
 
 				// Recompute the lead every ~250ms or whenever the target
 				// has drifted far enough from the last destination that
 				// the current path is no longer useful.
 				var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
 				var distToTarget = (float)this.Entity.Position.Get2DDistance(target.Position);
-				var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * Movement.UnitsPerMspdSecond) : 0f;
+				var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * UnitsPerMspdSecond) : 0f;
 
 				var destination = this.GetLeadPosition(target, travelSec);
 				destination = this.ApplyAllySeparation(destination);
@@ -255,6 +254,12 @@ namespace Melia.Zone.Scripting.AI
 			if (arrivedInRange)
 				yield return this.StopMove();
 		}
+
+		/// <summary>
+		/// World units covered per second, per point of MSPD. Empirically
+		/// a 30 MSPD entity travels ~75 units/s, so 1 MSPD ≈ 2.5 units/s.
+		/// </summary>
+		private const float UnitsPerMspdSecond = 2.5f;
 
 		/// <summary>
 		/// Returns the position the target will reach in
@@ -293,7 +298,7 @@ namespace Melia.Zone.Scripting.AI
 				return target.Position;
 
 			var targetSpeed = target.Properties.GetFloat(PropertyName.MSPD);
-			var distance = targetSpeed * Movement.UnitsPerMspdSecond * leadSec;
+			var distance = targetSpeed * UnitsPerMspdSecond * leadSec;
 			if (distance > MaxLeadDistance) distance = MaxLeadDistance;
 
 			var leadPos = target.Position.GetRelative(target.Direction, distance);
@@ -304,7 +309,7 @@ namespace Melia.Zone.Scripting.AI
 			if (mobSpeed > 0f)
 			{
 				var mobDistToLead = (float)this.Entity.Position.Get2DDistance(leadPos);
-				var mobTravelSec = mobDistToLead / (mobSpeed * Movement.UnitsPerMspdSecond);
+				var mobTravelSec = mobDistToLead / (mobSpeed * UnitsPerMspdSecond);
 				if (mobTravelSec > MaxLeadSeconds) return target.Position;
 			}
 
@@ -372,7 +377,7 @@ namespace Melia.Zone.Scripting.AI
 			// hit lands where the target will be when the cast resolves.
 			var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
 			var distToTarget = (float)this.Entity.Position.Get2DDistance(_target.Position);
-			var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * Movement.UnitsPerMspdSecond) : 0f;
+			var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * UnitsPerMspdSecond) : 0f;
 			var leadSec = travelSec + shootSec;
 
 			var destination = this.GetLeadPosition(_target, leadSec);
@@ -383,8 +388,8 @@ namespace Melia.Zone.Scripting.AI
 			var estimatedTime = _movement?.MoveStraight(validDest) ?? TimeSpan.Zero;
 			if (estimatedTime <= TimeSpan.Zero) yield break;
 
-			var deadline = GameClock.Now + estimatedTime + TimeSpan.FromMilliseconds(200);
-			while (_movement != null && _movement.IsMoving && GameClock.Now < deadline)
+			var deadline = DateTime.UtcNow + estimatedTime + TimeSpan.FromMilliseconds(200);
+			while (_movement != null && _movement.IsMoving && DateTime.UtcNow < deadline)
 			{
 				// Target came into range during the walk — stop and cast now
 				// so we don't waste time arriving at a spot we no longer need.
@@ -424,7 +429,7 @@ namespace Melia.Zone.Scripting.AI
 			{
 				// Strafe sideways while maintaining range
 				var dirFromTarget = target.Position.GetDirection(this.Entity.Position);
-				var arcDegrees = GameRandom.Get().Next(2) == 0 ? -20f : 20f;
+				var arcDegrees = RandomProvider.Get().Next(2) == 0 ? -20f : 20f;
 				var orbitDir = dirFromTarget.AddDegreeAngle(arcDegrees);
 				var strafePos = target.Position.GetRelative(orbitDir, idealRange);
 				yield return this.MoveTo(strafePos);
@@ -545,7 +550,7 @@ namespace Melia.Zone.Scripting.AI
 					possibleSkills.Add(a.SkillId);
 			if (possibleSkills.Count == 0)
 				return false;
-			var rndSkillId = possibleSkills.PickRandom();
+			var rndSkillId = possibleSkills.Random();
 
 			if (!skills.Has(rndSkillId))
 			{
@@ -566,7 +571,7 @@ namespace Melia.Zone.Scripting.AI
 		protected virtual IEnumerable UseSkill(Skill skill, ICombatEntity target, TimeSpan delay = default)
 		{
 			// Track when we start using a skill for fear behavior timing
-			_lastSkillUseTime = GameClock.Now;
+			_lastSkillUseTime = DateTime.UtcNow;
 			// Track the skill's duration to prevent interruption during animation
 			_lastSkillDuration = (delay == default) ? skill.Properties.ShootTime : delay;
 
@@ -597,9 +602,6 @@ namespace Melia.Zone.Scripting.AI
 				if (this.Entity.Components.TryGet<BaseSkillComponent>(out var skillComponent))
 					skillComponent.UseSkill(skill.Id);
 
-				if (this.Entity is Mob)
-					Debug.MobSkillAnnounce(this.Entity, skill);
-
 				handler.Handle(skill, this.Entity, target);
 			}
 			skillUsedSuccessfully = true;
@@ -620,8 +622,8 @@ namespace Melia.Zone.Scripting.AI
 			var useTime = (delay == default) ? skill.Properties.ShootTime : delay;
 			if (useTime > TimeSpan.Zero)
 			{
-				var waitEnd = GameClock.LocalNow + useTime;
-				while (GameClock.LocalNow < waitEnd)
+				var waitEnd = DateTime.Now + useTime;
+				while (DateTime.Now < waitEnd)
 				{
 					// If the cast was interrupted, stop waiting immediately
 					if (skill.Vars.GetBool("Melia.MonsterCastInterrupted"))
@@ -695,6 +697,9 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns></returns>
 		protected float GetAttackRange(Skill skill)
 		{
+			if (this.Entity is Summon)
+				return skill.GetAttackRange();
+
 			return this.Entity.AgentRadius + skill.GetAttackRange();
 		}
 
@@ -760,7 +765,7 @@ namespace Melia.Zone.Scripting.AI
 				{
 					// Option A: Teleport to target
 					movement?.Stop();
-					this.Entity.Position = followTarget.Position.GetRandomInRange2D((int)minDistance / 2, GameRandom.Get()); // Teleport nearby, not directly on top
+					this.Entity.Position = followTarget.Position.GetRandomInRange2D((int)minDistance / 2, RandomProvider.Get()); // Teleport nearby, not directly on top
 					Send.ZC_SET_POS(this.Entity);
 					yield return this.Wait(250); // Small delay after teleport to re-orient.
 					continue; // Continue the loop from the new position
@@ -791,7 +796,6 @@ namespace Melia.Zone.Scripting.AI
 			}
 
 			// If the loop exits, it means one of the conditions failed (target died, etc.)
-			Log.Debug($"'{this.Entity.Name}' is stopping its Follow routine for target '{followTarget.Name}'.");
 			this.SetRunning(false); // Revert speed
 			yield return this.StopMove();
 		}

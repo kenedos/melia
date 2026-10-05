@@ -110,14 +110,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				EffectMoveDelay = 0f,
 			};
 
-			if (!caster.Position.InRange2D(target.Position, 300))
-				return;
+			var position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 80, height: 1);
+			await MissilePadThrow(skill, caster, position, firstConfig, 0f, "Monster_Sleep");
 
-			var positions = GetScatteredPositions(GetLeadPosition(target, 1000, caster), 4, 90, 45);
-			var throws = new List<Task>();
-			for (var i = 0; i < positions.Count; i++)
-				throws.Add(MissilePadThrow(skill, caster, originPos.GetNearestPositionWithinDistance(positions[i], 250f), i == 0 ? firstConfig : config, 0f, "Monster_Sleep"));
-			await Task.WhenAll(throws);
+			for (var i = 0; i < 3; i++)
+			{
+				position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 80, height: 1);
+				await MissilePadThrow(skill, caster, position, config, 0f, "Monster_Sleep");
+			}
 		}
 	}
 
@@ -226,14 +226,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			var angles = new float[] { 45f, 54f, 74f, 95f, 110f, 130f, 139f, 159f, 180f, -169f, -159f, -144f, -110f, -95f, -79f, -60f, -45f, -30f, -19f, 30f };
 
-			var baseDir = originPos.GetDirection(farPos);
 			for (var i = 0; i < angles.Length; i++)
 			{
-				_ = MissileThrow(skill, caster, originPos.GetRelative(baseDir.AddDegreeAngle(angles[i]), 80f), config);
+				var position = originPos.GetRelative(farPos, distance: 80, angle: angles[i]);
+				await MissileThrow(skill, caster, position, config);
 				await skill.Wait(TimeSpan.FromMilliseconds(50));
 			}
 
-			await MissileThrow(skill, caster, originPos.GetRelative(baseDir, 80f), config);
+			var lastPosition = originPos.GetRelative(farPos, distance: 80);
+			await MissileThrow(skill, caster, lastPosition, config);
 		}
 	}
 
@@ -254,7 +255,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), Position.Zero);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
@@ -282,17 +283,18 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			var angles = new float[] { 45f, 54f, 74f, 95f, 110f, 130f, 139f, 159f, 180f, -169f, -159f, -144f, -110f, -95f, -79f, -60f, -45f, -30f, -19f, 30f };
 
-			var baseDir = caster.Direction;
 			for (var i = 0; i < angles.Length; i++)
 			{
-				_ = MissileThrow(skill, caster, originPos.GetRelative(baseDir.AddDegreeAngle(angles[i]), 80f), spreadConfig);
+				var position = originPos.GetRelative(farPos, distance: 80, angle: angles[i]);
+				await MissileThrow(skill, caster, position, spreadConfig);
 				await skill.Wait(TimeSpan.FromMilliseconds(50));
 			}
 
-			await MissileThrow(skill, caster, originPos.GetRelative(baseDir, 80f), spreadConfig);
+			var lastPosition = originPos.GetRelative(farPos, distance: 80);
+			await MissileThrow(skill, caster, lastPosition, spreadConfig);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(1600));
-			var bigPosition = originPos.GetRelative(baseDir, 40f);
+			var bigPosition = originPos.GetRelative(farPos, distance: 40, height: 2);
 			await MissileThrow(skill, caster, bigPosition, new MissileConfig
 			{
 				Effect = new EffectConfig("I_smoke004_4_grey#Dummy_effect_skl2", 1.5f),
@@ -308,7 +310,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			});
 
 			await skill.Wait(TimeSpan.FromMilliseconds(700));
-			var hitPosition = originPos.GetRelative(baseDir, 40f);
+			var hitPosition = originPos.GetRelative(farPos, distance: 40);
 			await EffectAndHit(skill, caster, hitPosition, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 2f),

@@ -205,11 +205,11 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, area, hitDelay, aniTime);
 			var area2 = new Circle(target.Position, 10f);
-			hitDelay = 100;
+			hitDelay = 1700;
 			aniTime = 100;
 			await SkillAttack(caster, skill, area2, hitDelay, aniTime);
 			var area3 = new Circle(target.Position, 10f);
-			hitDelay = 100;
+			hitDelay = 1800;
 			aniTime = 100;
 			await SkillAttack(caster, skill, area3, hitDelay, aniTime);
 		}

@@ -1,0 +1,49 @@
+// Project Baixada Ascension
+// Achievement title stat rewards
+//
+// Values: id, achieveCount, str, con, int, spr, dex, patk, matk, def, mdef, msp
+//---------------------------------------------------------------------------
+
+[
+{ id: 1, achieveCount: 0, str: 0, con: 0, int: 0, spr: 0, dex: 0, patk: 0, matk: 0, def: 0, mdef: 0, msp: 0 },
+{ id: 2, achieveCount: 1, str: 5, con: 0, int: 0, spr: 0, dex: 0, patk: 50, matk: 0, def: 0, mdef: 0, msp: 0 },
+{ id: 3, achieveCount: 2, str: 5, con: 5, int: 0, spr: 0, dex: 0, patk: 50, matk: 0, def: 150, mdef: 0, msp: 0 },
+{ id: 4, achieveCount: 3, str: 5, con: 5, int: 5, spr: 0, dex: 0, patk: 50, matk: 50, def: 150, mdef: 0, msp: 0 },
+{ id: 5, achieveCount: 4, str: 5, con: 5, int: 5, spr: 5, dex: 0, patk: 50, matk: 50, def: 150, mdef: 150, msp: 0 },
+{ id: 6, achieveCount: 5, str: 5, con: 5, int: 5, spr: 5, dex: 5, patk: 50, matk: 50, def: 150, mdef: 150, msp: 125 },
+{ id: 7, achieveCount: 6, str: 10, con: 5, int: 5, spr: 5, dex: 5, patk: 100, matk: 50, def: 150, mdef: 150, msp: 125 },
+{ id: 8, achieveCount: 7, str: 10, con: 10, int: 5, spr: 5, dex: 5, patk: 100, matk: 50, def: 300, mdef: 150, msp: 125 },
+{ id: 9, achieveCount: 8, str: 10, con: 10, int: 10, spr: 5, dex: 5, patk: 100, matk: 100, def: 300, mdef: 150, msp: 125 },
+{ id: 10, achieveCount: 9, str: 10, con: 10, int: 10, spr: 10, dex: 5, patk: 100, matk: 100, def: 300, mdef: 300, msp: 125 },
+{ id: 11, achieveCount: 10, str: 10, con: 10, int: 10, spr: 10, dex: 10, patk: 100, matk: 100, def: 300, mdef: 300, msp: 250 },
+{ id: 12, achieveCount: 11, str: 15, con: 10, int: 10, spr: 10, dex: 10, patk: 150, matk: 100, def: 300, mdef: 300, msp: 250 },
+{ id: 13, achieveCount: 12, str: 15, con: 15, int: 10, spr: 10, dex: 10, patk: 150, matk: 100, def: 450, mdef: 300, msp: 250 },
+{ id: 14, achieveCount: 13, str: 15, con: 15, int: 15, spr: 10, dex: 10, patk: 150, matk: 150, def: 450, mdef: 300, msp: 250 },
+{ id: 15, achieveCount: 14, str: 15, con: 15, int: 15, spr: 15, dex: 10, patk: 150, matk: 150, def: 450, mdef: 450, msp: 250 },
+{ id: 16, achieveCount: 15, str: 15, con: 15, int: 15, spr: 15, dex: 15, patk: 150, matk: 150, def: 450, mdef: 450, msp: 375 },
+{ id: 17, achieveCount: 16, str: 20, con: 15, int: 15, spr: 15, dex: 15, patk: 200, matk: 150, def: 450, mdef: 450, msp: 375 },
+{ id: 18, achieveCount: 17, str: 20, con: 20, int: 15, spr: 15, dex: 15, patk: 200, matk: 150, def: 600, mdef: 450, msp: 375 },
+{ id: 19, achieveCount: 18, str: 20, con: 20, int: 20, spr: 15, dex: 15, patk: 200, matk: 200, def: 600, mdef: 450, msp: 375 },
+{ id: 20, achieveCount: 19, str: 20, con: 20, int: 20, spr: 20, dex: 15, patk: 200, matk: 200, def: 600, mdef: 600, msp: 375 },
+{ id: 21, achieveCount: 20, str: 20, con: 20, int: 20, spr: 20, dex: 20, patk: 200, matk: 200, def: 600, mdef: 600, msp: 500 },
+{ id: 22, achieveCount: 22, str: 25, con: 20, int: 20, spr: 20, dex: 20, patk: 250, matk: 200, def: 600, mdef: 600, msp: 500 },
+{ id: 23, achieveCount: 24, str: 25, con: 25, int: 20, spr: 20, dex: 20, patk: 250, matk: 200, def: 750, mdef: 600, msp: 500 },
+{ id: 24, achieveCount: 26, str: 25, con: 25, int: 25, spr: 20, dex: 20, patk: 250, matk: 250, def: 750, mdef: 600, msp: 500 },
+{ id: 25, achieveCount: 28, str: 25, con: 25, int: 25, spr: 25, dex: 20, patk: 250, matk: 250, def: 750, mdef: 750, msp: 500 },
+{ id: 26, achieveCount: 30, str: 25, con: 25, int: 25, spr: 25, dex: 25, patk: 250, matk: 250, def: 750, mdef: 750, msp: 625 },
+{ id: 27, achieveCount: 32, str: 30, con: 25, int: 25, spr: 25, dex: 25, patk: 300, matk: 250, def: 750, mdef: 750, msp: 625 },
+{ id: 28, achieveCount: 34, str: 30, con: 30, int: 25, spr: 25, dex: 25, patk: 300, matk: 250, def: 900, mdef: 750, msp: 625 },
+{ id: 29, achieveCount: 36, str: 30, con: 30, int: 30, spr: 25, dex: 25, patk: 300, matk: 300, def: 900, mdef: 750, msp: 625 },
+{ id: 30, achieveCount: 38, str: 30, con: 30, int: 30, spr: 30, dex: 25, patk: 300, matk: 300, def: 900, mdef: 900, msp: 625 },
+{ id: 31, achieveCount: 40, str: 30, con: 30, int: 30, spr: 30, dex: 30, patk: 300, matk: 300, def: 900, mdef: 900, msp: 750 },
+{ id: 32, achieveCount: 42, str: 35, con: 30, int: 30, spr: 30, dex: 30, patk: 350, matk: 300, def: 900, mdef: 900, msp: 750 },
+{ id: 33, achieveCount: 44, str: 35, con: 35, int: 30, spr: 30, dex: 30, patk: 350, matk: 300, def: 1050, mdef: 900, msp: 750 },
+{ id: 34, achieveCount: 46, str: 35, con: 35, int: 35, spr: 30, dex: 30, patk: 350, matk: 350, def: 1050, mdef: 900, msp: 750 },
+{ id: 35, achieveCount: 48, str: 35, con: 35, int: 35, spr: 35, dex: 30, patk: 350, matk: 350, def: 1050, mdef: 1050, msp: 750 },
+{ id: 36, achieveCount: 50, str: 35, con: 35, int: 35, spr: 35, dex: 35, patk: 350, matk: 350, def: 1050, mdef: 1050, msp: 875 },
+{ id: 37, achieveCount: 52, str: 40, con: 35, int: 35, spr: 35, dex: 35, patk: 400, matk: 350, def: 1050, mdef: 1050, msp: 875 },
+{ id: 38, achieveCount: 54, str: 40, con: 40, int: 35, spr: 35, dex: 35, patk: 400, matk: 350, def: 1200, mdef: 1050, msp: 875 },
+{ id: 39, achieveCount: 56, str: 40, con: 40, int: 40, spr: 35, dex: 35, patk: 400, matk: 400, def: 1200, mdef: 1050, msp: 875 },
+{ id: 40, achieveCount: 58, str: 40, con: 40, int: 40, spr: 40, dex: 35, patk: 400, matk: 400, def: 1200, mdef: 1200, msp: 875 },
+{ id: 41, achieveCount: 60, str: 40, con: 40, int: 40, spr: 40, dex: 40, patk: 400, matk: 400, def: 1200, mdef: 1200, msp: 1000 }
+]

@@ -12,7 +12,6 @@ using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors.Characters.Components;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.Characters
 {
@@ -34,13 +33,14 @@ namespace Melia.Zone.World.Actors.Characters
 				amount = this.Job.MaxLevel - this.Job.Level;
 
 			var prevLevel = this.Job.Level;
-			var prevDisplayExp = this.Job.DisplayExp;
+			var prevExp = this.Job.TotalExp;
 
 			this.Job.TotalExp = ZoneServer.Instance.Data.ExpDb.GetNextTotalJobExp(this.Jobs.GetJobRank(this.JobId), prevLevel + amount - 1);
 
+			var expGained = (this.Job.TotalExp - prevExp);
 			var levelsGained = (this.Job.Level - prevLevel);
 
-			Send.ZC_JOB_EXP_UP(this, this.Job.DisplayExp - prevDisplayExp);
+			Send.ZC_JOB_EXP_UP(this, expGained);
 
 			if (levelsGained > 0)
 				this.FinishJobLevelChange(levelsGained);
@@ -59,19 +59,13 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Jobs.ModifySkillPoints(this.JobId, amount);
 
 			if (amount > 0)
-			{
 				this.FullHeal();
-				this.Tutorials.CheckJobChangeAvailable();
-			}
 
 			Send.ZC_OBJECT_PROPERTY(this);
 			Send.ZC_NORMAL.UpdateSkillUI(this);
 			this.AddonMessage("NOTICE_Dm_levelup_skill", "!@#$Auto_KeulLeSeu_LeBeli_SangSeungHayeossSeupNiDa#@!", 3);
 			this.PlayEffect("F_pc_joblevel_up", 3);
 			Send.ZC_SKILL_LIST(this);
-
-			if (ZoneServer.Instance.Conf.World.ClassCircleSystem && this.Job.Circle < JobCircle.Third && this.Job.Level >= this.Job.MaxLevel && this.Jobs.GetJobRank(this.JobId) > 1)
-				this.AddonMessage(Melia.Shared.Game.Const.AddonMessage.START_JOB_CHANGE);
 		}
 
 		/// <summary>
@@ -120,6 +114,14 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
+		/// Returns the permanent bonus skill points purchased from Seraphina.
+		/// </summary>
+		public int GetPurchasedSkillPointBonus()
+		{
+			return Math.Clamp(this.Variables.Perm.GetInt("SkillPointPurchaseCount"), 0, 5);
+		}
+
+		/// <summary>
 		/// Resets the character's skills, returning all spent points.
 		/// </summary>
 		public void ResetSkills()
@@ -150,15 +152,12 @@ namespace Melia.Zone.World.Actors.Characters
 				}
 			}
 
-			// The effective level is exactly how many points the job has
-			// earned, since every circle grants one on entry plus one per
-			// level up.
+			var purchasedSkillPoints = this.GetPurchasedSkillPointBonus();
+
 			foreach (var job in this.Jobs.GetList())
 			{
-				job.SetSkillPoints(job.EffectiveLevel);
+				job.SetSkillPoints(job.Level + purchasedSkillPoints);
 			}
-
-			this.Inventory.RefreshGemSkills();
 
 			if (commonSkillChanged)
 			{
@@ -202,9 +201,7 @@ namespace Melia.Zone.World.Actors.Characters
 				}
 			}
 
-			job.SetSkillPoints(job.EffectiveLevel);
-
-			this.Inventory.RefreshGemSkills();
+			job.SetSkillPoints(job.Level + this.GetPurchasedSkillPointBonus());
 
 			if (commonSkillChanged)
 			{
@@ -260,6 +257,37 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
+		/// Resets the learned abilities belonging to the given job and refunds their costs.
+		/// </summary>
+		public int ResetAbilities(JobId jobId)
+		{
+			var totalRefund = 0;
+			var abilitiesToRemove = this.Abilities.GetList().Where(ability => ZoneServer.Instance.Data.AbilityTreeDb.Find(jobId, ability.Id) != null).ToList();
+
+			foreach (var ability in abilitiesToRemove)
+			{
+				var treeData = ZoneServer.Instance.Data.AbilityTreeDb.Find(jobId, ability.Id);
+				var abilityData = ZoneServer.Instance.Data.AbilityDb.Find(ability.Id);
+
+				if (treeData != null && abilityData != null && treeData.HasPriceTimeScript && ScriptableFunctions.AbilityPrice.TryGet(treeData.PriceTimeScript, out var priceTimeFunc))
+				{
+					for (var level = 1; level <= ability.Level; level++)
+					{
+						priceTimeFunc(this, abilityData, level, treeData.MaxLevel, out var price, out var time);
+						totalRefund += price;
+					}
+				}
+
+				this.Abilities.Remove(ability.Id);
+			}
+
+			if (totalRefund > 0)
+				this.ModifyAbilityPoints(totalRefund);
+
+			return totalRefund;
+		}
+
+		/// <summary>
 		/// Sets and returns the currently correct stance, based on equipment. Does not update client.
 		/// </summary>
 		public int UpdateStance()
@@ -281,7 +309,7 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public void ChangeJob(JobId jobId)
 		{
-			this.ChangeJob(jobId, JobCircle.First, skillPoints: 1, playEffect: true);
+			this.ChangeJob(jobId, JobCircle.First, skillPoints: 1 + this.GetPurchasedSkillPointBonus(), playEffect: true);
 		}
 
 		/// <summary>
@@ -290,15 +318,15 @@ namespace Melia.Zone.World.Actors.Characters
 		public void ChangeJob(JobId jobId, JobCircle circle, int skillPoints, bool playEffect = true)
 		{
 			var newJob = new Job(this, jobId, circle, skillPoints);
-			newJob.AdvancementDate = GameClock.LocalNow;
+			newJob.AdvancementDate = DateTime.Now;
 
 			if (playEffect)
 				this.PlayEffect("F_pc_class_change");
 
 			this.JobId = jobId;
 			this.Jobs.Add(newJob);
-
-			this.Tutorials.CheckJobAdvancement(jobId);
+			this.VisualJobId = jobId;
+			this.AddonMessage(Shared.Game.Const.AddonMessage.UPDATE_REPRESENTATION_CLASS_ICON, "None", (int)jobId);
 
 			ZoneServer.Instance.ServerEvents.PlayerAdvancedJob.Raise(new PlayerEventArgs(this));
 

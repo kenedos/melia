@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -15,6 +15,8 @@ using Melia.Zone.Buffs.Handlers.Common;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
+using Melia.Zone.Packages.Laima.Helpers;
+using Melia.Zone.Packages.Laima.Skills.Wizards.Sage;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.AI;
 using Melia.Zone.Skills;
@@ -28,7 +30,6 @@ using Melia.Zone.World.Spawning;
 using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.Monsters
 {
@@ -38,18 +39,10 @@ namespace Melia.Zone.World.Actors.Monsters
 	public partial class Mob : Actor, IMonster, ICombatEntity, IUpdateable
 	{
 		private readonly object _hpLock = new();
-		private readonly object _pendingDropsLock = new();
 		private int _killed;
-		private Character _dropBeneficiary;
-		private List<DropStack> _pendingDrops;
-		private Character _preRollBeneficiary;
-		private List<DropStack> _preRolledDrops;
 		private Position _position;
-
-		/// <summary>
-		/// How long the corpse remains on the map after its death is shown.
-		/// </summary>
-		private static readonly TimeSpan CorpseDuration = TimeSpan.FromSeconds(3);
+		private bool _lastHitWasOverkill;
+		private int _lastHitOverkillAmount;
 
 		/// <summary>
 		/// Returns the monster's position on its current map.
@@ -90,11 +83,6 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Gets or sets the monster's tendency
 		/// </summary>
 		public TendencyType Tendency { get; set; } = TendencyType.Peaceful;
-
-		/// <summary>
-		/// Returns a list of effects that are attached to the actor.
-		/// </summary>
-		public ConcurrentBag<AttachableEffect> AttachableEffects { get; } = new();
 
 		/// <summary>
 		/// Monster ID in database.
@@ -207,12 +195,6 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Raised when the monster died.
 		/// </summary>
 		public event Action<Mob, ICombatEntity> Died;
-
-		/// <summary>
-		/// Raised when the monster took damage from an attacker, with the
-		/// amount that was dealt.
-		/// </summary>
-		public event Action<Mob, ICombatEntity, float> Damaged;
 
 		/// <summary>
 		/// Data entry for this monster.
@@ -392,15 +374,6 @@ namespace Melia.Zone.World.Actors.Monsters
 			}
 		}
 
-		private const float ShieldDamageRate = 5.0f;
-		private const float ShieldRegenRate = 0.05f;
-		private const float ShieldHpDamageRate = 0.5f;
-		private const float BossShieldRate = 100;
-		private static readonly TimeSpan ShieldRefillDelay = TimeSpan.FromSeconds(15);
-
-		private readonly object _shieldLock = new();
-		private DateTime _shieldBreakTime = DateTime.MinValue;
-
 		/// <summary>
 		/// Gets or sets if this mob is a special GTW objective (Amplifier, Boss).
 		/// </summary>
@@ -484,7 +457,7 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			if (this.Rank == MonsterRank.Boss)
 			{
-				this.Properties.SetFloat(PropertyName.ShieldRate, BossShieldRate);
+				this.Properties.SetFloat(PropertyName.ShieldRate, 100);
 				this.Shield = this.MaxShield;
 				this.Properties.AutoUpdateMax(PropertyName.Shield, PropertyName.MShield);
 			}
@@ -538,6 +511,8 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <returns></returns>
 		public bool TakeDamage(float damage, ICombatEntity attacker)
 		{
+			var sageBlinkInputDamage = damage;
+
 			// Don't hit an already dead monster
 			if (this.IsDead)
 				return true;
@@ -555,29 +530,46 @@ namespace Melia.Zone.World.Actors.Monsters
 				Send.MonsterSkillBalloonCancel(this);
 			}
 
-			this.Components.Get<CombatComponent>().SetAttackState(true);
+			if (damage > 0 && this.Components.Get<StateLockComponent>()?.IsStateActive(StateType.SageRupture) == true)
+				damage *= 1.30f;
 
-			var shielded = this.Shield > 0;
-			this.DamageShield(damage);
-
-			if (shielded)
-				damage *= ShieldHpDamageRate;
+			// Apply damage to shield, then apply HP damage.
+			damage = this.ApplyToShield(damage);
 
 			var currentHp = this.Hp;
+			var isOverkill = currentHp > 0 && damage >= currentHp * 2f;
+			var overkillAmount = isOverkill	? Math.Clamp((int)Math.Floor((damage / currentHp) * 100f), 100, 255) : 0;
+
+			this.Components.Get<CombatComponent>().SetAttackState(true);
+			var sageBlinkHpBefore = this.Properties.GetFloat(PropertyName.HP);
 
 			this.ModifyHpSafe(-damage, out _, out _);
+
+			SageBlinkHelper.RecordDamage(attacker, this, sageBlinkInputDamage, Math.Max(0f, sageBlinkHpBefore - this.Properties.GetFloat(PropertyName.HP)));
 
 			// Register hits before potentially killing the monster,
 			// so the damage can be factored into finding the top
 			// attacker.
 			if (attacker != null)
+			{
 				this.Components.Get<CombatComponent>()?.RegisterHit(attacker, damage);
-
-			if (attacker != null)
-				this.Damaged?.Invoke(this, attacker, damage);
+				ZoneServer.Instance.WorldBosses.RegisterParticipation(this, attacker);
+			}
 
 			if (this.Hp == 0)
+			{
+				_lastHitWasOverkill = isOverkill;
+				_lastHitOverkillAmount = overkillAmount;
+
+				if (isOverkill)
+				{
+					var overkillCharacter = this.GetOverkillCharacter(attacker);
+					if (overkillCharacter != null)
+						overkillCharacter.Components.Get<AchievementComponent>()?.AddOverkillPoints(1);
+				}
+
 				this.Kill(attacker);
+			}
 
 			if (attacker != null)
 				this.Map.AlertNearbyAis(this, new HitEventAlert(this, attacker, damage));
@@ -585,86 +577,39 @@ namespace Melia.Zone.World.Actors.Monsters
 			return this.IsDead;
 		}
 
-		/// <summary>
-		/// Reduces the monster's debuff-blocking shield by the given damage.
-		/// </summary>
-		private void DamageShield(float damage)
+		private Character GetOverkillCharacter(ICombatEntity attacker)
 		{
-			if (damage <= 0)
-				return;
-
-			// The value is sent inside the lock so concurrent hits reach the client in order.
-			lock (_shieldLock)
-			{
-				var shield = this.Shield;
-				if (shield <= 0)
-					return;
-
-				var newShield = (int)Math.Max(0, shield - damage * ShieldDamageRate);
-				if (newShield == shield)
-					return;
-
-				this.Shield = newShield;
-				if (newShield == 0)
-					_shieldBreakTime = GameClock.Now;
-
-				this.SendShieldUpdate(newShield);
-			}
+			return CombatComponent.ResolveEffectiveAttacker(attacker) as Character;
 		}
 
 		/// <summary>
-		/// Refills the monster's shield once it has been depleted for long enough.
+		/// Applies damage to the monster's shield at 5x rate and returns
+		/// any remaining damage that passes through to HP.
 		/// </summary>
-		public void UpdateShieldRefill()
+		private float ApplyToShield(float damage)
 		{
-			if (_shieldBreakTime == DateTime.MinValue)
-				return;
-
-			lock (_shieldLock)
+			if (this.Shield > 0)
 			{
-				if (_shieldBreakTime == DateTime.MinValue || GameClock.Now - _shieldBreakTime < ShieldRefillDelay)
-					return;
+				// Shield takes 5x damage
+				var shieldDamage = damage * 5;
+				var shieldBreak = (this.Shield - shieldDamage) < 0;
 
-				_shieldBreakTime = DateTime.MinValue;
-				this.Shield = this.MaxShield;
-
-				this.SendShieldUpdate(this.Shield);
+				if (shieldBreak)
+				{
+					var remainingShieldHealth = this.Shield;
+					this.Shield = 0;
+					damage -= remainingShieldHealth / 5;
+					Send.ZC_UPDATE_SHIELD(this, this.Shield, 1);
+				}
+				else
+				{
+					this.Shield -= (int)shieldDamage;
+					Send.ZC_UPDATE_SHIELD(this, this.Shield, 0);
+					return 0;
+				}
 			}
-		}
 
-		/// <summary>
-		/// Regenerates part of a depleted but unbroken shield while the monster is out of combat.
-		/// </summary>
-		public void RegenShield()
-		{
-			lock (_shieldLock)
-			{
-				if (_shieldBreakTime != DateTime.MinValue || this.CombatState.AttackState)
-					return;
-
-				var shield = this.Shield;
-				var maxShield = this.MaxShield;
-				if (shield <= 0 || shield >= maxShield)
-					return;
-
-				var newShield = Math.Min(maxShield, shield + Math.Max(1, (int)(maxShield * ShieldRegenRate)));
-				this.Shield = newShield;
-
-				this.SendShieldUpdate(newShield);
-			}
-		}
-
-		/// <summary>
-		/// Sends the shield value to nearby clients, refreshing the boss
-		/// target gauge for boss monsters.
-		/// </summary>
-		/// <param name="shield"></param>
-		private void SendShieldUpdate(int shield)
-		{
-			// The client writes a refreshed value into the target gauge without checking the current target.
-			var refreshTargetGauge = this.Rank == MonsterRank.Boss ? (byte)1 : (byte)0;
-
-			Send.ZC_UPDATE_SHIELD(this, shield, refreshTargetGauge);
+			return damage;
 		}
 
 		/// <summary>
@@ -677,20 +622,41 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (Interlocked.Exchange(ref _killed, 1) != 0)
 				return;
 
+			Send.ZC_SKILL_CAST_CANCEL(this);
+			Send.ZC_SKILL_DISABLE(this);
+			Send.ZC_DEAD(this, killer, true, _lastHitWasOverkill, false, _lastHitOverkillAmount);
+
 			this.Components.Get<BaseSkillComponent>()?.CancelCurrentSkill();
 
 			this.Properties.SetFloat(PropertyName.HP, 0);
 			this.Components.Get<MovementComponent>()?.Stop();
+			this.DisappearTime = DateTime.Now.AddSeconds(3);
+			if (this.Effects?.Count != 0)
+				Send.ZC_NORMAL.ClearEffects(this);
 
 			var beneficiary = this.GetKillBeneficiary(killer);
+
+			if (killer is Summon summon && summon.Owner is Character owner)
+			{
+				var isNecromancerSkeleton =
+					summon.Id == MonsterId.SkeletonSoldier ||
+					summon.Id == MonsterId.SkeletonArcher ||
+					summon.Id == MonsterId.SkeletonMage;
+
+				if (isNecromancerSkeleton && owner.IsAbilityActive(AbilityId.Necromancer22))
+				{
+					var abilityLevel = owner.GetAbilityLevel(AbilityId.Necromancer22);
+
+					if (abilityLevel > 0 && NecromancerCorpsePartsHelper.TryAdd(owner, abilityLevel))
+						Send.ZC_NORMAL.PlayGatherCorpseParts(owner, this);
+				}
+			}
 
 			if (beneficiary != null && beneficiary.IsOnline && beneficiary.Connection != null)
 			{
 				this.GetExpToGive(out var exp, out var jobExp);
 
-				// Drops are spawned along with the death packets, so loot
-				// doesn't appear before the monster is seen dying.
-				_dropBeneficiary = beneficiary;
+				this.DropItems(beneficiary);
 
 				var SCR_Get_MON_ExpPenalty = ScriptableFunctions.MonsterCharacter.Get("GET_EXP_RATIO");
 				var SCR_Get_MON_ClassExpPenalty = ScriptableFunctions.MonsterCharacter.Get("GET_EXP_RATIO");
@@ -708,30 +674,6 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			this.Died?.Invoke(this, killer);
 			ZoneServer.Instance.ServerEvents.EntityKilled.Raise(new CombatEventArgs(this, killer));
-
-			beneficiary?.Tutorials.CheckMonsterKill(this);
-
-			// Rolled here, while buffs and combat state are still live; only
-			// the placement is deferred to the death broadcast.
-			if (_dropBeneficiary != null)
-			{
-				if (_preRolledDrops != null && _preRollBeneficiary == _dropBeneficiary)
-				{
-					// Static drops added after the roll would be lost otherwise
-					_pendingDrops = new List<DropStack>(_preRolledDrops);
-					_pendingDrops.AddRange(this.GenerateStaticDropStacks());
-				}
-				else
-				{
-					_pendingDrops = this.GenerateAllDropStacks(_dropBeneficiary);
-				}
-			}
-
-			this.ScheduleDeathBroadcast();
-
-			// A floor for the corpse's lifetime; the broadcast sets the final time.
-			this.DisappearTime = GameClock.LocalNow + DeathBroadcastGrace + CorpseDuration;
-
 			this.Buffs?.RemoveAll();
 
 			// Trigger Kill card effects
@@ -753,62 +695,12 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
-		/// Broadcasts the monster's death packets right away, whether they
-		/// were due yet or not. Used to make sure a death is announced before
-		/// the monster leaves the map.
-		/// </summary>
-		public void FlushDeathBroadcast()
-			=> this.FlushDeathBroadcast(true);
-
-		/// <summary>
-		/// Broadcasts the monster's death packets, optionally only once
-		/// they're due, and returns whether they were sent.
-		/// </summary>
-		/// <param name="force"></param>
-		private bool FlushDeathBroadcast(bool force)
-		{
-			Character beneficiary;
-			List<DropStack> pendingDrops;
-
-			if (!this.TryClaimDeathBroadcast(force))
-				return false;
-
-			lock (_pendingDropsLock)
-			{
-				beneficiary = _dropBeneficiary;
-				pendingDrops = _pendingDrops;
-				_dropBeneficiary = null;
-				_pendingDrops = null;
-			}
-
-			this.DisappearTime = GameClock.LocalNow + CorpseDuration;
-
-			Send.ZC_SKILL_CAST_CANCEL(this);
-			Send.ZC_SKILL_DISABLE(this);
-			Send.ZC_DEAD(this);
-			this.IsDeathAnnounced = true;
-
-			if (this.Effects?.Count != 0)
-				Send.ZC_NORMAL.ClearEffects(this);
-
-			if (pendingDrops != null && beneficiary != null && beneficiary.IsOnline && beneficiary.Connection != null)
-				this.DropStacks(beneficiary, pendingDrops);
-
-			return true;
-		}
-
-		/// <summary>
 		/// Clears heavy internal state after the monster is removed from
 		/// the map, allowing the GC to collect referenced objects sooner.
 		/// </summary>
 		public void Cleanup()
 		{
 			this.Died = null;
-			this.Damaged = null;
-			_dropBeneficiary = null;
-			_pendingDrops = null;
-			_preRollBeneficiary = null;
-			_preRolledDrops = null;
 			this.FixedDrops.Clear();
 			//this.Vars.Clear();
 			while (this.StaticDrops.TryTake(out _)) { }
@@ -835,30 +727,15 @@ namespace Melia.Zone.World.Actors.Monsters
 			var beneficiary = killer;
 
 			var topAttacker = this.Components.Get<CombatComponent>()?.GetTopAttackerByDamage();
-			if (topAttacker != null && ResolveOwningCharacter(topAttacker) != null)
+			if (topAttacker != null)
 				beneficiary = topAttacker;
 
-			return ResolveOwningCharacter(beneficiary);
-		}
+			if (beneficiary.Components.Get<AiComponent>()?.Script.GetMaster() is Character master)
+				beneficiary = master;
+			else if (beneficiary is Summon summon && summon.Owner is Character summonOwner)
+				beneficiary = summonOwner;
 
-		/// <summary>
-		/// Returns the character the given entity acts for, be it the
-		/// entity itself, its AI master, or its summoner.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns></returns>
-		private static Character ResolveOwningCharacter(ICombatEntity entity)
-		{
-			if (entity is Character character)
-				return character;
-
-			if (entity.Components.Get<AiComponent>()?.Script.GetMaster() is Character master)
-				return master;
-
-			if (entity is Summon summon && summon.Owner is Character summonOwner)
-				return summonOwner;
-
-			return null;
+			return beneficiary as Character;
 		}
 
 		/// <summary>
@@ -970,21 +847,20 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
-		/// Generates every item stack the monster drops on death, without
-		/// placing any of them on the map.
+		/// Drops random items from the monster's drop table.
 		/// </summary>
 		/// <param name="killer"></param>
-		/// <returns></returns>
-		private List<DropStack> GenerateAllDropStacks(Character killer)
+		private void DropItems(Character killer)
 		{
-			var result = new List<DropStack>();
-
 			if (!this.HasDrops)
-				return result;
+				return;
+
+			if (this.Data.Drops == null)
+				return;
 
 			// Normal
-			if (this.Data?.Drops != null)
-				result.AddRange(this.GenerateDropStacks(killer));
+			var drops = this.GenerateDropStacks(killer);
+			this.DropStacks(killer, drops);
 
 			// Event - Removed: GlobalBonusManager was in deleted GameEvents namespace
 			// var eventDrops = this.GenerateDropStacks(killer, ZoneServer.Instance.GameEvents.GlobalBonuses.GetDrops(this, killer));
@@ -995,13 +871,18 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			// Fixed drops
 			if (this.FixedDrops != null && this.FixedDrops.Count > 0)
-				result.AddRange(this.GenerateDropStacks(killer, this.FixedDrops));
+			{
+				var fixedDrops = this.GenerateDropStacks(killer, this.FixedDrops);
+				this.DropStacks(killer, fixedDrops);
+			}
 
 			// Global drops
 			if (killer != null)
-				result.AddRange(this.GetGlobalDropStacks(killer));
-
-			result.AddRange(this.GenerateStaticDropStacks());
+			{
+				var globalDrops = this.GetGlobalDropStacks(killer);
+				this.DropStacks(killer, globalDrops);
+			}
+			this.DropStatic(killer);
 
 			// Map bonus drops
 			var mapBonusRerolls = 1;
@@ -1021,43 +902,7 @@ namespace Melia.Zone.World.Actors.Monsters
 					};
 				}
 			}
-			result.AddRange(this.GenerateMapBonusDropStacks(killer, mapBonusRerolls));
-
-			return result;
-		}
-
-		/// <summary>
-		/// Returns the items the monster is going to drop for the given
-		/// character, rolling and remembering them if that didn't happen yet.
-		/// </summary>
-		/// <param name="killer"></param>
-		/// <returns></returns>
-		public List<DropStack> PeekDrops(Character killer)
-		{
-			if (killer == null)
-				return new List<DropStack>();
-
-			if (_preRolledDrops != null && _preRollBeneficiary == killer)
-				return _preRolledDrops;
-
-			return this.RerollDrops(killer);
-		}
-
-		/// <summary>
-		/// Rolls the items the monster is going to drop for the given
-		/// character anew, discarding any previously rolled ones.
-		/// </summary>
-		/// <param name="killer"></param>
-		/// <returns></returns>
-		public List<DropStack> RerollDrops(Character killer)
-		{
-			if (killer == null)
-				return new List<DropStack>();
-
-			_preRollBeneficiary = killer;
-			_preRolledDrops = this.GenerateAllDropStacks(killer);
-
-			return _preRolledDrops;
+			this.DropMapBonusItems(killer, mapBonusRerolls);
 		}
 
 		/// <summary>
@@ -1080,13 +925,13 @@ namespace Melia.Zone.World.Actors.Monsters
 		private List<DropStack> GenerateDropStacks(Character killer, List<DropData> drops)
 		{
 			var result = new List<DropStack>();
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 
 			foreach (var dropItemData in drops)
 			{
 				if (!ZoneServer.Instance.Data.ItemDb.TryFind(dropItemData.ItemId, out var itemData))
 				{
-					Log.Warning("Monster.GenerateDropStacks: Drop item '{0}' not found.", dropItemData.ItemId);
+					Log.Warning("Monster.DropItems: Drop item '{0}' not found.", dropItemData.ItemId);
 					continue;
 				}
 
@@ -1164,10 +1009,8 @@ namespace Melia.Zone.World.Actors.Monsters
 					// super mobs or bosses
 					if ((isSuperMob) || this.Rank == MonsterRank.Boss)
 					{
-						superMobMoneyMultiplier = Math.Max(1f, superMobMoneyMultiplier);
-
-						minAmount = Math.Max(1, (int)Math.Round(minAmount * superMobMoneyMultiplier));
-						maxAmount = Math.Max(minAmount, (int)Math.Round(maxAmount * superMobMoneyMultiplier));
+						minAmount = (int)Math.Round(minAmount * superMobMoneyMultiplier);
+						maxAmount = (int)Math.Round(maxAmount * superMobMoneyMultiplier);
 						stackCount += superMobMoneyStacks;
 					}
 				}
@@ -1293,7 +1136,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <param name="dropChance"></param>
 		public void DropItem(Character killer, int itemId, int amount, float dropChance)
 		{
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 
 			var dropItem = new Item(itemId, amount);
 
@@ -1308,9 +1151,6 @@ namespace Melia.Zone.World.Actors.Monsters
 					lootingChance = 1;
 				var grade = this.DetermineItemGrade(lootingChance, dropItem);
 				this.ApplyItemGrade(dropItem, grade);
-
-				if (LootFilter.IsTrashLoot(killer, dropItem, grade))
-					dropItem.SetTrashLoot(TimeSpan.FromSeconds(ZoneServer.Instance.Conf.World.TrashLootPickUpDelay));
 			}
 
 			var autolootThreshold = killer?.Variables.Perm.Get("Melia.Autoloot", 0);
@@ -1385,51 +1225,48 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
-		/// Generates stacks for the monster's static drops if any were added.
+		/// Drops the monster's static drops if any were added.
 		/// </summary>
-		/// <returns></returns>
-		private List<DropStack> GenerateStaticDropStacks()
+		/// <param name="killer"></param>
+		private void DropStatic(Character killer)
 		{
-			var result = new List<DropStack>();
+			var rnd = RandomProvider.Get();
 
 			if (this.StaticDrops.IsEmpty)
-				return result;
+				return;
 
 			while (this.StaticDrops.TryTake(out var dropItem))
-				result.Add(new DropStack(dropItem.Id, dropItem.Amount, 100f, 100f));
-
-			return result;
+			{
+				this.DropItem(killer, dropItem.Id, dropItem.Amount, 100f);
+			}
 		}
 
 		/// <summary>
-		/// Generates stacks for the bonus items configured for the current map.
+		/// Drops bonus items configured for the current map.
 		/// Only applies to non-Boss and non-MISC rank monsters.
 		/// Each item in the map's bonus drop list rolls independently.
 		/// </summary>
 		/// <param name="killer"></param>
 		/// <param name="rerolls">Number of times to roll for drops (jackpot/elite mobs get more rolls)</param>
-		/// <returns></returns>
-		private List<DropStack> GenerateMapBonusDropStacks(Character killer, int rerolls = 1)
+		private void DropMapBonusItems(Character killer, int rerolls = 1)
 		{
-			var result = new List<DropStack>();
-
 			// Skip Boss and MISC rank monsters
 			if (this.Rank == MonsterRank.Boss ||
 				this.Rank == MonsterRank.MISC ||
 				this.Rank == MonsterRank.Material ||
 				this.Rank == MonsterRank.NPC)
-				return result;
+				return;
 
 			// Get the map class name
 			var mapClassName = this.Map?.Data?.ClassName;
 			if (string.IsNullOrEmpty(mapClassName))
-				return result;
+				return;
 
 			// Check if this map has bonus drops configured
 			if (!ZoneServer.Instance.Data.MapBonusDropsDb.TryFind(mapClassName, out var mapBonusData))
-				return result;
+				return;
 
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 			var lootingChance = killer?.Properties.GetFloat(PropertyName.LootingChance) ?? 0;
 			var lootingRate = 1f + lootingChance * 0.001f;
 
@@ -1491,13 +1328,12 @@ namespace Melia.Zone.World.Actors.Monsters
 						if (dropEntry.MaxAmount > dropEntry.MinAmount)
 							amount = rnd.Next(dropEntry.MinAmount, dropEntry.MaxAmount + 1);
 
-						result.Add(new DropStack(dropEntry.ItemId, amount, dropChance, dropChance));
+						// Use DropItem which handles party distribution and equipment grading
+						this.DropItem(killer, dropEntry.ItemId, amount, dropChance);
 					}
 				}
 				while (rollsRemaining > 0 && !isMoney);
 			}
-
-			return result;
 		}
 
 		/// <summary>
@@ -1523,19 +1359,19 @@ namespace Melia.Zone.World.Actors.Monsters
 				this.Rank == MonsterRank.NPC)
 				return;
 
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 
 			var worldConf = ZoneServer.Instance.Conf.World;
 
 			var silverChance = worldConf.SilverJackpotSpawnChance * jackpotRate / 100f;
-			if (this.Level >= worldConf.SilverJackpotMinLevel && rnd.NextDouble() * 100 < silverChance)
+			if (rnd.NextDouble() * 100 < silverChance)
 			{
 				this.StartBuff(BuffId.SuperDrop, 100, 0, TimeSpan.Zero, this);
 				return;
 			}
 
 			var goldChance = worldConf.GoldJackpotSpawnChance * jackpotRate / 100f;
-			if (this.Level >= worldConf.GoldJackpotMinLevel && rnd.NextDouble() * 100 < goldChance)
+			if (rnd.NextDouble() * 100 < goldChance)
 			{
 				this.StartBuff(BuffId.SuperDrop, 1000, 1, TimeSpan.Zero, this);
 				return;
@@ -1544,14 +1380,14 @@ namespace Melia.Zone.World.Actors.Monsters
 			// The default chance for SuperExp is 1:12000, based on the
 			// monster property "SuperExpRegenRatio".
 			var blueChance = worldConf.BlueJackpotSpawnChance * jackpotRate / 100f;
-			if (this.Level >= worldConf.BlueJackpotMinLevel && rnd.NextDouble() * 100 < blueChance)
+			if (rnd.NextDouble() * 100 < blueChance)
 			{
 				this.StartBuff(BuffId.SuperExp, 1, 0, TimeSpan.Zero, this);
 				return;
 			}
 
 			var redChance = worldConf.RedJackpotSpawnChance * jackpotRate / 100f;
-			if (this.Level >= worldConf.RedJackpotMinLevel && (rnd.NextDouble() * 100) < redChance)
+			if ((rnd.NextDouble() * 100) < redChance)
 			{
 				this.StartBuff(BuffId.SuperMonGen, 1, 0, TimeSpan.Zero, this);
 				this.Died += this.SuperMonGenMob_Died;
@@ -1611,7 +1447,7 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			var worldConf = ZoneServer.Instance.Conf.World;
 
-			var waves = GameRandom.Get().Next(worldConf.RedJackpotWaveMin, worldConf.RedJackpotWaveMax);
+			var waves = RandomProvider.Next(worldConf.RedJackpotWaveMin, worldConf.RedJackpotWaveMax);
 			var waveMinDelay = worldConf.RedJackpotWaveDelayMin;
 			var waveMaxDelay = worldConf.RedJackpotWaveDelayMax;
 			var mobPerWave = worldConf.RedJackpotWaveMonsterCount;
@@ -1624,17 +1460,17 @@ namespace Melia.Zone.World.Actors.Monsters
 			var deathPos = mob.Position;
 			var aiName = mob.Data?.AiName;
 
-			await GameClock.Delay(500);
+			await Task.Delay(500);
 			for (var i = 0; i < waves; i++)
 			{
 				if (map == null)
 					break;
 
 				var fromGround = false;
-				if (GameRandom.Get().Next(2) == 1)
+				if (RandomProvider.Get().Next(2) == 1)
 					fromGround = true;
 
-				var waveDelay = TimeSpan.FromSeconds(GameRandom.Get().Next(waveMinDelay, waveMaxDelay));
+				var waveDelay = TimeSpan.FromSeconds(RandomProvider.Get().Next(waveMinDelay, waveMaxDelay));
 
 				for (var j = 0; j < mobPerWave; j++)
 				{
@@ -1663,7 +1499,7 @@ namespace Melia.Zone.World.Actors.Monsters
 						spawnMob.ApplyOverrides(propertyOverrides);
 					map.AddMonster(spawnMob);
 				}
-				await GameClock.Delay(waveDelay);
+				await Task.Delay(waveDelay);
 			}
 		}
 
@@ -1794,9 +1630,6 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <param name="elapsed"></param>
 		public virtual void Update(TimeSpan elapsed)
 		{
-			if (this.IsDeathBroadcastPending)
-				this.FlushDeathBroadcast(false);
-
 			this.Components.Update(elapsed);
 		}
 
@@ -1834,6 +1667,23 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			if (hpAmount > 0)
 				Send.ZC_ADD_HP(this, hpAmount, this.Hp, this.HpChangeCounter);
+		}
+
+		/// <summary>
+		/// Restore the monster's shield. Only works for boss monsters.
+		/// </summary>
+		public void HealShield(int amount)
+		{
+			if (this.IsDead)
+				return;
+
+			if (amount == 0)
+				return;
+
+			this.Shield = this.Shield + amount;
+
+			if (amount > 0)
+				Send.ZC_UPDATE_SHIELD(this, this.Shield, 1);
 		}
 
 		/// <summary>

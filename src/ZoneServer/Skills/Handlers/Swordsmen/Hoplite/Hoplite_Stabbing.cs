@@ -6,7 +6,6 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
@@ -88,7 +87,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 				target.StartBuff(BuffId.Stabbing_Debuff, TimeSpan.FromSeconds(3));
 
 				var buffRemoveChance = BuffRemoveChancePerLevel * skill.Level;
-				if (GameRandom.Get().Next(10000) < buffRemoveChance)
+				if (RandomProvider.Get().Next(10000) < buffRemoveChance)
 				{
 					target.RemoveRandomBuff();
 					target.RemoveRandomBuff();
@@ -121,7 +120,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 					target.StartBuff(BuffId.Stabbing_Debuff, TimeSpan.FromSeconds(3));
 
 					var buffRemoveChance = BuffRemoveChancePerLevel * skill.Level;
-					if (GameRandom.Get().Next(10000) < buffRemoveChance)
+					if (RandomProvider.Get().Next(10000) < buffRemoveChance)
 					{
 						target.RemoveRandomBuff();
 						target.RemoveRandomBuff();

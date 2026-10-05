@@ -6,7 +6,6 @@ using Melia.Shared.L10N;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
-using Melia.Zone.Skills.Helpers;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
@@ -26,6 +25,13 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 		/// </summary>
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
+
+			skill.IncreaseOverheat();
 			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
@@ -42,30 +48,9 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 				return;
 			}
 
-			SkillRepeatHelper.Request(skill, caster, target, hitTarget => this.TryAttack(skill, caster, hitTarget), () => Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, ForceId.GetNew(), null));
-		}
-
-		/// <summary>
-		/// Starts a single attack against the target, returning false if the
-		/// caster can't pay for it.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		/// <param name="target"></param>
-		private bool TryAttack(Skill skill, ICombatEntity caster, ICombatEntity target)
-		{
-			if (!caster.TrySpendSp(skill))
-			{
-				caster.ServerMessage(Localization.Get("Not enough SP."));
-				return false;
-			}
-
-			skill.IncreaseOverheat();
 			caster.StartBuff(BuffId.ObliqueFire_Buff, skill.Level, 0, TimeSpan.FromSeconds(10), caster);
 
 			skill.Run(this.Attack(skill, caster, target));
-
-			return true;
 		}
 
 		/// <summary>

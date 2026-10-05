@@ -66,6 +66,7 @@ namespace Melia.Zone.World.Dungeons
 		/// Lock object for thread-safe dungeon state transitions.
 		/// </summary>
 		private readonly object _stateLock = new();
+		private readonly HashSet<long> _entryCountedCharacters = new();
 
 		/// <summary>
 		/// Gets or sets the unique dungeon instance's id.
@@ -397,8 +398,13 @@ namespace Melia.Zone.World.Dungeons
 				Stages = stages,
 				StartPosition = startPosition
 			};
+
 			instance.RankCalculator = new DungeonRankCalculator(instance);
 			instance.RegisterStages();
+			instance.RegisterCharacterEntry(owner);
+
+			Log.Info("[DungeonEntry] Party leader '{0}' registered immediately after creating instance '{1}', DungeonId={2}.", owner.Name, instance.Id, instance.DungeonId);
+
 			return instance;
 		}
 
@@ -429,6 +435,34 @@ namespace Melia.Zone.World.Dungeons
 		public bool IsOwner(Character character)
 		{
 			return (this.Owner == character);
+		}
+
+		/// <summary>
+		/// Increments the dungeon entry counter once for a character joining this instance.
+		/// Rejoining the same instance does not consume another entry.
+		/// </summary>
+		public void RegisterCharacterEntry(Character character)
+		{
+			if (character?.Connection?.Account == null)
+				return;
+
+			if (ZoneServer.Instance.Conf.World.InstancedDungeonIncrementEntryOnComplete)
+				return;
+
+			lock (_stateLock)
+			{
+				if (!_entryCountedCharacters.Add(character.DbId))
+					return;
+
+				character.Dungeon.IncreaseEntryCount(this.DungeonId, 1);
+			}
+
+			Log.Info(
+				"[DungeonEntry] Character='{0}' registered in Instance='{1}', DungeonId={2}.",
+				character.Name,
+				this.Id,
+				this.DungeonId
+			);
 		}
 
 		/// <summary>
@@ -466,6 +500,18 @@ namespace Melia.Zone.World.Dungeons
 			// Check if entry count should be incremented on enter (default) or on complete
 			var incrementOnComplete = ZoneServer.Instance.Conf.World.InstancedDungeonIncrementEntryOnComplete;
 
+			Log.Info(
+				"[DungeonEntryDebug] Instance='{0}', DungeonId={1}, ClassName='{2}', PlayPerReset={3}, PlayPerResetType={4}, WeeklyEnterableCount={5}, ResetType={6}, Infinite={7}.",
+				this.Id,
+				this.DungeonId,
+				this.InstanceDungeonData.ClassName,
+				this.InstanceDungeonData.PlayPerReset,
+				this.InstanceDungeonData.PlayPerResetType,
+				this.InstanceDungeonData.WeeklyEnterableCount,
+				this.InstanceDungeonData.ResetType,
+				this.InstanceDungeonData.EnableInfiniteEnter
+			);
+
 			// Take a snapshot of characters to avoid collection modification during iteration
 			var charactersSnapshot = this.Characters.ToList();
 			foreach (var character in charactersSnapshot)
@@ -476,12 +522,6 @@ namespace Melia.Zone.World.Dungeons
 				{
 					Log.Info("InstanceDungeon.StartDungeon: Skipping '{0}' — no longer on dungeon map {1}.", character.Name, this.MapId);
 					continue;
-				}
-
-				// Increment entry count on enter if not configured to increment on complete
-				if (!incrementOnComplete && character.Connection?.Account != null)
-				{
-					character.Dungeon.IncreaseEntryCount(this.DungeonId, 1);
 				}
 
 				character.SetPosition(this.StartPosition);

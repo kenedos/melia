@@ -17,6 +17,11 @@
     <OutputPath>..\..\bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Packages\Laima\Abilities\Swordsmen\Doppelsoeldner.cs" />
+    <Compile Remove="Packages\Laima\Pads\Clerics\Exorcist.cs" />
+    <Compile Remove="Packages\Laima\Skills\Scouts\Bulletmarker.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
   <ItemGroup>

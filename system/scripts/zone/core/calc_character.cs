@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
@@ -13,7 +14,9 @@ using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
+using Yggdrasil.Logging;
 using Yggdrasil.Util;
 
 public class CharacterCalculationsScript : GeneralScript
@@ -26,18 +29,15 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_STR(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.STR(character);
-
 		var properties = character.Properties;
 
 		var byJob = properties.GetFloat(PropertyName.STR_JOB);
 		var byStat = properties.GetFloat(PropertyName.STR_STAT);
 		var byBonus = properties.GetFloat(PropertyName.STR_Bonus);
 		var byAdd = properties.GetFloat(PropertyName.STR_ADD);
-		var byTemp = character.Variables.Temp.GetFloat(PropertyName.STR_TEMP);
+		var byTemp = 0; // properties.GetFloat(PropertyName.STR_TEMP);
 
-		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.STR) + character.Quests.GetRewardProperty(PropertyName.STR);
+		var rewardProperty = 0; // GET_REWARD_PROPERTY(self, statString);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -51,18 +51,15 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CON(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.CON(character);
-
 		var properties = character.Properties;
 
 		var byJob = properties.GetFloat(PropertyName.CON_JOB);
 		var byStat = properties.GetFloat(PropertyName.CON_STAT);
 		var byBonus = properties.GetFloat(PropertyName.CON_Bonus);
 		var byAdd = properties.GetFloat(PropertyName.CON_ADD);
-		var byTemp = character.Variables.Temp.GetFloat(PropertyName.CON_TEMP);
+		var byTemp = 0; // properties.GetFloat(PropertyName.CON_TEMP);
 
-		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.CON) + character.Quests.GetRewardProperty(PropertyName.CON);
+		var rewardProperty = 0; // GET_REWARD_PROPERTY(self, statString);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -76,18 +73,15 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_INT(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.INT(character);
-
 		var properties = character.Properties;
 
 		var byJob = properties.GetFloat(PropertyName.INT_JOB);
 		var byStat = properties.GetFloat(PropertyName.INT_STAT);
 		var byBonus = properties.GetFloat(PropertyName.INT_Bonus);
 		var byAdd = properties.GetFloat(PropertyName.INT_ADD);
-		var byTemp = character.Variables.Temp.GetFloat(PropertyName.INT_TEMP);
+		var byTemp = 0; // properties.GetFloat(PropertyName.INT_TEMP);
 
-		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.INT) + character.Quests.GetRewardProperty(PropertyName.INT);
+		var rewardProperty = 0; // GET_REWARD_PROPERTY(self, statString);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -101,18 +95,15 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MNA(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MNA(character);
-
 		var properties = character.Properties;
 
 		var byJob = properties.GetFloat(PropertyName.MNA_JOB);
 		var byStat = properties.GetFloat(PropertyName.MNA_STAT);
 		var byBonus = properties.GetFloat(PropertyName.MNA_Bonus);
 		var byAdd = properties.GetFloat(PropertyName.MNA_ADD);
-		var byTemp = character.Variables.Temp.GetFloat(PropertyName.MNA_TEMP);
+		var byTemp = 0; // properties.GetFloat(PropertyName.MNA_TEMP);
 
-		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.MNA) + character.Quests.GetRewardProperty(PropertyName.MNA);
+		var rewardProperty = 0; // GET_REWARD_PROPERTY(self, statString);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -126,58 +117,17 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_DEX(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.DEX(character);
-
 		var properties = character.Properties;
 
 		var byJob = properties.GetFloat(PropertyName.DEX_JOB);
 		var byStat = properties.GetFloat(PropertyName.DEX_STAT);
 		var byBonus = properties.GetFloat(PropertyName.DEX_Bonus);
 		var byAdd = properties.GetFloat(PropertyName.DEX_ADD);
-		var byTemp = character.Variables.Temp.GetFloat(PropertyName.DEX_TEMP);
+		var byTemp = 0; // properties.GetFloat(PropertyName.DEX_TEMP);
 
-		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.DEX) + character.Quests.GetRewardProperty(PropertyName.DEX);
+		var rewardProperty = 0; // GET_REWARD_PROPERTY(self, statString);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
-		return (float)Math.Floor(Math.Max(1, result));
-	}
-
-	/// <summary>
-	/// Returns character's total luck.
-	/// </summary>
-	/// <remarks>Legacy stat, not used currently</remarks>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_Character_LUCK(Character character)
-	{
-		var properties = character.Properties;
-
-		var byJob = properties.GetFloat(PropertyName.LUCK_JOB);
-		var byStat = properties.GetFloat(PropertyName.LUCK_STAT);
-		var byBonus = properties.GetFloat(PropertyName.LUCK_Bonus);
-		var byAdd = properties.GetFloat(PropertyName.LUCK_ADD);
-
-		var result = byJob + byStat + byBonus + byAdd;
-		return (float)Math.Floor(Math.Max(1, result));
-	}
-
-	/// <summary>
-	/// Returns character's total all stat.
-	/// </summary>
-	/// <remarks>Legacy stat, not used currently</remarks>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_Character_ALLSTAT(Character character)
-	{
-		var properties = character.Properties;
-
-		var byStat = properties.GetFloat(PropertyName.ALLSTAT_STAT);
-		var byAdd = properties.GetFloat(PropertyName.ALLSTAT_ADD);
-
-		var result = byStat + byAdd;
 		return (float)Math.Floor(Math.Max(1, result));
 	}
 
@@ -194,9 +144,8 @@ public class CharacterCalculationsScript : GeneralScript
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.STR);
 		var byBuffs = properties.GetFloat(PropertyName.STR_BM);
 		var byItemBuff = properties.GetFloat(PropertyName.STR_ITEM_BM);
-		var byAllStat = properties.GetFloat(PropertyName.ALLSTAT);
 
-		var value = byItem + byBuffs + byItemBuff + byAllStat;
+		var value = byItem + byBuffs + byItemBuff;
 
 		return value;
 	}
@@ -214,9 +163,8 @@ public class CharacterCalculationsScript : GeneralScript
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.CON);
 		var byBuffs = properties.GetFloat(PropertyName.CON_BM);
 		var byItemBuff = properties.GetFloat(PropertyName.CON_ITEM_BM);
-		var byAllStat = properties.GetFloat(PropertyName.ALLSTAT);
 
-		var value = byItem + byBuffs + byItemBuff + byAllStat;
+		var value = byItem + byBuffs + byItemBuff;
 
 		return value;
 	}
@@ -234,9 +182,8 @@ public class CharacterCalculationsScript : GeneralScript
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.INT);
 		var byBuffs = properties.GetFloat(PropertyName.INT_BM);
 		var byItemBuff = properties.GetFloat(PropertyName.INT_ITEM_BM);
-		var byAllStat = properties.GetFloat(PropertyName.ALLSTAT);
 
-		var value = byItem + byBuffs + byItemBuff + byAllStat;
+		var value = byItem + byBuffs + byItemBuff;
 
 		return value;
 	}
@@ -254,9 +201,8 @@ public class CharacterCalculationsScript : GeneralScript
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.MNA);
 		var byBuffs = properties.GetFloat(PropertyName.MNA_BM);
 		var byItemBuff = properties.GetFloat(PropertyName.MNA_ITEM_BM);
-		var byAllStat = properties.GetFloat(PropertyName.ALLSTAT);
 
-		var value = byItem + byBuffs + byItemBuff + byAllStat;
+		var value = byItem + byBuffs + byItemBuff;
 
 		return value;
 	}
@@ -274,50 +220,10 @@ public class CharacterCalculationsScript : GeneralScript
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.DEX);
 		var byBuffs = properties.GetFloat(PropertyName.DEX_BM);
 		var byItemBuff = properties.GetFloat(PropertyName.DEX_ITEM_BM);
-		var byAllStat = properties.GetFloat(PropertyName.ALLSTAT);
-
-		var value = byItem + byBuffs + byItemBuff + byAllStat;
-
-		return value;
-	}
-
-	/// <summary>
-	/// Returns character's LUCK bonus from items and buffs.
-	/// </summary>
-	/// <remarks>Legacy Stat, unused in modern ToS.</remarks>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_Character_LUCK_ADD(Character character)
-	{
-		var properties = character.Properties;
-
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.Luck);
-		var byBuffs = properties.GetFloat(PropertyName.LUCK_BM);
-		var byItemBuff = properties.GetFloat(PropertyName.LUCK_ITEM_BM);
 
 		var value = byItem + byBuffs + byItemBuff;
 
 		return value;
-	}
-
-	/// <summary>
-	/// Returns character's ALLSTAT bonus from items and buffs.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_Character_ALLSTAT_ADD(Character character)
-	{
-		var properties = character.Properties;
-
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ALLSTAT);
-		var byBuffs = properties.GetFloat(PropertyName.ALLSTAT_BM);
-		var byItemBuff = properties.GetFloat(PropertyName.ALLSTAT_ITEM_BM);
-
-		var value = byItem + byBuffs + byItemBuff;
-
-		return (float)Math.Floor(value);
 	}
 
 	/// <summary>
@@ -328,9 +234,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_STR_JOB(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.STR_JOB(character);
-
 		if (!Feature.IsEnabled("JobStatBonuses"))
 			return 0;
 
@@ -356,9 +259,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CON_JOB(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.CON_JOB(character);
-
 		if (!Feature.IsEnabled("JobStatBonuses"))
 			return 0;
 
@@ -384,9 +284,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_INT_JOB(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.INT_JOB(character);
-
 		if (!Feature.IsEnabled("JobStatBonuses"))
 			return 0;
 
@@ -412,9 +309,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MNA_JOB(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MNA_JOB(character);
-
 		if (!Feature.IsEnabled("JobStatBonuses"))
 			return 0;
 
@@ -440,9 +334,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_DEX_JOB(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.DEX_JOB(character);
-
 		if (!Feature.IsEnabled("JobStatBonuses"))
 			return 0;
 
@@ -511,29 +402,21 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MHP(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MHP(character);
-
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv, 1);
 		var stat = properties.GetFloat(PropertyName.CON, 1);
 
 		var rateByJob = character.Job?.Data.HpRate ?? 1;
-		var byJob = 80 * rateByJob;
+		var byJob = Math.Floor(400 * rateByJob);
 
-		var levels = level - 1;
-		var byLevel = Math.Floor(byJob + (((levels * 3.25f) + (levels * levels * 0.13f)) * rateByJob));
-		var byStat = Math.Floor((stat * 0.0065f) * byLevel);
-
-		byStat *= 4.5f; // Custom to Laima
-
+		var byLevel = Math.Floor(byJob + ((level - 1) * 80 * rateByJob));
+		var byStat = Math.Floor(((stat * 0.003f) + (Math.Floor(stat / 10.0f) * 0.01f)) * byLevel);
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.MHP);
 		var byItemRatio = (byLevel + byStat) * (character.Inventory.GetEquipProperties(PropertyName.MHPRatio) / 100f);
 		var byBonus = properties.GetFloat(PropertyName.MHP_Bonus);
 
-		var byReward = character.Quests.GetRewardProperty(PropertyName.MHP);
-		var value = byLevel + byStat + byItem + byItemRatio + byBonus + byReward;
+		var value = byLevel + byStat + byItem + byItemRatio + byBonus;
 
 		var byBuffs = properties.GetFloat(PropertyName.MHP_BM);
 		var byBuffRate = Math.Floor(value * properties.GetFloat(PropertyName.MHP_RATE_BM));
@@ -551,42 +434,25 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MSP(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MSP(character);
-
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv, 1);
 		var stat = properties.GetFloat(PropertyName.MNA, 1);
 
 		var rateByJob = character.Job?.Data.SpRate ?? 1;
-		var byJob = Math.Floor(60 * rateByJob);
+		var byJob = Math.Floor(200 * rateByJob);
 
-		var levels = level - 1;
-		var byLevel = Math.Floor(byJob + (((levels * 1.625f) + (levels * levels * 0.065f)) * rateByJob));
-
-		var byStat = Math.Floor((stat * 0.0065f) * byLevel);
-
-		byStat *= 2.5f; // Custom to Laima
-
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.MSP);
+		var byLevel = Math.Floor(byJob + ((level - 1) * 18 * rateByJob));
+		var byStat = Math.Floor(((stat * 0.005f) + (Math.Floor(stat / 10.0f) * 0.015f)) * byLevel);
+		var byItem = character.Inventory.GetEquipProperties("MSP");
 		var byBonus = properties.GetFloat(PropertyName.MSP_Bonus);
 
-		var byReward = character.Quests.GetRewardProperty(PropertyName.MSP);
-		var value = byLevel + byStat + byItem + byBonus + byReward;
+		var value = byLevel + byStat + byItem + byBonus;
 
 		var byBuffs = properties.GetFloat(PropertyName.MSP_BM);
 		var byBuffRate = Math.Floor(value * properties.GetFloat(PropertyName.MSP_RATE_BM));
 
 		value += byBuffs + byBuffRate;
-
-		// Cloth Mastery
-		var byAbility = 1.0f;
-		if (character.Abilities.TryGet(AbilityId.Cloth, out var ability))
-		{
-			byAbility += character.Inventory.CountEquipMaterial(ArmorMaterialType.Cloth) >= 4 ? 0.4f : 0f;
-		}
-		value *= byAbility;
 
 		return (int)Math.Max(0, value);
 	}
@@ -599,22 +465,18 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MaxSta(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MaxSta(character);
-
 		var properties = character.Properties;
 
 		var baseValue = 25;
 		var stat = properties.GetFloat(PropertyName.CON, 1);
 
-		var byStat = stat * 0.05f;
-
+		var byStat = Math.Floor(stat / 20f);
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.MSTA);
 		var byBonus = properties.GetFloat(PropertyName.MAXSTA_Bonus, 0);
 		var byBuff = properties.GetFloat(PropertyName.MaxSta_BM, 0);
-		var byReward = character.Quests.GetRewardProperty(PropertyName.MSTA);
+		//var byReward = GetReward(PropertyName.MSTA);
 
-		var value = baseValue + byStat + byItem + byBonus + byBuff + byReward;
+		var value = baseValue + byStat + byItem + byBonus + byBuff;
 
 		return (int)(value * 1000);
 	}
@@ -638,9 +500,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_Sta_Run(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.Sta_Run(character);
-
 		var properties = character.Properties;
 
 		// Running costs 50 stamina per second by default
@@ -650,23 +509,15 @@ public class CharacterCalculationsScript : GeneralScript
 		if (Feature.IsEnabled("FreeRunning"))
 			baseValue = 0;
 
-		// Root crystal buff allows dashing without consuming stamina
-		if (character.Buffs.Has(BuffId.RootCrystalMoveSpeed))
-			return 0;
-
 		// If DashRun is active, the stamina usage is increased. This does
 		// not apply if character is in a city and FreeDashingInCities is
 		// enabled.
 		var isDashRun = properties.GetFloat(PropertyName.DashRun, 0);
-		if (isDashRun > 0 && (!Feature.IsEnabled("FreeDashingInCities") || character.Map?.Data?.Type != MapType.City))
+		if (isDashRun > 0 && (!Feature.IsEnabled("FreeDashingInCities") || character.Map.Data.Type != MapType.City))
 		{
 			var dashAmount = 500f;
 			if (isDashRun == 2)
 				dashAmount *= 0.9f;
-
-			// Trot buff reduces dash stamina consumption by 50%
-			if (character.Buffs.Has(BuffId.Trot_Buff))
-				dashAmount *= 0.5f;
 
 			baseValue += dashAmount;
 		}
@@ -684,9 +535,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_Sta_Recover(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.Sta_Recover(character);
-
 		var properties = character.Properties;
 
 		//if (buffCursed?)
@@ -733,9 +581,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_Sta_Jump(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.Sta_Jump(character);
-
 		if (Feature.IsEnabled("FreeJumping"))
 			return 0;
 
@@ -761,27 +606,18 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_RHP(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.RHP(character);
-
-		if (character.IsBuffActiveByKeyword(BuffTag.Curse, BuffTag.UnrecoverableHP))
-			return 0;
-
 		var properties = character.Properties;
-		var stat = properties.GetFloat(PropertyName.CON, 1);
 
 		var mhp = properties.GetFloat(PropertyName.MHP, 1);
 		var jobHpRate = character.Job?.Data.RHpRate ?? 1;
 
-		var byStat = Math.Floor(stat * 1.5f);
-
 		var byDefault = Math.Floor(mhp / 100f * jobHpRate);
-		var byItems = character.Inventory.GetEquipProperties(PropertyName.RHP);
+		var byItems = character.Inventory.GetEquipProperties("RHP");
 		var byBuffs = properties.GetFloat(PropertyName.RHP_BM);
 
-		var value = (byStat + byDefault + byItems + byBuffs);
+		var value = (byDefault + byItems + byBuffs);
 
-		if (character.Buffs.Has(BuffId.Rest) || character.Buffs.Has(BuffId.SitRest))
+		if (character.Buffs.Has(BuffId.Rest))
 			value *= 2;
 
 		return (float)Math.Max(0, value);
@@ -795,9 +631,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_RHPTIME(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.RHPTIME(character);
-
 		var properties = character.Properties;
 
 		// The recovery time is presumably the number of milliseconds
@@ -807,12 +640,12 @@ public class CharacterCalculationsScript : GeneralScript
 		var defaultTime = 20000;
 
 		// Item.RHPTIME doesn't exist?
-		var byItems = 0; ; // TimeSpan.FromMilliseconds(character.Inventory.GetEquipProperties("RHPTIME"));
+		var byItems = 0; // TimeSpan.FromMilliseconds(character.Inventory.GetEquipProperties("RHPTIME"));
 		var byBuffs = properties.GetFloat(PropertyName.RHPTIME_BM);
 
 		var value = defaultTime - byItems - byBuffs;
 
-		if (character.Buffs.Has(BuffId.Rest) || character.Buffs.Has(BuffId.SitRest))
+		if (character.IsSitting)
 			value /= 2;
 
 		return (int)Math.Max(1000, value);
@@ -826,29 +659,16 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_RSP(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.RSP(character);
-
-		if (character.IsBuffActiveByKeyword(BuffTag.Curse, BuffTag.Formation,
-			BuffTag.SpDrain, BuffTag.UnrecoverableSP, BuffTag.NoneRecoverableSP))
-			return 0;
 		var properties = character.Properties;
-		var stat = properties.GetFloat(PropertyName.MNA, 1);
 
-		var msp = properties.GetFloat(PropertyName.MSP, 1);
+		var mhp = properties.GetFloat(PropertyName.MSP, 1);
 		var jobSpRate = character.Job?.Data.RSpRate ?? 1;
 
-		var byStat = Math.Floor(stat * 1.5f);
-
-		var byDefault = Math.Floor(msp * 0.03f * jobSpRate);
-		var byItems = character.Inventory.GetEquipProperties(PropertyName.RSP);
+		var byDefault = Math.Floor(mhp * 0.03f * jobSpRate);
+		var byItems = character.Inventory.GetEquipProperties("RSP");
 		var byBuffs = properties.GetFloat(PropertyName.RSP_BM);
 
-		var value = (byStat + byDefault + byItems + byBuffs);
-
-		if (character.Buffs.Has(BuffId.Rest) || character.Buffs.Has(BuffId.SitRest))
-			value *= 2;
-
+		var value = (byDefault + byItems + byBuffs);
 		return (float)Math.Max(0, value);
 	}
 
@@ -860,19 +680,16 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_RSPTIME(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.RSPTIME(character);
-
 		var properties = character.Properties;
 
 		var baseValue = 20000;
 
-		var byItems = 0; ; // TimeSpan.FromMilliseconds(character.Inventory.GetEquipProperties("RSPTIME"));
+		var byItems = 0; // TimeSpan.FromMilliseconds(character.Inventory.GetEquipProperties("RSPTIME"));
 		var byBuffs = properties.GetFloat(PropertyName.RSPTIME_BM);
 
 		var value = baseValue - byItems - byBuffs;
 
-		if (character.Buffs.Has(BuffId.Rest) || character.Buffs.Has(BuffId.SitRest))
+		if (character.IsSitting)
 			value /= 2;
 
 		return (int)Math.Max(1000, value);
@@ -886,32 +703,25 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MaxWeight(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MaxWeight(character);
-
 		var properties = character.Properties;
 
 		var value = 5000f;
 
 		if (Feature.IsEnabled("IncreasedMaxWeight"))
-			value = 14000f;
+			value = 8000f;
 
 		if (Feature.IsEnabled("StaticInventoryWeight"))
 		{
 			var con = properties.GetFloat(PropertyName.CON);
 			var str = properties.GetFloat(PropertyName.STR);
 
-			var byStats = (con * 20) + (str * 20);
+			var byStats = (con * 5) + (str * 5);
 			value += byStats;
 		}
 
-		if (character.TryGetActiveAbilityLevel(AbilityId.MaxWeightAbil, out var abilityLevel))
-			value += abilityLevel * 20;
-
 		var byBuffs = properties.GetFloat(PropertyName.MaxWeight_BM);
 		var byBonus = properties.GetFloat(PropertyName.MaxWeight_Bonus);
-		var byBuffRate = (float)Math.Floor(value * properties.GetFloat(PropertyName.MaxWeight_RATE_BM));
-		value += byBuffs + byBonus + byBuffRate + character.Quests.GetRewardProperty(PropertyName.MaxWeight);
+		value += byBuffs + byBonus;
 
 		return value;
 	}
@@ -955,33 +765,24 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MINPATK(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MINPATK(character);
-
 		var SCR_Get_Character_MAXPATK = ScriptableFunctions.Character.Get("SCR_Get_Character_MAXPATK");
 
 		var properties = character.Properties;
 
+		var level = properties.GetFloat(PropertyName.Lv, 1);
 		var stat = properties.GetFloat(PropertyName.STR, 1);
 
-		var baseValue = 5;
+		var baseValue = 20;
+		var byLevel = level;
+
+		var byStat = (stat * 2f) + ((float)Math.Floor(stat / 10f) * (byLevel * 0.05f));
 
 		var byItem = 0f;
 		byItem += character.Inventory.GetEquipProperties(PropertyName.MINATK);
 		byItem += character.Inventory.GetEquipProperties(PropertyName.PATK);
 		byItem += character.Inventory.GetEquipProperties(PropertyName.ADD_MINATK);
 
-		// Weapon carries flat attack, the stat adds a matching flat amount
-		var byWeapon = byItem;
-		var byStat = stat * 1.55f;
-
-		var value = baseValue + byWeapon + byStat;
-
-		// Card percentage bonuses (EQUIP_PATK stores percentage points, e.g., 5 = 5%)
-		var byCards = 0f;
-		var cardPatkRate = character.Inventory.GetCardBonuses(PropertyName.EQUIP_PATK) / 100f;
-		cardPatkRate += character.Inventory.GetCardBonuses(PropertyName.EQUIP_PATK_MAIN) / 100f;
-		byCards = value * cardPatkRate;
+		var value = (baseValue + byLevel + byStat + byItem);
 
 		var byBuffs = 0f;
 		byBuffs += properties.GetFloat(PropertyName.PATK_BM);
@@ -996,7 +797,7 @@ public class CharacterCalculationsScript : GeneralScript
 		byRateBuffs += properties.GetFloat(PropertyName.MINPATK_MAIN_RATE_BM);
 		byRateBuffs = (value * byRateBuffs);
 
-		value += byCards + byBuffs + byRateBuffs;
+		value += byBuffs + byRateBuffs;
 
 		var max = SCR_Get_Character_MAXPATK(character);
 		return (int)Math2.Clamp(1, max, value);
@@ -1010,31 +811,22 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MAXPATK(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MAXPATK(character);
-
 		var properties = character.Properties;
 
+		var level = properties.GetFloat(PropertyName.Lv, 1);
 		var stat = properties.GetFloat(PropertyName.STR, 1);
 
-		var baseValue = 5;
+		var baseValue = 20;
+		var byLevel = level;
+
+		var byStat = (stat * 2f) + ((float)Math.Floor(stat / 10f) * (byLevel * 0.05f));
 
 		var byItem = 0f;
 		byItem += character.Inventory.GetEquipProperties(PropertyName.MAXATK);
 		byItem += character.Inventory.GetEquipProperties(PropertyName.PATK);
 		byItem += character.Inventory.GetEquipProperties(PropertyName.ADD_MAXATK);
 
-		// Weapon carries flat attack, the stat adds a matching flat amount
-		var byWeapon = byItem;
-		var byStat = stat * 1.55f;
-
-		var value = baseValue + byWeapon + byStat;
-
-		// Card percentage bonuses (EQUIP_PATK stores percentage points, e.g., 5 = 5%)
-		var byCards = 0f;
-		var cardPatkRate = character.Inventory.GetCardBonuses(PropertyName.EQUIP_PATK) / 100f;
-		cardPatkRate += character.Inventory.GetCardBonuses(PropertyName.EQUIP_PATK_MAIN) / 100f;
-		byCards = value * cardPatkRate;
+		var value = (baseValue + byLevel + byStat + byItem);
 
 		var byBuffs = 0f;
 		byBuffs += properties.GetFloat(PropertyName.PATK_BM);
@@ -1049,7 +841,7 @@ public class CharacterCalculationsScript : GeneralScript
 		byRateBuffs += properties.GetFloat(PropertyName.MAXPATK_MAIN_RATE_BM);
 		byRateBuffs = (value * byRateBuffs);
 
-		value += byCards + byBuffs + byRateBuffs;
+		value += byBuffs + byRateBuffs;
 
 		return (int)Math.Max(1, value);
 	}
@@ -1062,9 +854,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MINPATK_SUB(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MINPATK_SUB(character);
-
 		var SCR_Get_Character_MAXPATK_SUB = ScriptableFunctions.Character.Get("SCR_Get_Character_MAXPATK_SUB");
 
 		var properties = character.Properties;
@@ -1074,11 +863,8 @@ public class CharacterCalculationsScript : GeneralScript
 		var stat = properties.GetFloat(PropertyName.STR);
 
 		var byLevel = level / 2f;
-		var byStat = stat * 1.25f;
-
-		// We don't want item bonuses affecting subweapons because they will
-		// be added both to main weapon and subweapon if they do.
-		var byItem = 0f;
+		var byStat = (stat * 2f) + ((float)Math.Floor(stat / 10f) * 5f);
+		var byItem = 0; // TODO: "MINATK" "PATK" "ADD_MINATK"
 
 		var value = baseValue + byLevel + byStat + byItem;
 
@@ -1113,9 +899,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MAXPATK_SUB(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MAXPATK_SUB(character);
-
 		var properties = character.Properties;
 
 		var baseValue = 20;
@@ -1123,11 +906,8 @@ public class CharacterCalculationsScript : GeneralScript
 		var stat = properties.GetFloat(PropertyName.STR);
 
 		var byLevel = level / 2f;
-		var byStat = stat * 1.25f;
-
-		// We don't want item bonuses affecting subweapons because they will
-		// be added both to main weapon and subweapon if they do.
-		var byItem = 0;
+		var byStat = (stat * 2f) + ((float)Math.Floor(stat / 10f) * 5f);
+		var byItem = 0; // TODO: "MAXATK" "PATK" "ADD_MAXATK"
 
 		var value = baseValue + byLevel + byStat + byItem;
 
@@ -1158,32 +938,24 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MINMATK(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MINMATK(character);
-
 		var SCR_Get_Character_MAXMATK = ScriptableFunctions.Character.Get("SCR_Get_Character_MAXMATK");
 
 		var properties = character.Properties;
 
+		var level = properties.GetFloat(PropertyName.Lv, 1);
 		var stat = properties.GetFloat(PropertyName.INT, 1);
 
-		var baseValue = 5;
+		var baseValue = 20;
+		var byLevel = level;
+
+		var byStat = (stat * 2f) + ((float)Math.Floor(stat / 10f) * (byLevel * 0.05f));
 
 		var byItem = 0f;
 		byItem += character.Inventory.GetEquipProperties(PropertyName.MATK);
 		byItem += character.Inventory.GetEquipProperties(PropertyName.ADD_MATK);
 		byItem += character.Inventory.GetEquipProperties(PropertyName.ADD_MINATK);
 
-		// Weapon carries flat attack, the stat adds a matching flat amount
-		var byWeapon = byItem;
-		var byStat = stat * 1.55f;
-
-		var value = baseValue + byWeapon + byStat;
-
-		// Card percentage bonuses (EQUIP_MATK stores percentage points, e.g., 5 = 5%)
-		var byCards = 0f;
-		var cardMatkRate = character.Inventory.GetCardBonuses(PropertyName.EQUIP_MATK) / 100f;
-		byCards = value * cardMatkRate;
+		var value = (baseValue + byLevel + byStat + byItem);
 
 		var byBuffs = 0f;
 		byBuffs += properties.GetFloat(PropertyName.MATK_BM);
@@ -1194,7 +966,7 @@ public class CharacterCalculationsScript : GeneralScript
 		byRateBuffs += properties.GetFloat(PropertyName.MINMATK_RATE_BM);
 		byRateBuffs = (value * byRateBuffs);
 
-		value += byCards + byBuffs + byRateBuffs;
+		value += byBuffs + byRateBuffs;
 
 		var max = SCR_Get_Character_MAXMATK(character);
 		return (int)Math2.Clamp(1, max, value);
@@ -1208,30 +980,22 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MAXMATK(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MAXMATK(character);
-
 		var properties = character.Properties;
 
+		var level = properties.GetFloat(PropertyName.Lv, 1);
 		var stat = properties.GetFloat(PropertyName.INT, 1);
 
-		var baseValue = 5;
+		var baseValue = 20;
+		var byLevel = level;
+
+		var byStat = (stat * 2f) + ((float)Math.Floor(stat / 10f) * (byLevel * 0.05f));
 
 		var byItem = 0f;
 		byItem += character.Inventory.GetEquipProperties(PropertyName.MATK);
 		byItem += character.Inventory.GetEquipProperties(PropertyName.ADD_MATK);
 		byItem += character.Inventory.GetEquipProperties(PropertyName.ADD_MAXATK);
 
-		// Weapon carries flat attack, the stat adds a matching flat amount
-		var byWeapon = byItem;
-		var byStat = stat * 1.55f;
-
-		var value = baseValue + byWeapon + byStat;
-
-		// Card percentage bonuses (EQUIP_MATK stores percentage points, e.g., 5 = 5%)
-		var byCards = 0f;
-		var cardMatkRate = character.Inventory.GetCardBonuses(PropertyName.EQUIP_MATK) / 100f;
-		byCards = value * cardMatkRate;
+		var value = (baseValue + byLevel + byStat + byItem);
 
 		var byBuffs = 0f;
 		byBuffs += properties.GetFloat(PropertyName.MATK_BM);
@@ -1242,7 +1006,7 @@ public class CharacterCalculationsScript : GeneralScript
 		byRateBuffs += properties.GetFloat(PropertyName.MAXMATK_RATE_BM);
 		byRateBuffs = (value * byRateBuffs);
 
-		value += byCards + byBuffs + byRateBuffs;
+		value += byBuffs + byRateBuffs;
 
 		return (int)Math.Max(1, value);
 	}
@@ -1255,25 +1019,15 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_DEF(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.DEF(character);
-
 		var properties = character.Properties;
 
-		var baseValue = 5;
-		var stat = properties.GetFloat(PropertyName.CON, 1);
+		var baseValue = 20;
+		var level = properties.GetFloat(PropertyName.Lv);
 
-		var byItem = 0f;
-		var byBonus = properties.GetFloat(PropertyName.MAXDEF_Bonus);
+		var byLevel = level;
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.DEF);
 
-		byItem += character.Inventory.GetEquipProperties(PropertyName.DEF);
-		byItem += character.Inventory.GetEquipProperties(PropertyName.ADD_DEF);
-
-		// Armor carries flat defense, CON adds a matching flat amount
-		var byArmor = byItem;
-		var byStat = stat * 1.55f;
-
-		var value = baseValue + byArmor + byStat + byBonus;
+		var value = baseValue + byLevel + byItem;
 
 		var byBuffs = properties.GetFloat(PropertyName.DEF_BM);
 
@@ -1282,13 +1036,7 @@ public class CharacterCalculationsScript : GeneralScript
 
 		value += byBuffs + byRateBuffs;
 
-		var decRatio = properties.GetFloat(PropertyName.DEF_RATE_MUL_BM, 1);
-
-		if (decRatio < 0.5)
-			decRatio = 0.5f;
-		value = (float)Math.Floor(value * decRatio);
-
-		return (int)Math.Max(0, value);
+		return (int)value;
 	}
 
 	/// <summary>
@@ -1299,25 +1047,15 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MDEF(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MDEF(character);
-
 		var properties = character.Properties;
-		var con = properties.GetFloat(PropertyName.CON, 1);
-		var spr = properties.GetFloat(PropertyName.MNA, 1);
 
-		var baseValue = 5;
+		var baseValue = 20;
+		var level = properties.GetFloat(PropertyName.Lv);
 
-		var byItem = 0f;
+		var byLevel = level;
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.MDEF);
 
-		byItem += character.Inventory.GetEquipProperties(PropertyName.MDEF);
-		byItem += character.Inventory.GetEquipProperties(PropertyName.ADD_MDEF);
-
-		// Armor carries flat magic defense, SPR adds a matching flat amount
-		var byArmor = byItem;
-		var byStat = spr * 1.55f;
-
-		var value = baseValue + byArmor + byStat;
+		var value = baseValue + byLevel + byItem;
 
 		var byBuffs = properties.GetFloat(PropertyName.MDEF_BM);
 
@@ -1337,21 +1075,16 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CRTATK(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.CRTATK(character);
-
 		var properties = character.Properties;
 
 		var stat = properties.GetFloat(PropertyName.DEX);
 
-		var baseValue = 5;
+		var byStat = (stat * 4f) + ((float)Math.Floor(stat / 10f) * 10f);
+		var byItem = 0f;
 
-		var level = properties.GetFloat(PropertyName.Lv);
-		var byStat = stat * 1.55f;
+		byItem += character.Inventory.GetEquipProperties(PropertyName.CRTATK);
 
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.CRTATK);
-
-		var value = baseValue + byStat + byItem;
+		var value = byStat + byItem;
 
 		var byBuffs = properties.GetFloat(PropertyName.CRTATK_BM);
 
@@ -1371,22 +1104,16 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CRTHR(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.CRTHR(character);
-
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv);
-		var stat = properties.GetFloat(PropertyName.DEX);
 
-		var byLevel = level;
+		var byLevel = level / 2f;
 		var byItem = 0f;
-		// Linear in DEX, so a committed crit build actually outruns the target's CRTDR
-		var byStat = stat * 0.6f;
 
 		byItem += character.Inventory.GetEquipProperties(PropertyName.CRTHR);
 
-		var value = byStat + byLevel + byItem;
+		var value = byLevel + byItem;
 
 		var byBuffs = character.Properties.GetFloat(PropertyName.CRTHR_BM);
 
@@ -1406,22 +1133,16 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CRTDR(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.CRTDR(character);
-
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv);
-		var stat = properties.GetFloat(PropertyName.CON);
 
-		var byLevel = level;
+		var byLevel = level / 2f;
 		var byItem = 0f;
-		// Mirrors CRTHR, so an equal CON investment cancels an attacker's DEX
-		var byStat = stat * 0.6f;
 
 		byItem += character.Inventory.GetEquipProperties(PropertyName.CRTDR);
 
-		var value = byStat + byLevel + byItem;
+		var value = byLevel + byItem;
 
 		var byBuffs = character.Properties.GetFloat(PropertyName.CRTDR_BM);
 
@@ -1441,35 +1162,25 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_HR(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.HR(character);
-
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv);
-		var stat = properties.GetFloat(PropertyName.DEX);
+		var stat = properties.GetFloat(PropertyName.STR);
 
-		// Below the monster level term, so an average monster is missed a little
-		var byLevel = level * 0.85f;
-		// Linear in DEX, so a full investment covers the most evasive monsters
-		var byStat = stat * 0.15f;
-
+		var byLevel = level / 4f;
+		var byStat = (stat / 2f) + ((float)Math.Floor(stat / 15f) * 3f);
 		var byItem = 0f;
 
 		byItem += character.Inventory.GetEquipProperties(PropertyName.HR);
 		byItem += character.Inventory.GetEquipProperties(PropertyName.ADD_HR);
 		var value = byLevel + byStat + byItem;
 
-		var byItemRareOption = properties.GetFloat(PropertyName.EnchantHitRate);
-
-		byItemRareOption = (float)Math.Floor(value * (byItemRareOption / 1000));
-
 		var byBuffs = character.Properties.GetFloat(PropertyName.HR_BM);
 
 		var rate = character.Properties.GetFloat(PropertyName.HR_RATE_BM);
 		var byRateBuffs = (float)Math.Floor(value * rate);
 
-		value += byItemRareOption + byBuffs + byRateBuffs;
+		value += byBuffs + byRateBuffs;
 
 		return (int)value;
 	}
@@ -1482,9 +1193,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_DR(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.DR(character);
-
 		// Highguard completely negates evasion
 		if (character.IsBuffActive(BuffId.HighGuard_Buff))
 			return 0;
@@ -1494,14 +1202,12 @@ public class CharacterCalculationsScript : GeneralScript
 		var level = properties.GetFloat(PropertyName.Lv);
 		var stat = properties.GetFloat(PropertyName.DEX);
 
-		var byLevel = level * 0.85f;
-
-		// Mirrors HR, so an equal DEX investment on both sides cancels out
-		var byStat = stat * 0.15f;
-
+		var byLevel = level / 4f;
+		var byStat = (stat / 2f) + ((float)Math.Floor(stat / 15f) * 3f);
 		var byItem = 0f;
 
-		byItem += character.Inventory.GetSumOfEquipProperties(PropertyName.DR, PropertyName.ADD_DR);
+		byItem += character.Inventory.GetEquipProperties(PropertyName.DR);
+		byItem += character.Inventory.GetEquipProperties(PropertyName.ADD_DR);
 
 		var value = byLevel + byStat + byItem;
 
@@ -1510,15 +1216,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var rate = character.Properties.GetFloat(PropertyName.DR_RATE_BM);
 		var byRateBuffs = (float)Math.Floor(value * rate);
 
-		// Leather Mastery
-		var byAbility = 0f;
-		if (character.Abilities.TryGet(AbilityId.Leather, out var ability))
-		{
-			rate = 0.6f;
-			byAbility += character.Inventory.CountEquipMaterial(ArmorMaterialType.Leather) >= 4 ? (float)Math.Floor(value * rate) : 0f;
-		}
-
-		value += byBuffs + byAbility + byRateBuffs;
+		value += byBuffs + byRateBuffs;
 
 		return (int)value;
 	}
@@ -1531,26 +1229,18 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_BLK(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.BLK(character);
-
 		var properties = character.Properties;
-
-		var blockEnablingBuff = character.IsBuffActive(BuffId.CrossGuard_Buff);
 
 		// TODO: Update it after equipment change.
 		// Shield/Dagger = Right hand.
-		var lhItem = character.Inventory.GetItem(EquipSlot.LeftHand);
-		if ((lhItem == null || lhItem.Data.EquipType1 != EquipType.Shield) && !blockEnablingBuff)
+		if (character.Inventory.GetItem(EquipSlot.LeftHand).Data.EquipType1 != EquipType.Shield)
 			return 0;
 
-		var level = properties.GetFloat(PropertyName.Lv);
+		var Level = properties.GetFloat(PropertyName.Lv);
 		var stat = properties.GetFloat(PropertyName.CON);
 
-		var byLevel = level;
-
-		// Linear in CON, and mirrored by BLK_BREAK's STR term so the two cancel
-		var byStat = stat * 0.8f;
+		var byLevel = Level / 4f;
+		var byStat = (stat / 2f) + ((float)Math.Floor(stat / 15f) * 3f);
 		var byItem = 0f;
 
 		byItem += character.Inventory.GetEquipProperties(PropertyName.BLK);
@@ -1569,23 +1259,6 @@ public class CharacterCalculationsScript : GeneralScript
 
 		value += byBuffs + byRateBuffs;
 
-		if (character.IsGuarding())
-		{
-			// The block amount added while actively guarding appears to have
-			// changed over time, but some sources say it was a flat 550 block
-			// bonus at some point at least. Pre-ReBuild sources on the other
-			// hand speak of a bonus based on the character's level.
-			if (Feature.IsEnabled("FlatGuardBonus"))
-			{
-				if (character.JobClass == JobClass.Swordsman || character.JobClass == JobClass.Cleric)
-					value += 550;
-				else if (character.JobClass == JobClass.Archer || character.JobClass == JobClass.Scout)
-					value += 225;
-			}
-			else
-				value += character.Level * 5.5f;
-		}
-
 		return (int)value;
 	}
 
@@ -1597,19 +1270,13 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_BLK_BREAK(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.BLK_BREAK(character);
-
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv);
-		var stat = properties.GetFloat(PropertyName.STR);
+		var stat = properties.GetFloat(PropertyName.DEX);
 
-		var byLevel = level;
-
-		// Deliberately below BLK, so shielded monsters stay relevant at level
-		var byStat = stat * 0.4f;
-
+		var byLevel = level / 4f;
+		var byStat = (stat / 2f) + ((float)Math.Floor(stat / 15f) * 3f);
 		var byItem = 0f;
 
 		byItem += character.Inventory.GetEquipProperties(PropertyName.BLK_BREAK);
@@ -1627,38 +1294,6 @@ public class CharacterCalculationsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Returns heal power.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_Character_HEAL_PWR(Character character)
-	{
-		var properties = character.Properties;
-
-		var statINT = properties.GetFloat(PropertyName.INT);
-		var statSPR = properties.GetFloat(PropertyName.MNA);
-
-		var level = properties.GetFloat(PropertyName.Lv);
-
-		var byLevel = level;
-
-		var byStat = (statINT * 0.25f) + (statSPR * 1.25f);
-
-		var value = byLevel + byStat;
-
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.HEAL_PWR);
-		var byBuffs = character.Properties.GetFloat(PropertyName.HEAL_PWR_BM);
-
-		var rate = character.Properties.GetFloat(PropertyName.HEAL_PWR_RATE_BM);
-		var byRateBuffs = (float)Math.Floor(value * rate);
-
-		value += byItem + byBuffs + byRateBuffs;
-
-		return (int)value;
-	}
-
-	/// <summary>
 	/// Returns the character's AoE Attack Ratio?
 	/// </summary>
 	/// <param name="character"></param>
@@ -1666,12 +1301,14 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_SR(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.SR(character);
-
 		var properties = character.Properties;
 
 		var baseValue = 3;
+
+		if (character.Jobs.Has(JobId.Swordsman, JobCircle.First))
+			baseValue = 4;
+		else if (character.Jobs.Has(JobId.Archer, JobCircle.First))
+			baseValue = 0;
 
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.SR);
 		var byBuffs = character.Properties.GetFloat(PropertyName.SR_BM);
@@ -1712,9 +1349,6 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MSPD(Character character)
 	{
-		if (!Feature.IsEnabled("LaimaFormulas"))
-			return CharacterFormulas2016.MSPD(character);
-
 		var properties = character.Properties;
 
 		if (character.IsLocked(LockType.Movement))
@@ -1727,16 +1361,15 @@ public class CharacterCalculationsScript : GeneralScript
 		var baseValue = 30;
 		var byBuff = properties.GetFloat(PropertyName.MSPD_BM);
 		var byBonus = properties.GetFloat(PropertyName.MSPD_Bonus);
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.MSPD);
-		var value = (baseValue + byBuff + byItem + byBonus);
+		var value = (baseValue + byBuff + byBonus);
 
 		var nowWeight = properties.GetFloat(PropertyName.NowWeight);
 		var maxWeight = properties.GetFloat(PropertyName.MaxWeight);
 
-		if (nowWeight > maxWeight && !character.Map.IsCity)
+		if (nowWeight > maxWeight)
 			value /= 3;
 
-		return Math.Max(1, value);
+		return value;
 	}
 
 	/// <summary>
@@ -1762,39 +1395,10 @@ public class CharacterCalculationsScript : GeneralScript
 		var properties = character.Properties;
 
 		var baseStat = 100;
-		var byStat = Math.Min(250, properties.GetFloat(PropertyName.DEX));
-		var byBuff = Math2.Clamp(0, 100, properties.GetFloat(PropertyName.CastingSpeed_BM));
+		var byBuff = properties.GetFloat(PropertyName.CastingSpeed_BM);
 
-		// 30% Fixed, 70% Variable cast time
-		var fixedPortion = baseStat * 0.3f;
-		var variablePortion = baseStat * 0.7f * (1 - byStat / 300);
-		var result = (fixedPortion + variablePortion) * (1 - byBuff / 100f);
-
-		// 100% Variable cast time
-		// var result = baseStat * (1 - byStat / 300) - byBuff;
-
-		result = (float)Math.Floor(Math2.Clamp(0, 200, result));
-
-		return result;
-	}
-
-
-	/// <summary>
-	/// Returns character's attack speed bonus.
-	/// </summary>
-	/// <remarks>
-	/// DEX Contribution to skill speed handled by skill properties
-	/// </remarks>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_Character_AttackSpeed(Character character)
-	{
-		var byBuff = character.Properties.GetFloat(PropertyName.NormalASPD_BM);
-
-		var value = byBuff;
-
-		return (float)Math.Floor(value);
+		var result = baseStat + byBuff;
+		return (float)Math.Floor(Math2.Clamp(10, 200, result));
 	}
 
 	/// <summary>
@@ -1808,7 +1412,10 @@ public class CharacterCalculationsScript : GeneralScript
 		if (character.JobClass == JobClass.Archer)
 			return 1;
 
-		if (character.IsAnyBuffActive(BuffId.Warrior_EnableMovingShot_Buff, BuffId.Warrior_RushMove_Buff, BuffId.Cyclone_EnableMovingShot_Buff, BuffId.DoubleGunStance_Buff, BuffId.Limacon_Buff))
+		var buffs = new[] { BuffId.Cyclone_EnableMovingShot_Buff, BuffId.DoubleGunStance_Buff, BuffId.Warrior_EnableMovingShot_Buff, BuffId.Warrior_RushMove_Buff, BuffId.Limacon_Buff };
+
+		var anyBuffsActive = buffs.Any(character.IsBuffActive);
+		if (anyBuffsActive)
 			return 1;
 
 		return 0;
@@ -1826,12 +1433,28 @@ public class CharacterCalculationsScript : GeneralScript
 		if (!canMoveWhileShooting)
 			return 0;
 
-		var byJob = (character.JobClass == JobClass.Archer ? 0.4f : 0);
+		var byJob = (character.JobClass == JobClass.Archer ? 0.8f : 0);
 		var byBuff = character.Properties.GetFloat(PropertyName.MovingShot_BM);
 
 		var value = byJob + byBuff;
 
-		return Math.Min(2, value);
+		return Math.Min(5, value);
+	}
+
+	/// <summary>
+	/// Returns character's skill range, which adds potentially to the
+	/// skill's splash range.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_SkillRange(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.SkillRange);
+		var byBuff = character.Properties.GetFloat(PropertyName.SkillRange_BM);
+
+		var value = byItem + byBuff;
+		return value;
 	}
 
 	/// <summary>
@@ -1852,29 +1475,13 @@ public class CharacterCalculationsScript : GeneralScript
 		// not grant a skill.
 		var lhItem = character.Inventory.GetItem(EquipSlot.LeftHand);
 
-		if (lhItem == null || lhItem.Data.EquipType1 != EquipType.Shield)
+		if (lhItem.Data.EquipType1 != EquipType.Shield)
 			return 0;
 
 		if (lhItem.Data.LeftHandSkill != SkillId.None)
 			return 0;
 
 		return 1;
-	}
-
-	/// <summary>
-	/// Returns character's skill range, which adds potentially to the
-	/// skill's splash range.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_Character_SkillRange(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.SkillRange);
-		var byBuff = character.Properties.GetFloat(PropertyName.SkillRange_BM);
-
-		var value = byItem + byBuff;
-		return value;
 	}
 
 	/// <summary>
@@ -1895,435 +1502,7 @@ public class CharacterCalculationsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Character's additional slash attack.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_ATK_SLASH(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.Slash);
-		var byBuff = character.Properties.GetFloat(PropertyName.Slash_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's additional piercing attack.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_ATK_ARIES(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.Aries);
-		var byBuff = character.Properties.GetFloat(PropertyName.Aries_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's additional bludgeon attack.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_ATK_STRIKE(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.Strike);
-		var byBuff = character.Properties.GetFloat(PropertyName.Strike_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's additional slash defense.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_DEF_SLASH(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.SlashDEF);
-		var byBuff = character.Properties.GetFloat(PropertyName.DefSlash_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's additional piercing defense.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_DEF_ARIES(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.AriesDEF);
-		var byBuff = character.Properties.GetFloat(PropertyName.DefAries_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's additional bludgeon defense.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_DEF_STRIKE(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.StrikeDEF);
-		var byBuff = character.Properties.GetFloat(PropertyName.DefStrike_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's elemental attack - Fire.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_FIRE_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_FIRE);
-		var byBuff = character.Properties.GetFloat(PropertyName.Fire_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's elemental attack - Ice.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_ICE_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_ICE);
-		var byBuff = character.Properties.GetFloat(PropertyName.Ice_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's elemental attack - Lightning.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_LIGHTNING_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_LIGHTNING);
-		var byBuff = character.Properties.GetFloat(PropertyName.Lightning_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's elemental attack - Poison.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_POISON_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_POISON);
-		var byBuff = character.Properties.GetFloat(PropertyName.Poison_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's elemental attack - Earth.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_EARTH_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_EARTH);
-		var byBuff = character.Properties.GetFloat(PropertyName.Earth_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's elemental attack - Holy.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_HOLY_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_HOLY);
-		var byBuff = character.Properties.GetFloat(PropertyName.Holy_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's elemental attack - Dark.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_DARK_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_DARK);
-		var byBuff = character.Properties.GetFloat(PropertyName.Dark_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's elemental attack - Soul.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_SOUL_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_SOUL);
-		var byBuff = character.Properties.GetFloat(PropertyName.Soul_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's size attack - Small.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_SmallSize_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_SMALLSIZE);
-		var byBuff = character.Properties.GetFloat(PropertyName.SmallSize_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's size attack - Medium.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_MiddleSize_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_MIDDLESIZE);
-		var byBuff = character.Properties.GetFloat(PropertyName.MiddleSize_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's size attack - Large.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_LargeSize_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_LARGESIZE);
-		var byBuff = character.Properties.GetFloat(PropertyName.LargeSize_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's size attack - Boss.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_BOSS_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_BOSS_ATK);
-		var byBuff = character.Properties.GetFloat(PropertyName.BOSS_ATK_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's race attack - Demon.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_Velnias_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_VELIAS);
-		var byBuff = character.Properties.GetFloat(PropertyName.Velnias_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's race attack - Beast.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_Widling_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_WIDLING);
-		var byBuff = character.Properties.GetFloat(PropertyName.Widling_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's race attack - Mutant.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_Paramune_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_PARAMUNE);
-		var byBuff = character.Properties.GetFloat(PropertyName.Paramune_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's race attack - Plant.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_Forester_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_FORESTER);
-		var byBuff = character.Properties.GetFloat(PropertyName.Forester_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's race attack - Insect.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_Klaida_ATK(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_KLAIDA);
-		var byBuff = character.Properties.GetFloat(PropertyName.Klaida_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's armor material attack - Cloth.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_Cloth_ATK(Character character)
-	{
-		return character.Inventory.GetEquipProperties(PropertyName.ADD_CLOTH);
-	}
-
-	/// <summary>
-	/// Character's armor material attack - Leather.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_Leather_ATK(Character character)
-	{
-		return character.Inventory.GetEquipProperties(PropertyName.ADD_LEATHER);
-	}
-
-	/// <summary>
-	/// Character's armor material attack - Iron.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_Iron_ATK(Character character)
-	{
-		return character.Inventory.GetEquipProperties(PropertyName.ADD_IRON);
-	}
-
-	/// <summary>
-	/// Character's armor material attack - Ghost.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_Ghost_ATK(Character character)
-	{
-		return character.Inventory.GetEquipProperties(PropertyName.ADD_GHOST);
-	}
-
-	/// <summary>
-	/// Character's additional damage attack.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_GET_Add_Damage_Atk(Character character)
-	{
-		var byItem = character.Inventory.GetEquipProperties(PropertyName.Add_Damage_Atk);
-		var byBuff = character.Properties.GetFloat(PropertyName.Add_Damage_Atk_BM);
-
-		var value = byItem + byBuff;
-
-		return (float)Math.Floor(value);
-	}
-
-	/// <summary>
-	/// Character's elemental resistance - Fire.
+	/// Returns the character's fire resistance.
 	/// </summary>
 	/// <param name="character"></param>
 	/// <returns></returns>
@@ -2335,11 +1514,11 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var value = byItem + byBuff;
 
-		return (float)Math.Floor(value);
+		return (int)value;
 	}
 
 	/// <summary>
-	/// Character's elemental resistance - Ice.
+	/// Returns the character's ice resistance.
 	/// </summary>
 	/// <param name="character"></param>
 	/// <returns></returns>
@@ -2351,11 +1530,11 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var value = byItem + byBuff;
 
-		return (float)Math.Floor(value);
+		return (int)value;
 	}
 
 	/// <summary>
-	/// Character's elemental resistance - Lightning.
+	/// Returns the character's lightning resistance.
 	/// </summary>
 	/// <param name="character"></param>
 	/// <returns></returns>
@@ -2367,11 +1546,11 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var value = byItem + byBuff;
 
-		return (float)Math.Floor(value);
+		return (int)value;
 	}
 
 	/// <summary>
-	/// Character's elemental resistance - Earth.
+	/// Returns the character's earth resistance.
 	/// </summary>
 	/// <param name="character"></param>
 	/// <returns></returns>
@@ -2383,11 +1562,11 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var value = byItem + byBuff;
 
-		return (float)Math.Floor(value);
+		return (int)value;
 	}
 
 	/// <summary>
-	/// Character's elemental resistance - Poison.
+	/// Returns the character's poison resistance.
 	/// </summary>
 	/// <param name="character"></param>
 	/// <returns></returns>
@@ -2399,11 +1578,11 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var value = byItem + byBuff;
 
-		return (float)Math.Floor(value);
+		return (int)value;
 	}
 
 	/// <summary>
-	/// Character's elemental resistance - Holy.
+	/// Returns the character's holy resistance.
 	/// </summary>
 	/// <param name="character"></param>
 	/// <returns></returns>
@@ -2415,11 +1594,11 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var value = byItem + byBuff;
 
-		return (float)Math.Floor(value);
+		return (int)value;
 	}
 
 	/// <summary>
-	/// Character's elemental resistance - Dark.
+	/// Returns the character's dark resistance.
 	/// </summary>
 	/// <param name="character"></param>
 	/// <returns></returns>
@@ -2431,11 +1610,11 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var value = byItem + byBuff;
 
-		return (float)Math.Floor(value);
+		return (int)value;
 	}
 
 	/// <summary>
-	/// Character's elemental resistance - Soul.
+	/// Returns the character's soul resistance.
 	/// </summary>
 	/// <param name="character"></param>
 	/// <returns></returns>
@@ -2447,6 +1626,78 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var value = byItem + byBuff;
 
-		return (float)Math.Floor(value);
+		return (int)value;
+	}
+
+	/// <summary>
+	/// Returns the character's heal power.
+	/// </summary>
+	/// <remarks>
+	/// Listed as "Healing" in the stats window.
+	/// </remarks>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_Character_HEAL_PWR(Character character)
+	{
+		var properties = character.Properties;
+
+		var defaultValue = 20f;
+
+		var level = properties.GetFloat(PropertyName.Lv, 1);
+		var stat = properties.GetFloat(PropertyName.MNA, 1);
+
+		var byLevel = level * 2.5f;
+		var byStat = stat * 1f;
+
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.HEAL_PWR);
+		var byBuff = properties.GetFloat(PropertyName.HEAL_PWR_BM, 0);
+
+		var value = (float)Math.Floor(defaultValue + byLevel + byStat) + byItem + byBuff;
+
+		var avgPatk = (properties.GetFloat(PropertyName.MINPATK) + properties.GetFloat(PropertyName.MAXPATK)) / 2f;
+		var avgMatk = (properties.GetFloat(PropertyName.MINMATK) + properties.GetFloat(PropertyName.MAXMATK)) / 2f;
+		var atk = Math.Max(avgPatk, avgMatk);
+
+		var byAttack = atk / 4f;
+		value = (float)Math.Floor((value * 0.4f) + (byAttack * 0.6f));
+
+		var byRateBuff = properties.GetFloat(PropertyName.HEAL_PWR_RATE_BM, 0);
+		value *= (1f + byRateBuff);
+
+		var byExProperties = 0f;
+
+		// byExProperties += ABIL_MACE_ADDHEAL
+		// byExProperties += ITEM_Cleric_PatronSaint_HwpRate / 1000f
+		// byExProperties += ITEM_goddess_seal_lv1 / 1000f
+		// byExProperties += ITEM_goddess_seal_def_lv2 / 1000f
+
+		value *= (1f + byExProperties);
+
+		//if (character.IsInPvp)
+		//{
+		//	var byPvp = 0.5f; // TODO: Get actual PvP reduction ratio
+		//	value *= (1f - byPvp);
+		//}
+
+		// This one's weird. The HEAL_PWR property appears in the stat
+		// list as "Healing", but the value the client displays is not the
+		// one we send. Instead, it applies additional shenanigans on top
+		// of the value, from the UI code, resulting in a number that's
+		// higher than ours. If the stats then change, and the preview
+		// takes over, it displays the actual value, which matches ours.
+		// 
+		// The line below could be used to compensate for this difference,
+		// displaying the correct value, but then the preview doesn't
+		// match up, displaying the compensated value as the old and
+		// the actual one as the new value.
+		// 
+		// Since neither of these options are great, I guess we'll live
+		// with the presumed default behavior for now. If anyone knows
+		// what's going on here, let us know.
+
+		//value = (value - (byAttack * 0.6f)) * 0.4f + byAttack * 0.6f;
+
+		return (int)Math.Max(1, value);
 	}
 }

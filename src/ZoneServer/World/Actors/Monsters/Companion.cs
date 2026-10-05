@@ -254,36 +254,45 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <param name="monster"></param>
 		public void GiveExp(long exp, IMonster monster)
 		{
-			// Don't give exp while dead
 			if (this.IsDead)
 				return;
 
-			// Base EXP
+			if (exp <= 0)
+				return;
+
+			var maxLevel = ZoneServer.Instance.Conf.World.MaxCompanionLevel;
+
+			if (this.Level >= maxLevel)
+				return;
+
 			this.Exp += exp;
 			this.TotalExp += exp;
-
-			Send.ZC_NORMAL.PetExpUpdate(this.Owner, this);
 
 			var level = this.Level;
 			var levelUps = 0;
 			var maxExp = this.MaxExp;
-			var maxLevel = ZoneServer.Instance.Conf.World.MaxCompanionLevel;
 
-			// Consume EXP as many times as possible to reach new levels
 			while (maxExp > 0 && this.Exp >= maxExp && level < maxLevel)
 			{
 				this.Exp -= maxExp;
 
 				level++;
 				levelUps++;
+
+				if (level >= maxLevel)
+				{
+					this.Exp = 0;
+					maxExp = 0;
+					break;
+				}
+
 				maxExp = ZoneServer.Instance.Data.ExpDb.GetNextExp(ExpType.Pet, level);
 			}
 
-			// Execute level up only once to avoid client lag on multiple
-			// level ups. Leveling up a thousand times in a loop is not
-			// fun for the client =D"
 			if (levelUps > 0)
 				this.LevelUp(levelUps);
+
+			Send.ZC_NORMAL.PetExpUpdate(this.Owner, this);
 		}
 
 		/// <summary>
@@ -387,7 +396,7 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (this.IsDead)
 				return;
 
-			if (GameClock.LocalNow < _emergencyCareReadyAt)
+			if (DateTime.Now < _emergencyCareReadyAt)
 				return;
 
 			if (!this.Owner.TryGetActiveAbilityLevel(AbilityId.CompMastery2, out var level))
@@ -402,10 +411,10 @@ namespace Melia.Zone.World.Actors.Monsters
 				return;
 
 			var duration = TimeSpan.FromSeconds(level == 1 ? 2 : 1 + level);
-			this.StartBuff(BuffId.Pet_Heal, 1, 0, duration, this.Owner, SkillId.Hunter_PetComeBack);
+			this.StartBuff(BuffId.Pet_Heal, 1, 0, duration, this.Owner);
 			this.PlayGroundEffect("F_buff_basic008_blue", 1);
 
-			_emergencyCareReadyAt = GameClock.LocalNow + TimeSpan.FromMinutes(10);
+			_emergencyCareReadyAt = DateTime.Now + TimeSpan.FromMinutes(10);
 		}
 
 		/// <summary>
@@ -480,10 +489,10 @@ namespace Melia.Zone.World.Actors.Monsters
 				this.DetachEffect("F_sys_heart");
 				this.AttachEffect("F_sys_heart", 2, EffectLocation.Top);
 
-				GameClock.Delay(2000).ContinueWith(_ =>
+				Task.Delay(2000).ContinueWith(_ =>
 				{
 					this.DetachEffect("F_sys_heart");
-				}, TaskContinuationOptions.ExecuteSynchronously);
+				});
 			}
 		}
 
@@ -647,7 +656,7 @@ namespace Melia.Zone.World.Actors.Monsters
 				attachSeconds: 1f, attachAnimation: "SIT", preserveCurrentAnim: 1);
 			Send.ZC_NORMAL.AddAttachAnimList(this, "SIT_IDLE", "SIT_IDLE2");
 
-			await GameClock.Delay(1000);
+			await Task.Delay(1000);
 
 			if (this.Owner == null || !this.IsLandedOnShoulder)
 				return;
@@ -721,7 +730,7 @@ namespace Melia.Zone.World.Actors.Monsters
 				attachSeconds: 1f, attachAnimation: "SIT", preserveCurrentAnim: 1);
 			Send.ZC_NORMAL.AddAttachAnimList(this, "SIT_IDLE", "SIT_IDLE2");
 
-			await GameClock.Delay(1000);
+			await Task.Delay(1000);
 
 			if (roost == null || roost.IsDead || !this.IsOnRoost)
 				return;
@@ -744,7 +753,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		{
 			while (this.IsPerched)
 			{
-				await GameClock.Delay(PerchIdleLoopIntervalMs);
+				await Task.Delay(PerchIdleLoopIntervalMs);
 
 				if (!this.IsPerched)
 					break;

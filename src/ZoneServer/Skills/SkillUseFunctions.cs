@@ -1,4 +1,5 @@
 ﻿using System;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -104,6 +105,24 @@ namespace Melia.Zone.Skills
 		/// <param name="skill"></param>
 		/// <returns></returns>
 		public static SkillHitResult SCR_SkillHit(ICombatEntity caster, ICombatEntity target, Skill skill, SkillModifier modifier)
-			=> Call("SCR_SkillHit", caster, target, skill, modifier);
+		{
+			var effectiveModifier = modifier.Clone();
+
+			if (caster.TryGetBuff(BuffId.KaguraDance_Buff, out var kaguraBuff))
+			{
+				var damageBonus = Math.Max(kaguraBuff.NumArg2, 0f);
+				effectiveModifier.DamageMultiplier *= 1f + damageBonus;
+
+				if (target.TryGetBuff(BuffId.Kagura_Debuff, out var nightingaleDebuff))
+				{
+					var nightingaleLevel = Math.Min((int)nightingaleDebuff.NumArg1, 5);
+					var defensePenetration = 0.03f + nightingaleLevel * 0.01f;
+
+					effectiveModifier.DefensePenetrationRate = Math.Min(1f, effectiveModifier.DefensePenetrationRate + defensePenetration);
+				}
+			}
+
+			return Call("SCR_SkillHit", caster, target, skill, effectiveModifier);
+		}
 	}
 }

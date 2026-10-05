@@ -13,6 +13,12 @@ namespace Melia.Zone.Scripting
 	/// </summary>
 	public class PropertyShop
 	{
+		/// <summary>
+		/// Item used as currency instead of an account property.
+		/// 0 = uses CurrencyProperty (default behavior).
+		/// </summary>
+		public int CurrencyItemId { get; set; }
+		public bool UsesHuntingPoints { get; set; }
 		public string Name { get; }
 		public string PointName { get; }
 
@@ -66,6 +72,27 @@ namespace Melia.Zone.Scripting
 			var shop = new PropertyShop(name, pointName, currencyProperty);
 			configure(shop);
 			_shops[name] = shop;
+			return shop;
+		}
+
+		/// <summary>
+		/// Creates a property shop that uses an inventory item as currency.
+		/// </summary>
+		public static PropertyShop Create(string name, string pointName, int currencyItemId, Action<PropertyShop> configure)
+		{
+			if (currencyItemId <= 0)
+				throw new ArgumentOutOfRangeException(
+					nameof(currencyItemId),
+					"Currency item ID must be greater than zero.");
+
+			var shop = new PropertyShop(name, pointName, string.Empty)
+			{
+				CurrencyItemId = currencyItemId
+			};
+
+			configure(shop);
+			_shops[name] = shop;
+
 			return shop;
 		}
 

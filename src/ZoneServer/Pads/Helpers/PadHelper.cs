@@ -26,7 +26,6 @@ using static Melia.Zone.Scripting.Shortcuts;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.SkillUseFunctions;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.Pads.Helpers
 {
@@ -95,7 +94,7 @@ namespace Melia.Zone.Pads.Helpers
 			monster.Vars.SetInt("Melia.Summon.SkillLevel", skill.Level);
 
 			if (lifeTime > 0)
-				monster.DisappearTime = GameClock.LocalNow.AddMilliseconds(lifeTime);
+				monster.DisappearTime = DateTime.Now.AddMilliseconds(lifeTime);
 
 			if (effect == "Invisible")
 				monster.AddEffect(new ScriptInvisibleEffect());
@@ -155,9 +154,9 @@ namespace Melia.Zone.Pads.Helpers
 			}
 
 			if (lifeTime > 0 && lifeTime <= 300)
-				mob.DisappearTime = GameClock.LocalNow.AddSeconds(lifeTime);
+				mob.DisappearTime = DateTime.Now.AddSeconds(lifeTime);
 			else if (lifeTime > 300)
-				mob.DisappearTime = GameClock.LocalNow.AddMilliseconds(lifeTime);
+				mob.DisappearTime = DateTime.Now.AddMilliseconds(lifeTime);
 
 			if (effect != "None")
 				mob.AttachEffect(effect, eftScale);
@@ -232,7 +231,7 @@ namespace Melia.Zone.Pads.Helpers
 					var isAppliedBuff = target.IsBuffActive(buffId);
 					if (isAppliedBuff && immune)
 					{
-						var elapsedTime = (float)(GameClock.Now - skill.Vars.Get<DateTime>("Sadhu_Bind_StartTime")).TotalMilliseconds / 1000f;
+						var elapsedTime = (float)(DateTime.UtcNow - skill.Vars.Get<DateTime>("Sadhu_Bind_StartTime")).TotalMilliseconds / 1000f;
 						applyTime = 6500f - elapsedTime;
 						AddPadBuff(caster, target, pad, buffId, lv, arg2, applyTime, over, rate);
 					}
@@ -330,6 +329,8 @@ namespace Melia.Zone.Pads.Helpers
 				return;
 			if (caster.IsDead)
 				return;
+
+			// Official code searches for normal skill if it's null.
 			if (skill == null)
 				return;
 
@@ -386,11 +387,11 @@ namespace Melia.Zone.Pads.Helpers
 			var timeTaken = pad.Movement.MoveTo(destination);
 			if (destroyOnArrival)
 			{
-				_ = GameClock.Delay(timeTaken).ContinueWith(_ =>
+				_ = Task.Delay(timeTaken).ContinueWith(_ =>
 				{
 					try { pad.Destroy(); }
 					catch (Exception ex) { Log.Error("PadHelper.SetDestPos: Error destroying pad: {0}", ex); }
-				}, TaskContinuationOptions.ExecuteSynchronously);
+				}, TaskScheduler.Default);
 			}
 		}
 
@@ -400,12 +401,12 @@ namespace Melia.Zone.Pads.Helpers
 			var timeTaken = pad.Movement.MoveTo(destination);
 			if (destroyOnArrival)
 			{
-				await GameClock.Delay(timeTaken);
+				await Task.Delay(timeTaken);
 				try { pad.Destroy(); }
 				catch (Exception ex) { Log.Error("PadHelper.SetDestPosWithDelay: Error destroying pad: {0}", ex); }
 			}
 			if (accumDelay > 0)
-				await GameClock.Delay((int)accumDelay);
+				await Task.Delay((int)accumDelay);
 		}
 
 		public static void PadRemoveBuff(Pad pad, RelationType targetRelation, float consumeLife, float consumeUse, BuffId buffId)
@@ -441,22 +442,6 @@ namespace Melia.Zone.Pads.Helpers
 					if (pad.IsDead)
 						return;
 				}
-			}
-		}
-
-		/// <summary>
-		/// Destroys every magic pad of the pad creator's enemies whose area
-		/// overlaps the pad's own.
-		/// </summary>
-		/// <param name="pad"></param>
-		public static void PadKillEnemyMagicPads(Pad pad)
-		{
-			var targetPads = pad.Map.GetPads(other => other != pad && other.IsMagic && other.Layer == pad.Layer && pad.Creator.IsEnemy(other.Creator));
-
-			foreach (var targetPad in targetPads)
-			{
-				if ((pad.Area?.IsInside(targetPad.Position) ?? false) || (targetPad.Area?.IsInside(pad.Position) ?? false))
-					targetPad.Destroy();
 			}
 		}
 
@@ -561,7 +546,7 @@ namespace Melia.Zone.Pads.Helpers
 					var remainingTime = pad.Trigger.LifeTime;
 					if (skill.Id == SkillId.Psychokino_Raise)
 					{
-						//var now = Convert.ToInt32(GameClock.LocalNow);
+						//var now = Convert.ToInt32(DateTime.Now);
 						//target.SetTempVar("Psychokino_Raise_remainingTime", (float)remainingTime.TotalSeconds);
 						//target.SetTempVar("Psychokino_Raise_startTime", now);
 					}
@@ -764,7 +749,7 @@ namespace Melia.Zone.Pads.Helpers
 			}
 
 			Buff buff = null;
-			if (rate == 0 || rate >= GameRandom.Get().Next(1, 100))
+			if (rate == 0 || rate >= RandomProvider.Next(1, 100))
 			{
 				buff = target.StartBuff(buffId, arg1, arg2, TimeSpan.FromMilliseconds(time), caster, pad.Skill?.Id ?? SkillId.None);
 			}

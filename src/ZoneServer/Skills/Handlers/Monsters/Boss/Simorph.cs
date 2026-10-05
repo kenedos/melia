@@ -32,7 +32,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -63,23 +63,23 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			};
 
 			await MissileFall(caster, skill, position, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 6000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 6000f, 1, 50, -1, hits);
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 200, height: 1);
 			hits = new List<SkillHitInfo>();
 			await MissileFall(caster, skill, position, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 6000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 6000f, 1, 50, -1, hits);
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 200, height: 1);
 			hits = new List<SkillHitInfo>();
 			await MissileFall(caster, skill, position, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 6000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 6000f, 1, 50, -1, hits);
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 200, height: 1);
 			hits = new List<SkillHitInfo>();
 			await MissileFall(caster, skill, position, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 6000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 6000f, 1, 50, -1, hits);
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 200, height: 1);
 			hits = new List<SkillHitInfo>();
 			await MissileFall(caster, skill, position, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 6000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 6000f, 1, 50, -1, hits);
 		}
 	}
 
@@ -127,7 +127,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 0f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}
 
@@ -200,8 +200,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-			var config = new ArrowConfig
+			await skill.Wait(TimeSpan.FromMilliseconds(1800));
+			var startingPosition = originPos.GetRelative(farPos, distance: 0);
+			var endingPosition = originPos.GetRelative(farPos, distance: 200f);
+			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
 				ArrowEffect = EffectConfig.None,
 				ArrowSpacing = 15f,
@@ -216,13 +218,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitTimeSpacing = 0.01f,
 				HitCount = 1,
 				HitDuration = 50f,
-			};
-
-			var lines = new List<Task>();
-			var startingPosition = originPos.GetRelative(farPos, distance: 20f);
-			foreach (var angle in new[] { 0f, 30f, -30f, -60f, 60f })
-				lines.Add(EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(farPos, distance: 200f, angle: angle), config));
-			await Task.WhenAll(lines);
+			});
 		}
 	}
 }

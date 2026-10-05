@@ -12,14 +12,12 @@ using Melia.Zone.Events;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting.Hooking;
-using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
-using Melia.Zone.World.Quests;
 using Yggdrasil.Extensions;
 using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Logging;
@@ -93,14 +91,6 @@ namespace Melia.Zone.Scripting.Dialogues
 		/// Used to prevent stale packets from being processed.
 		/// </summary>
 		public DialogResponseType ExpectedResponseType { get; private set; }
-
-		/// <summary>
-		/// Returns true if a bare CZ_DIALOG_ACK, sent when the player
-		/// confirms with the space bar instead of clicking an option,
-		/// should resume this Select wait with the client's own
-		/// no-selection-made sentinel rather than being ignored.
-		/// </summary>
-		internal bool AcksAsDefaultSelect { get; private set; }
 
 		/// <summary>
 		/// Returns the data for a potentially open shop.
@@ -295,8 +285,7 @@ namespace Melia.Zone.Scripting.Dialogues
 
 			// Prepend dialog class name if one was set. This controls the
 			// portrait and also the title if no custom title was set.
-			// No NPC check: a track's dialog has no NPC, but a portrait it set is still wanted.
-			if (!message.Contains(NpcDialogTextSeperator) && this.Portrait != null)
+			if (this.Npc != null && !message.Contains(NpcDialogTextSeperator) && this.Portrait != null)
 			{
 				message = this.Portrait + NpcDialogTextSeperator + message;
 			}
@@ -525,166 +514,6 @@ namespace Melia.Zone.Scripting.Dialogues
 		}
 
 		/// <summary>
-		/// Opens the client's quest reward window for the given client-side
-		/// quest id and returns the index of the item the player picked
-		/// from that quest's Success_SelectItemName1-8, or 0 if the player
-		/// closed the window, or 100 if the quest has no select-item reward
-		/// to offer, both matching the client's own sentinel values.
-		/// </summary>
-		/// <remarks>
-		/// Confirmed against a capture of the game's own quest turn-in: the
-		/// server sends ZC_ADDON_MSG("SHOW_QUEST_SEL_DLG", questClientId),
-		/// which the client's questreward addon uses to look up the
-		/// reward data straight out of its own QuestProgressCheck_Auto
-		/// table, so this only works for a quest carrying a client id via
-		/// SetClientId.
-		/// </remarks>
-		/// <param name="questClientId"></param>
-		/// <returns></returns>
-		public async Task<int> SelectQuestReward(int questClientId, bool allowAckToConfirm = true)
-		{
-			this.Player.AddonMessage(AddonMessage.SHOW_QUEST_SEL_DLG, null, questClientId);
-
-			this.ExpectedResponseType = DialogResponseType.Select;
-			this.AcksAsDefaultSelect = allowAckToConfirm;
-
-			string response;
-			try { response = await this.GetClientResponse(); }
-			finally { this.AcksAsDefaultSelect = false; }
-
-			if (!int.TryParse(response, out var selectedIndex))
-			{
-				Log.Warning("Dialog.SelectQuestReward: Unexpected non-integer response '{0}'.", response);
-				selectedIndex = 0;
-			}
-
-			return selectedIndex;
-		}
-
-		/// <summary>
-		/// Shows a menu with options to select from, with the game's own
-		/// quest reward preview attached for the quest being offered,
-		/// returns the key of the selected option.
-		/// </summary>
-		/// <param name="questId">The quest the options are offering to start.</param>
-		/// <param name="text">Text to display with the options.</param>
-		/// <param name="options">List of options to select from.</param>
-		/// <returns></returns>
-		public async Task<string> SelectQuestOffer(QuestId questId, string text, params DialogOption[] options)
-			=> await this.SelectQuestOffer(questId, text, (IEnumerable<DialogOption>)options);
-
-		/// <summary>
-		/// Shows a menu with options to select from, with the game's own
-		/// quest reward preview attached for the quest being offered,
-		/// returns the key of the selected option.
-		/// </summary>
-		/// <param name="questId">The quest the options are offering to start.</param>
-		/// <param name="text">Text to display with the options.</param>
-		/// <param name="options">List of options to select from.</param>
-		/// <returns></returns>
-		public async Task<string> SelectQuestOffer(QuestId questId, string text, IEnumerable<DialogOption> options)
-		{
-			var enabledOptions = options.Where(a => a.Enabled());
-			var optionsTexts = enabledOptions.Select(a => a.Text);
-			var selectedIndex = await this.SelectQuestOffer(questId, text, optionsTexts);
-
-			var response = enabledOptions.ElementAt(selectedIndex - 1).Key;
-			return response;
-		}
-
-		/// <summary>
-		/// Shows a menu with options to select from, with the game's own
-		/// quest reward preview attached for the quest being offered,
-		/// returns the index of the selected option, starting at 1.
-		/// Returns 0 in case of errors.
-		/// </summary>
-		/// <remarks>
-		/// Confirmed against a capture of the game's own quest offer: the
-		/// arguments carry the quest's own className as a leading entry,
-		/// right after the message and before the real options - the
-		/// client's dialogselect addon recognizes that entry as a
-		/// QuestProgressCheck class and renders the reward preview from it,
-		/// without it taking up a button or a slot in the response index.
-		/// </remarks>
-		/// <param name="questId">The quest the options are offering to start.</param>
-		/// <param name="text">Text to display with the options.</param>
-		/// <param name="options">List of options to select from.</param>
-		/// <returns></returns>
-		public async Task<int> SelectQuestOffer(QuestId questId, string text, IEnumerable<string> options)
-		{
-			if (this.Npc != null)
-			{
-				ZoneServer.Instance.ServerEvents.PlayerDialog.Raise(new PlayerDialogEventArgs(this.Player, this.Npc, this.GetNpcDialogTitle(), text));
-			}
-
-			text = this.FrameMessage(text);
-
-			var arguments = new List<string>();
-			arguments.Add(text);
-
-			if (ZoneServer.Instance.Data.QuestDb.TryFind((int)questId.Value, out var questData))
-				arguments.Add(questData.ClassName);
-
-			arguments.AddRange(options);
-
-			Send.ZC_DIALOG_SELECT(this.Player.Connection, arguments);
-
-			this.ExpectedResponseType = DialogResponseType.Select;
-			var response = await this.GetClientResponse();
-
-			// Parse selected index
-			if (!int.TryParse(response, out var selectedIndex))
-			{
-				Log.Warning("Dialog.SelectQuestOffer: Unexpected non-integer response '{0}'.", response);
-				selectedIndex = 0;
-				this.Close();
-			}
-			// Check range
-			else if (selectedIndex < 0 || selectedIndex > options.Count())
-			{
-				Log.Warning("Dialog.SelectQuestOffer: Unexpected out-of-range response '{0}/{1}'.", selectedIndex, options.Count());
-				selectedIndex = 0;
-				this.Close();
-			}
-
-			return selectedIndex;
-		}
-
-		/// <summary>
-		/// Completes the given quest, showing the game's own quest reward
-		/// window first. If the quest has a pick-one-of reward, the picked
-		/// item is applied before the quest is completed; a quest with no
-		/// select reward still shows the window, matching the game's own
-		/// behavior, and closes itself once the player confirms.
-		/// </summary>
-		/// <param name="questId"></param>
-		public async Task CompleteQuest(QuestId questId)
-		{
-			if (!this.Player.Quests.HasRewards(questId))
-			{
-				this.Player.Quests.Complete(questId);
-				return;
-			}
-
-			var hasSelectReward = this.Player.Quests.TryGetSelectItemReward(questId, out var reward);
-
-			// A quest with a pick-one-of reward can't be confirmed with
-			// the space bar's bare ack - the client itself blocks a mouse
-			// confirm the same way until an item is actually clicked, so
-			// the space bar has to be left with nothing to do here too.
-			var pick = await this.SelectQuestReward((int)questId.Value, allowAckToConfirm: !hasSelectReward);
-
-			// 0 is the client's own cancel response
-			if (pick == 0)
-				return;
-
-			if (hasSelectReward && pick >= 1 && pick <= reward.ItemClassIds.Count)
-				this.Player.Quests.SelectReward(questId, reward.ItemClassIds[pick - 1]);
-
-			this.Player.Quests.Complete(questId);
-		}
-
-		/// <summary>
 		/// Shows a dialog with "Yes" and "No" options.
 		/// </summary>
 		/// <param name="text">The question to ask the player.</param>
@@ -880,6 +709,18 @@ namespace Melia.Zone.Scripting.Dialogues
 			throw new OperationCanceledException("Dialog closed by script.");
 		}
 
+		public void End()
+		{
+			this.State = DialogState.Ended;
+			this.ExpectedResponseType = DialogResponseType.None;
+
+			Send.ZC_DIALOG_CLOSE(this.Player.Connection);
+			Send.ZC_LEAVE_TRIGGER(this.Player.Connection);
+
+			if (_connection?.CurrentDialog == this)
+				_connection.CurrentDialog = null;
+		}
+
 		/// <summary>
 		/// Opens the player's personal storage.
 		/// </summary>
@@ -1025,35 +866,69 @@ namespace Melia.Zone.Scripting.Dialogues
 		}
 
 		/// <summary>
-		/// Opens a property (point/badge-based) shop for the player. The
-		/// shop's item list must already have been streamed to the client
-		/// via <see cref="SendPropertyShop"/> — typically on map entry.
+		/// Opens a property shop for the player.
 		///
-		/// When <paramref name="uiShopName"/> is provided, the UI opens
-		/// against that shop entry (for its title/frame definition) while
-		/// serving the item list from <paramref name="shopName"/>.
+		/// The shop may use either an account property or an inventory item
+		/// as currency.
 		/// </summary>
-		public void OpenPropertyShop(string shopName, string currencyProperty, string shopPointName, string uiShopName = null)
+		public void OpenPropertyShop(
+			string shopName,
+			string currencyProperty,
+			string shopPointName,
+			string uiShopName = null)
 		{
-			if (!PropertyShops.TryGet(shopName, out _))
+			if (!PropertyShops.TryGet(shopName, out var shop))
 				return;
 
 			var conn = this.Player.Connection;
 
-			// Push the current point balance so the UI header shows it
-			var balance = (int)conn.Account.Properties.GetFloat(currencyProperty);
-			Send.ZC_SHOP_POINT_UPDATE(conn, shopPointName, balance);
+			int balance;
 
-			// If an alias is supplied, alias the current shop's data into
-			// the UI-shop slot so the propertyshop frame renders the
-			// correct title while serving our per-weapon item list.
+			if (shop.UsesHuntingPoints)
+			{
+				balance = ZoneServer.Instance.HuntingTasks.GetPoints(this.Player);
+			}
+			else if (shop.CurrencyItemId != 0)
+			{
+				balance = this.Player.Inventory.CountItem(shop.CurrencyItemId);
+			}
+			else
+			{
+				var propertyName = string.IsNullOrWhiteSpace(shop.CurrencyProperty)
+					? currencyProperty
+					: shop.CurrencyProperty;
+
+				balance = (int)conn.Account.Properties.GetFloat(propertyName);
+			}
+
+			var pointName = !string.IsNullOrWhiteSpace(shopPointName) ? shopPointName : shop.PointName;
+
+			Log.Debug(
+				"[PROPERTY SHOP OPEN] Character={0}, Shop={1}, PointName={2}, Balance={3}, UsesHuntingPoints={4}, CurrencyItemId={5}, CurrencyProperty={6}, UiShopName={7}",
+				this.Player.Name,
+				shop.Name,
+				pointName,
+				balance,
+				shop.UsesHuntingPoints,
+				shop.CurrencyItemId,
+				shop.CurrencyProperty,
+				uiShopName ?? "NULL");
+
+			Send.ZC_SHOP_POINT_UPDATE(conn, pointName, balance);
+
 			var openName = uiShopName ?? shopName;
-			if (uiShopName != null && uiShopName != shopName)
-				Send.ZC_EXEC_CLIENT_SCP(conn, $"M_CPS_ALIAS('{uiShopName}','{shopName}')");
 
-			// Open the property-shop UI. The shopInfo is already cached
-			// client-side from the earlier SendPropertyShop stream.
-			Send.ZC_EXEC_CLIENT_SCP(conn, $"TOGGLE_PROPERTY_SHOP('{openName}', 1)");
+			if (uiShopName != null && uiShopName != shopName)
+			{
+				// Remember which real shop this UI alias represents
+				this.Player.PropertyShopAliases[uiShopName] = shopName;
+
+				Send.ZC_EXEC_CLIENT_SCP(conn, $"M_CPS_ALIAS('{uiShopName}','{shopName}')");
+			}
+
+			Send.ZC_EXEC_CLIENT_SCP(
+				conn,
+				$"TOGGLE_PROPERTY_SHOP('{openName}', 1)");
 		}
 
 		// Map class name -> property shops that should be streamed to the
@@ -1145,14 +1020,6 @@ namespace Melia.Zone.Scripting.Dialogues
 
 			Send.ZC_EXEC_CLIENT_SCP(conn, $"M_CPS_END('{shopName}','{pointScript}')");
 		}
-
-		/// <summary>
-		/// Opens the player's Pardoner offering box, streaming its
-		/// contents to their client first.
-		/// </summary>
-		/// <param name="atChurch">Whether the box is open to donations.</param>
-		public void OpenOblationBox(bool atChurch)
-			=> PardonerSkillHelper.SendOblationBox(this.Player, atChurch);
 
 		/// <summary>
 		/// Opens a custom companion shop with the given name.

@@ -2400,12 +2400,6 @@ namespace Melia.Shared.Game.Const
 		RussianRoulette_OH = 50732,
 		LastManStanding_OH = 50733,
 
-		Commodore_TargetingSight = 14001,
-		Commodore_ArtillerySupport = 14002,
-		Commodore_AnchorStrike = 14003,
-		Commodore_AntiBoarding = 14004,
-		Commodore_ArmorPiercingShot = 14005,
-		Commodore_AnnihilationBombardment = 14006,
 		RAID_POTION_TP = 30000,
 	}
 }

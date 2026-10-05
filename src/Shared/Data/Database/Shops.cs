@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Melia.Shared.Game.Const;
 using Newtonsoft.Json.Linq;
 using Yggdrasil.Data.JSON;
 
@@ -39,41 +38,14 @@ namespace Melia.Shared.Data.Database
 		public Dictionary<int, ProductData> Products { get; set; } = new Dictionary<int, ProductData>();
 		public int Level { get; set; }
 		public int EffectId { get; set; }
-
-		/// <summary>
-		/// Who the shop's owner opened it to - 0 for themselves, 1 for
-		/// their guild, 2 for everyone.
-		/// </summary>
-		public int Shared { get; set; }
-
-		/// <summary>
-		/// The handle of the actor the shop put in the world, for the
-		/// shops that stand on one.
-		/// </summary>
-		public int PropHandle { get; set; }
-
-		/// <summary>
-		/// The skill the shop was opened with.
-		/// </summary>
-		/// <remarks>
-		/// Both Squire shops register as the same client shop type, so this is
-		/// what tells them apart.
-		/// </remarks>
-		public SkillId SkillId { get; set; } = SkillId.None;
-
 		public string ShopAnimation
 		{
 			get
 			{
-				if (this.SkillId == SkillId.Squire_EquipmentTouchUp)
-					return "Squire_EquipmentTouchUp";
-
 				return this.Type switch
 				{
 					PersonalShopType.SpellShop => "Pardoner_SpellShop",
-					PersonalShopType.Oblation => "Pardoner_Oblation",
 					PersonalShopType.Repair => "Squire_Repair",
-					PersonalShopType.FoodTable => "Squire_FoodTable",
 					PersonalShopType.Portal => "Sage_PortalShop",
 					_ => "Squire_Repair",
 				};
@@ -83,20 +55,10 @@ namespace Melia.Shared.Data.Database
 		public bool IsClosed { get; set; }
 		public int OwnerHandle { get; set; }
 
-		/// <summary>
-		/// The sales made through this shop, shown in its trade log.
-		/// </summary>
-		public List<ShopSaleData> History { get; set; } = new List<ShopSaleData>();
-
 		public int SkillIcon
 		{
 			get
 			{
-				// The client looks this up as a skill class to pick the shop's
-				// UI, so a zero here leaves it with no window to open.
-				if (this.SkillId != SkillId.None)
-					return (int)this.SkillId;
-
 				return this.Type switch
 				{
 					PersonalShopType.ItemAwakening => 21007,
@@ -104,6 +66,7 @@ namespace Melia.Shared.Data.Database
 					PersonalShopType.Oblation => 40804,
 					PersonalShopType.Repair => 50301,
 					PersonalShopType.FoodTable => 50304,
+					PersonalShopType.Portal => 21409,
 					_ => 0,
 				};
 			}
@@ -121,40 +84,10 @@ namespace Melia.Shared.Data.Database
 		}
 	}
 
-	/// <summary>
-	/// One sale made through a personal shop, as its trade log shows it.
-	/// </summary>
-	[Serializable]
-	public class ShopSaleData
-	{
-		/// <summary>
-		/// What was sold - an item class for a shop that sells items, a
-		/// buff class for one that sells buffs.
-		/// </summary>
-		public int ClassId { get; set; }
-
-		/// <summary>
-		/// What it sold for, which the log only shows while no buyer is
-		/// named beside it.
-		/// </summary>
-		public int Price { get; set; }
-
-		/// <summary>
-		/// How many were sold, which the log only shows while no buyer is
-		/// named beside it.
-		/// </summary>
-		public int Amount { get; set; }
-
-		/// <summary>
-		/// Who bought it. The log shows this in place of the price and
-		/// the amount, which is what the game does with it.
-		/// </summary>
-		public string BuyerName { get; set; }
-	}
-
 	[Serializable]
 	public class ProductData
 	{
+		public string PortalDestination { get; set; }
 		public string ShopName { get; set; }
 		public int Id { get; set; }
 		public int ItemId { get; set; }

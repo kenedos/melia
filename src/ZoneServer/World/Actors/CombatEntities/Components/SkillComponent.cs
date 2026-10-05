@@ -139,10 +139,10 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 				foreach (var job in jobComponent.GetList())
 				{
-					var skillTreeDataList = ZoneServer.Instance.Data.SkillTreeDb.FindSkills(job.Id, job.EffectiveLevel).Where(a => a.SkillId == skillId);
+					var skillTreeDataList = ZoneServer.Instance.Data.SkillTreeDb.FindSkills(job.Id, job.Level).Where(a => a.SkillId == skillId);
 					foreach (var data in skillTreeDataList)
 					{
-						var jobsMaxLevel = job.GetSkillMaxLevel(data);
+						var jobsMaxLevel = data.MaxLevel;
 						if (jobsMaxLevel > maxLevel)
 							maxLevel = jobsMaxLevel;
 					}

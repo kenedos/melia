@@ -1,28 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Tracks;
-using Melia.Zone.World.Actors.Monsters;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.Characters.Components
 {
 	public class TrackComponent : CharacterComponent
 	{
-		private readonly static TimeSpan DialogTimeout = TimeSpan.FromMinutes(2);
-		private readonly static TimeSpan DialogPollInterval = TimeSpan.FromMilliseconds(100);
-		private readonly static TimeSpan BattleEndDelay = TimeSpan.FromSeconds(2);
-
 		public Track ActiveTrack { get; private set; }
-
-		private bool _disposed;
-		private int _trackLayer;
-		private int _returnLayer;
-		private Track _endingTrack;
 
 		/// <summary>
 		/// Raised when the character starts a track.
@@ -55,117 +43,25 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		public async Task<bool> Start(QuestTrackData questTrackData, string overrideTrackProperty = "")
 		{
-			return await this.Start(questTrackData.TrackName, questTrackData.StartDelay, questTrackData.QuestId, questTrackData.OnTrackStart, questTrackData.OnTrackEnd, overrideTrackProperty, questTrackData.PartyPlay);
+			return await this.Start(questTrackData.TrackName, questTrackData.StartDelay, questTrackData.QuestId, questTrackData.OnTrackStart, questTrackData.OnTrackEnd, overrideTrackProperty);
 		}
 
 		/// <summary>
 		/// Start a track for a specific quest.
 		/// </summary>
 		/// <param name="trackId"></param>
-		/// <param name="startDelay"></param>
-		/// <param name="questId"></param>
-		/// <param name="onStart"></param>
-		/// <param name="onComplete"></param>
-		/// <param name="overrideTrackProperty"></param>
-		/// <param name="partyPlay"></param>
 		/// <returns></returns>
-		public async Task<bool> Start(string trackId, TimeSpan startDelay, int questId, QuestStatus onStart, QuestStatus onComplete, string overrideTrackProperty = "", bool partyPlay = false)
+		public async Task<bool> Start(string trackId, TimeSpan startDelay, int questId, QuestStatus onStart, QuestStatus onComplete, string overrideTrackProperty = "")
 		{
 			if (!this.Character.EyesOpen)
 				return false;
 			if (this.ActiveTrack != null)
 				return false;
-			if (this._endingTrack != null)
-				return false;
-			if (_disposed)
-				return false;
-
-			// A character standing on a layer is already inside another
-			// track's private layer, so a second cutscene must not be
-			// started on top of it. An instance dungeon is exempt, since
-			// its cutscenes play on the dungeon's own layer.
-			if (this.Character.Layer != 0 && this.Character.Dungeon.InstanceDungeon == null)
-				return false;
-
 			if (!string.IsNullOrEmpty(overrideTrackProperty) && this.Character.Etc.Properties.GetFloat(overrideTrackProperty) == 1)
 				return false;
 			if (string.IsNullOrEmpty(overrideTrackProperty) && this.Character.Etc.Properties.GetFloat(trackId) == 1)
 				return false;
 
-			// The delay is what separates accepting a quest from its cutscene,
-			// so it has to run before the cutscene is sent, not after.
-			if (startDelay > TimeSpan.Zero)
-			{
-				await GameClock.Delay(startDelay);
-
-				if (_disposed || this.ActiveTrack != null || this._endingTrack != null)
-					return false;
-			}
-
-			// A dialog can be opened while the delay runs - talking to the
-			// quest giver once more is enough - and a track builds a dialog
-			// of its own, which throws while another is active. Hold the
-			// cutscene until the player is out of it.
-			if (!await this.WaitForDialogClose())
-				return false;
-
-			var party = partyPlay ? this.Character.Connection?.Party : null;
-
-			Track track;
-
-			if (party != null)
-			{
-				// Serialised so two members who finish their delay at the
-				// same moment cannot both spawn a cast. StartLock is held
-				// across the spawn, which takes the starters' quest locks;
-				// SyncLock is not, because the leave path takes it while
-				// holding a quest lock.
-				lock (TrackGroup.StartLock)
-				{
-					var group = TrackGroup.Find(party.ObjectId, questId, trackId, this.Character.MapId);
-					if (group != null)
-						return this.StartJoiningGroup(group, trackId, questId, onStart, onComplete, overrideTrackProperty);
-
-					track = this.CreateTrack(trackId, startDelay, questId, onStart, onComplete, overrideTrackProperty, party);
-				}
-			}
-			else
-			{
-				track = this.CreateTrack(trackId, startDelay, questId, onStart, onComplete, overrideTrackProperty, null);
-			}
-
-			// The cutscene addresses its cast by handle, so the client has to
-			// have been told about every one of them before it starts.
-			this.Character.LookAround();
-			this.ShowCast(track);
-
-			this.Character.StopBuff(BuffId.DashRun);
-			this.Character.Movement.Stop();
-
-			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
-			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x77, true, track.Id);
-			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x6B, true, this.Character.Name);
-			Send.ZC_NORMAL.StartCutscene(this.Character, track.Id, track.Actors, track.Data.ActorLines);
-
-			this.TrackStarted?.Invoke(this.Character, this.ActiveTrack);
-
-			return true;
-		}
-
-		/// <summary>
-		/// Creates the track, runs its OnStart, and registers the shared
-		/// group when it belongs to a party.
-		/// </summary>
-		/// <param name="trackId"></param>
-		/// <param name="startDelay"></param>
-		/// <param name="questId"></param>
-		/// <param name="onStart"></param>
-		/// <param name="onComplete"></param>
-		/// <param name="overrideTrackProperty"></param>
-		/// <param name="party"></param>
-		/// <returns></returns>
-		private Track CreateTrack(string trackId, TimeSpan startDelay, int questId, QuestStatus onStart, QuestStatus onComplete, string overrideTrackProperty, Party party)
-		{
 			var track = Track.Create(trackId);
 
 			track.Status = TrackStatus.Started;
@@ -174,20 +70,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			track.Data.OnStartQuestStatus = onStart;
 			track.Data.OnCompleteQuestStatus = onComplete;
 			track.Data.PropertyId = string.IsNullOrEmpty(overrideTrackProperty) ? trackId : overrideTrackProperty;
-			track.Owner = this.Character;
-
-			// Remember the status the quest was in before the track touched
-			// it, so cancelling the track only drops a quest that hadn't been
-			// accepted yet.
-			track.Data.OriginalQuestStatus = QuestStatus.Possible;
-			if (questId != 0 && this.Character.Quests.TryGetById(questId, out var quest))
-				track.Data.OriginalQuestStatus = quest.Status;
-
 			track.Dialog = new Dialog(this.Character, null);
 
 			this.ActiveTrack = track;
 
-			var returnLayer = this.Character.Layer;
 			IActor[] actors;
 			if (TrackScript.TryGet(track.Id, out var trackScript))
 				actors = trackScript.OnStart(this.Character, this.ActiveTrack);
@@ -195,129 +81,14 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				actors = Array.Empty<IActor>();
 			track.Actors = actors;
 
-			// The track builds its own layer in OnStart; remember it and
-			// the layer to hand the character back to, so a disconnect can
-			// destroy the track's layer without touching anything shared.
-			this._returnLayer = returnLayer;
-			this._trackLayer = this.Character.Layer;
-
-			if (party != null)
-			{
-				// A track's cast is only visible to the character it was
-				// spawned for, which would hide the whole cutscene from the
-				// party. The layer check keeps it off the field.
-				foreach (var actor in actors)
-				{
-					if (actor is Actor trackActor && trackActor.Visibility == ActorVisibility.Track)
-						trackActor.SetVisibilty(ActorVisibility.Party, party.ObjectId);
-				}
-
-				lock (TrackGroup.SyncLock)
-					track.Group = TrackGroup.CreateLocked(party.ObjectId, questId, trackId, track.Data.PropertyId, this.Character.MapId, this._trackLayer, actors, this.Character);
-			}
-
-			return track;
-		}
-
-		/// <summary>
-		/// Puts the character onto a party track's shared layer and plays
-		/// the cutscene for them, without spawning a second cast.
-		/// </summary>
-		/// <param name="group"></param>
-		/// <param name="trackId"></param>
-		/// <param name="questId"></param>
-		/// <param name="onStart"></param>
-		/// <param name="onComplete"></param>
-		/// <param name="overrideTrackProperty"></param>
-		/// <returns></returns>
-		private bool StartJoiningGroup(TrackGroup group, string trackId, int questId, QuestStatus onStart, QuestStatus onComplete, string overrideTrackProperty)
-		{
-			if (group.Ended || group.Owner == this.Character)
-				return false;
-
-			if (!group.TryJoin(this.Character))
-				return false;
-
-			var track = Track.Create(trackId);
-
-			track.Status = TrackStatus.Started;
-			track.Data.QuestId = questId;
-			track.Data.OnStartQuestStatus = onStart;
-			track.Data.OnCompleteQuestStatus = onComplete;
-			track.Data.PropertyId = string.IsNullOrEmpty(overrideTrackProperty) ? trackId : overrideTrackProperty;
-			track.Owner = group.Owner;
-			track.Group = group;
-
-			track.Data.OriginalQuestStatus = QuestStatus.Possible;
-			if (questId != 0 && this.Character.Quests.TryGetById(questId, out var quest))
-				track.Data.OriginalQuestStatus = quest.Status;
-
-			track.Dialog = new Dialog(this.Character, null);
-
-			this.ActiveTrack = track;
-
-			var returnLayer = this.Character.Layer;
-			var actors = group.BuildActorsFor(this.Character);
-			track.Actors = actors;
-
-			this._returnLayer = returnLayer;
-			this._trackLayer = group.Layer;
-
-			// The joiner starts where the party already is, so a kill the
-			// others made before they arrived still counts for them.
-			if (questId != 0)
-				this.Character.Quests.SyncProgressFrom(questId, group.Members);
-
-			this.Character.SetLayer(group.Layer);
-			this.Character.LookAround();
-			this.ShowCast(track);
-
-			this.Character.StopBuff(BuffId.DashRun);
-			this.Character.Movement.Stop();
-
 			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x77, true, track.Id);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x6B, true, this.Character.Name);
-			Send.ZC_NORMAL.StartCutscene(this.Character, track.Id, actors, track.Data.ActorLines);
+			Send.ZC_NORMAL.StartCutscene(this.Character, track.Id, actors);
 
 			this.TrackStarted?.Invoke(this.Character, this.ActiveTrack);
 
-			return true;
-		}
-
-		/// <summary>
-		/// Sends the track's cast to the character at once, so the cutscene
-		/// can address every handle the moment it starts.
-		/// </summary>
-		/// <param name="track"></param>
-		private void ShowCast(Track track)
-		{
-			foreach (var actor in track.Actors)
-			{
-				if (actor is IMonster monster)
-					this.Character.ShowMonster(monster);
-			}
-		}
-
-		/// <summary>
-		/// Waits until the character is out of any open dialog, so a track
-		/// can build the dialog it speaks through.
-		/// </summary>
-		/// <remarks>
-		/// The dialog that accepted the quest is already waited out by
-		/// QuestComponent.BeginTrack, but a start delay reopens the window
-		/// and a second conversation can be running by the time it ends.
-		/// </remarks>
-		/// <returns>False if a track became active while waiting.</returns>
-		private async Task<bool> WaitForDialogClose()
-		{
-			while (this.Character.Connection.CurrentDialog != null)
-			{
-				await GameClock.Delay(DialogPollInterval);
-
-				if (_disposed || this.ActiveTrack != null || this._endingTrack != null)
-					return false;
-			}
+			await Task.Delay(track.Data.StartDelay);
 
 			return true;
 		}
@@ -341,21 +112,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
-		/// Runs the active track's hand-over, when the client is done
-		/// playing the cinematic.
-		/// </summary>
-		public void HandOver()
-		{
-			var track = this.ActiveTrack;
-
-			if (track == null)
-				return;
-
-			if (TrackScript.TryGet(track.Id, out var trackScript))
-				trackScript.OnHandOver(this.Character, track);
-		}
-
-		/// <summary>
 		/// End a track.
 		/// </summary>
 		/// <param name="trackId"></param>
@@ -364,115 +120,20 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (this.ActiveTrack == null || this.ActiveTrack.Id != trackId)
 				return;
 
-			// Detached before OnComplete runs, so the quest status it sets
-			// cannot come back around and end the same track again.
-			var track = this.ActiveTrack;
-			this.ActiveTrack = null;
+			if (TrackScript.TryGet(trackId, out var trackScript))
+				trackScript.OnComplete(this.Character, this.ActiveTrack);
 
-			var pendingDialog = track.PendingDialog;
-
-			if (pendingDialog != null && !pendingDialog.IsCompleted)
-			{
-				_ = this.CompleteAfterDialog(track, pendingDialog);
-				return;
-			}
-
-			// A track that ran into a fight is held open a moment past the
-			// last kill, so the client can finish the death animation before
-			// the cast is pulled out from under it. A track can override the
-			// delay with SetEndDelay.
-			var endDelay = track.Data.EndDelay;
-			if (endDelay == TimeSpan.Zero && track.HasBattleBoxInLayer)
-				endDelay = BattleEndDelay;
-
-			if (endDelay > TimeSpan.Zero)
-			{
-				_ = this.CompleteAfterDelay(track, endDelay);
-				return;
-			}
-
-			this.Complete(track);
-		}
-
-		/// <summary>
-		/// Waits for the track's conversation to be read before completing
-		/// the track.
-		/// </summary>
-		/// <param name="track"></param>
-		/// <param name="pendingDialog"></param>
-		/// <returns></returns>
-		private async Task CompleteAfterDialog(Track track, Task pendingDialog)
-		{
-			this._endingTrack = track;
-
-			await Task.WhenAny(pendingDialog, Task.Delay(DialogTimeout));
-
-			if (this._endingTrack != track)
-				return;
-
-			this._endingTrack = null;
-
-			if (_disposed || this.Character.Map == null)
-				return;
-
-			this.Complete(track);
-		}
-
-		/// <summary>
-		/// Holds the track open for the given delay before completing it.
-		/// </summary>
-		/// <param name="track"></param>
-		/// <param name="delay"></param>
-		/// <returns></returns>
-		private async Task CompleteAfterDelay(Track track, TimeSpan delay)
-		{
-			this._endingTrack = track;
-
-			await GameClock.Delay(delay);
-
-			if (this._endingTrack != track)
-				return;
-
-			this._endingTrack = null;
-
-			if (_disposed || this.Character.Map == null)
-				return;
-
-			this.Complete(track);
-		}
-
-		/// <summary>
-		/// Completes the given track and cleans up after it.
-		/// </summary>
-		/// <param name="track"></param>
-		private void Complete(Track track)
-		{
-			if (TrackScript.TryGet(track.Id, out var trackScript))
-				trackScript.OnComplete(this.Character, track);
-
-			// A shared track's cast and layer belong to every member, so the
-			// loot only moves once the last of them has left.
-			if (track.Group == null || track.Group.Ended)
-			{
-				this.ReturnGroundItemsToBaseLayer();
-				this.RemoveRemainingLayerEntities();
-			}
-
-			// OnComplete stops the track's layer, which makes the client
-			// hide the tracker; re-show it now that the quest state it
-			// carries is final.
-			this.Character.Quests.RefreshChase();
-
-			this.TrackCompleted?.Invoke(this.Character, track);
+			this.TrackCompleted?.Invoke(this.Character, this.ActiveTrack);
 
 			// Clean up the track dialog to prevent blocking future NPC interactions
-			if (track.Dialog != null)
+			if (this.ActiveTrack.Dialog != null)
 			{
-				track.Dialog.State = DialogState.Ended;
-				track.Dialog.Cancel();
+				this.ActiveTrack.Dialog.State = DialogState.Ended;
 				this.Character.Connection.CurrentDialog?.Cancel();
 				this.Character.Connection.CurrentDialog = null;
 			}
+
+			this.ActiveTrack = null;
 		}
 
 		/// <summary>
@@ -483,134 +144,18 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (this.ActiveTrack == null)
 				return;
 
-			var track = this.ActiveTrack;
-			this.ActiveTrack = null;
-
-			if (TrackScript.TryGet(track.Id, out var trackScript))
-				trackScript.OnCancel(this.Character, track);
-
-			if (track.Group == null || track.Group.Ended)
-			{
-				this.ReturnGroundItemsToBaseLayer();
-				this.RemoveRemainingLayerEntities();
-			}
+			if (TrackScript.TryGet(this.ActiveTrack.Id, out var trackScript))
+				trackScript.OnCancel(this.Character, this.ActiveTrack);
 
 			// Clean up the track dialog to prevent blocking future NPC interactions
-			if (track.Dialog != null)
+			if (this.ActiveTrack.Dialog != null)
 			{
-				track.Dialog.State = DialogState.Ended;
+				this.ActiveTrack.Dialog.State = DialogState.Ended;
 				this.Character.Connection.CurrentDialog?.Cancel();
 				this.Character.Connection.CurrentDialog = null;
 			}
-		}
 
-		/// <summary>
-		/// Moves loot dropped on the track's private layer onto the layer
-		/// the character returns to.
-		/// </summary>
-		/// <remarks>
-		/// A track with a battle box leaves its drops behind when it ends,
-		/// because they spawned on the track's own layer. OnComplete/OnCancel
-		/// stop that layer before this runs, so the loot has already left the
-		/// client's view and LookAround sends it again on the return layer.
-		/// </remarks>
-		private void ReturnGroundItemsToBaseLayer()
-		{
-			if (this._trackLayer == this._returnLayer)
-				return;
-
-			var map = this.Character.Map;
-			if (map == null)
-				return;
-
-			var groundItems = map.GetMonsters(m => m.Layer == this._trackLayer && m is ItemMonster);
-			if (groundItems.Count == 0)
-				return;
-
-			foreach (var monster in groundItems)
-				monster.Layer = this._returnLayer;
-
-			this.Character.LookAround();
-		}
-
-		/// <summary>
-		/// Removes everything else the track left on its private layer,
-		/// including monsters a boss summoned there with a skill rather
-		/// than placed as part of the cast.
-		/// </summary>
-		private void RemoveRemainingLayerEntities()
-		{
-			if (this._trackLayer == this._returnLayer)
-				return;
-
-			var map = this.Character.Map;
-			if (map == null)
-				return;
-
-			map.RemoveEntitiesOnLayer(this._trackLayer);
-		}
-
-		/// <summary>
-		/// Tears down the character's track and the actors it spawned on
-		/// its private layer, for a disconnect that never reaches End or
-		/// Cancel and so would otherwise leave the cast behind.
-		/// </summary>
-		public void Cleanup()
-		{
-			_disposed = true;
-
-			var track = this.ActiveTrack;
 			this.ActiveTrack = null;
-
-			track ??= this._endingTrack;
-			this._endingTrack = null;
-
-			if (track == null)
-				return;
-
-			if (track.Dialog != null)
-			{
-				track.Dialog.State = DialogState.Ended;
-				track.Dialog.Cancel();
-
-				var connection = this.Character.Connection;
-				if (connection != null)
-				{
-					connection.CurrentDialog?.Cancel();
-					connection.CurrentDialog = null;
-				}
-			}
-
-			var map = this.Character.Map;
-
-			// The track created its own layer, so everything left on it
-			// belongs to the cutscene and can go. A track that did not move
-			// the character - a dungeon's shared party layer - only loses
-			// its own cast, never the layer itself.
-			if (this._trackLayer != this._returnLayer)
-			{
-				// A shared track's layer and cast outlive the member that
-				// dropped, unless they were the last one on it.
-				if (track.Group != null && !track.Group.Leave(this.Character))
-				{
-					this.Character.SetLayer(this._returnLayer, enabled: false);
-					return;
-				}
-
-				if (map != null)
-				{
-					map.RemoveEntitiesOnLayer(this._trackLayer);
-					this.Character.SetLayer(this._returnLayer, enabled: false);
-				}
-			}
-			else if (map != null && track.Actors != null)
-			{
-				foreach (var actor in track.Actors)
-				{
-					if (actor != this.Character && actor is IMonster monster)
-						map.RemoveMonster(monster);
-				}
-			}
 		}
 	}
 }

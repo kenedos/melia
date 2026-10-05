@@ -87,8 +87,6 @@ namespace Melia.Shared.Game.Const
 		BonemancerA = 3109,
 		BlitzHunterA = 3110,
 		HermitA = 3111,
-		GrimmarkA = 3112,
-		CommodoreA = 3113,
 
 		// Cleric
 		Cleric = 4001,
@@ -142,7 +140,6 @@ namespace Melia.Shared.Game.Const
 		AetherBladerT = 5022,
 		GrimmarkT = 5023,
 		KnellerT = 5024,
-		CommodoreT = 5025,
 
 		// GM
 		GM = 9001,
@@ -164,78 +161,6 @@ namespace Melia.Shared.Game.Const
 		First,
 		Second,
 		Third,
-	}
-
-	/// <summary>
-	/// Helper methods for the class circle system, where every circle of
-	/// an advanced job occupies its own rank and its own 1~15 level band.
-	/// </summary>
-	public static class JobCircleHelper
-	{
-		/// <summary>
-		/// Returns the level a job would be on under the flat job model,
-		/// combining its circle and its level within that circle. Skill
-		/// tree unlock levels are still banded 1/16/31, so they're
-		/// compared against this rather than the raw job level.
-		/// </summary>
-		/// <param name="circle"></param>
-		/// <param name="level"></param>
-		/// <param name="levelsPerCircle"></param>
-		/// <returns></returns>
-		public static int GetEffectiveJobLevel(JobCircle circle, int level, int levelsPerCircle)
-		{
-			var circleIndex = Math.Max(0, (int)circle - 1);
-			return circleIndex * levelsPerCircle + level;
-		}
-
-		/// <summary>
-		/// The number of skill levels every circle adds to a skill that has
-		/// already been unlocked.
-		/// </summary>
-		public const int SkillLevelsPerCircle = 5;
-
-		/// <summary>
-		/// The highest circle an advanced job reaches.
-		/// </summary>
-		public const int MaxCircles = 3;
-
-		/// <summary>
-		/// Returns the circle a skill belongs to, derived from the 1/16/31
-		/// banding of its skill tree unlock level.
-		/// </summary>
-		/// <param name="unlockLevel"></param>
-		/// <param name="levelsPerCircle"></param>
-		/// <returns></returns>
-		public static int GetSkillCircle(int unlockLevel, int levelsPerCircle)
-		{
-			if (levelsPerCircle < 1)
-				return 1;
-
-			return Math.Max(1, (unlockLevel + levelsPerCircle - 1) / levelsPerCircle);
-		}
-
-		/// <summary>
-		/// Returns the max level a skill can be raised to on a job that is
-		/// on the given circle. A skill gains five levels for its own circle
-		/// and five more for every circle gained past it, so an unlock level
-		/// 1 skill caps at 5/10/15 and an unlock level 16 skill at 0/5/10,
-		/// never going past the cap its skill tree entry sets.
-		/// </summary>
-		/// <param name="circle"></param>
-		/// <param name="unlockLevel"></param>
-		/// <param name="dataMaxLevel"></param>
-		/// <param name="levelsPerCircle"></param>
-		/// <returns></returns>
-		public static int GetSkillMaxLevel(JobCircle circle, int unlockLevel, int dataMaxLevel, int levelsPerCircle)
-		{
-			var skillCircle = GetSkillCircle(unlockLevel, levelsPerCircle);
-			var unlockedCircles = Math.Max(1, (int)circle) - skillCircle + 1;
-
-			if (unlockedCircles <= 0)
-				return 0;
-
-			return Math.Min(dataMaxLevel, unlockedCircles * SkillLevelsPerCircle);
-		}
 	}
 
 	public static class JobExtension

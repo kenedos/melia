@@ -41,6 +41,7 @@ namespace Melia.Shared.Data.Database
 		private readonly List<BaseExpData> _petExp = new List<BaseExpData>();
 		private readonly List<BaseExpData> _friendExp = new List<BaseExpData>();
 		private readonly List<BaseExpData> _ancientExp = new List<BaseExpData>();
+		private readonly List<BaseExpData> _teamExp = new List<BaseExpData>();
 
 		// Precomputed lookup caches for job exp (built in AfterLoad)
 		private int _highestJobRank;
@@ -54,6 +55,7 @@ namespace Melia.Shared.Data.Database
 			_guildExp.Clear();
 			_petExp.Clear();
 			_ancientExp.Clear();
+			_teamExp.Clear();
 			_maxJobLevelByRank.Clear();
 			_totalJobExpByRankLevel.Clear();
 			_highestJobRank = 0;
@@ -208,6 +210,8 @@ namespace Melia.Shared.Data.Database
 				this.ReadExpEntry(entry, "friendExp", _friendExp);
 			else if (entry.ContainsKey("ancientExp"))
 				this.ReadExpEntry(entry, "ancientExp", _ancientExp);
+			else if (entry.ContainsKey("teamExp"))
+				this.ReadExpEntry(entry, "teamExp", _teamExp);
 			else
 				throw new DatabaseErrorException("Unknown exp type.");
 		}
@@ -290,6 +294,53 @@ namespace Melia.Shared.Data.Database
 		}
 
 		/// <summary>
+		/// Returns the total Team EXP required to reach the given Team Level.
+		/// </summary>
+		public long GetTeamTotalExp(int level)
+		{
+			if (level < 1)
+				throw new ArgumentException("Invalid Team Level (too low).");
+
+			var data = _teamExp.FirstOrDefault(a => a.Level == level);
+			return data?.Exp ?? 0;
+		}
+
+		/// <summary>
+		/// Returns the Team Level for the given accumulated Team EXP.
+		/// </summary>
+		public int GetTeamLevel(long exp)
+		{
+			if (exp < 0)
+				throw new ArgumentException("Invalid Team EXP (too low).");
+
+			if (_teamExp.Count == 0)
+				return 1;
+
+			var level = 1;
+
+			foreach (var data in _teamExp.OrderBy(a => a.Level))
+			{
+				if (exp < data.Exp)
+					break;
+
+				level = Math.Min(data.Level + 1, 100);
+			}
+
+			return level;
+		}
+
+		/// <summary>
+		/// Returns the maximum configured Team Level.
+		/// </summary>
+		public int GetMaxTeamLevel()
+		{
+			if (_teamExp.Count == 0)
+				return 0;
+
+			return _teamExp.Max(a => a.Level);
+		}
+
+		/// <summary>
 		/// Called after loading, adds data to Entries so the servers
 		/// can show that something was loaded.
 		/// </summary>
@@ -301,6 +352,7 @@ namespace Melia.Shared.Data.Database
 			this.Entries.AddRange(_petExp);
 			this.Entries.AddRange(_friendExp);
 			this.Entries.AddRange(_ancientExp);
+			this.Entries.AddRange(_teamExp);
 
 			this.BuildJobExpCaches();
 		}

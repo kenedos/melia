@@ -41,7 +41,9 @@ direction dir;
 Relation relation;
 byte fromGround; // true = appears from ground
 int hp, maxHp;
-int64 shield;
+short s1;
+short s2;
+int i7;
 float walkSpeed;
 
 // MONSTER_APPEARANCE_BASE

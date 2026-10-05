@@ -111,7 +111,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 		/// <param name="splashArea"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
-			// The aniTime1 is unusually long, but confirmed in the game.
+			// The aniTime1 is unusually long, but confirmed with official.
 
 			var hitDelay = TimeSpan.FromMilliseconds(30);
 			var aniTime1 = TimeSpan.FromMilliseconds(240);

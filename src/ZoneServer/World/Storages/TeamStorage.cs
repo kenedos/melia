@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Zone.Network;
@@ -15,16 +16,24 @@ namespace Melia.Zone.World.Storages
 	public class TeamStorage : Storage
 	{
 		private int _silver;
+		private bool _sizeFinalized;
 		private readonly int _silverMax;
 		private readonly Queue<StorageSilverTransaction> _silverTransactions;
 		// This is necessary because the client identifies the
 		// silver in storage by its objectId
 		private readonly Item _silverDummyItem;
-		private readonly int _maxSilverTransactions = 5; // Client limit
+		private readonly int _maxSilverTransactions = 0; // Client limit
 		private readonly object _silverLock = new(); // Lock for silver operations
 
-		public const int DefaultSize = 5;
+		public const int MaximumSlotCount = 70;
+		private static int CapacityLimit => Math.Clamp(ZoneServer.Instance.Conf.World.TeamStorageMaxSize, 1, MaximumSlotCount);
+
+		public const int DefaultSize = 40;
 		public const int ExtensionSize = 1;
+		private const string SizeVariable = "Melia.TeamStorage.Size";
+		// Keeps the base independent of the client property, which includes voucher slots.
+		private const string BaseSlotsVariable = "Melia.TeamStorage.BaseSlots";
+		private const string SilverVariable = "Melia.TeamStorage.Silver";
 
 		/// <summary>
 		/// Returns the silver transactions in this storage.
@@ -51,7 +60,7 @@ namespace Melia.Zone.World.Storages
 		public TeamStorage(Character owner) : base()
 		{
 			this.Owner = owner;
-			this.SetStorageSize(DefaultSize);
+			this.SetStorageSize(Math.Min(DefaultSize, CapacityLimit));
 
 			_silverDummyItem = new Item(ItemId.Silver);
 			_silverMax = _silverDummyItem.Data.MaxStack;
@@ -73,6 +82,10 @@ namespace Melia.Zone.World.Storages
 				this.Owner.ServerMessage(Localization.Get("You must be at least level {0} to access team storage."), minLevel);
 				return StorageResult.InvalidOperation;
 			}
+
+			var capacityResult = this.RefreshCapacity();
+			if (capacityResult != StorageResult.Success)
+				return capacityResult;
 
 			this.IsBrowsing = true;
 			this.Owner.CurrentStorage = this;
@@ -150,9 +163,9 @@ namespace Melia.Zone.World.Storages
 		{
 			lock (_silverLock)
 			{
-				_silver = Math.Min(_silverMax, amount);
+				_silver = Math.Clamp(amount, 0, _silverMax);
+				this.Owner.Connection.Account.Variables.Perm.SetInt(SilverVariable, _silver);
 			}
-			this.AddSilverTransaction(StorageInteraction.Store, amount);
 		}
 
 		/// <summary>
@@ -242,12 +255,21 @@ namespace Melia.Zone.World.Storages
 			if (!character.HasSilver(extCost))
 				return StorageResult.InvalidOperation;
 
-			if (curSize >= ZoneServer.Instance.Conf.World.TeamStorageMaxSize)
+			var maxSize = CapacityLimit;
+			if (curSize >= maxSize || newSize > maxSize)
 				return StorageResult.InvalidOperation;
 
 			character.RemoveItem(ItemId.Silver, extCost);
-			this.ModifySize(addSize);
+			var resizeResult = this.ModifySize(addSize);
+			if (resizeResult != StorageResult.Success)
+			{
+				character.Inventory.Add(ItemId.Silver, extCost, InventoryAddType.New);
+				return resizeResult;
+			}
+
 			account.Properties.Modify(PropertyName.AccountWareHouseExtend, addSize);
+			account.Variables.Perm.SetInt(SizeVariable, newSize);
+			this.UpdateClientCapacity(newSize);
 
 			// Send updated properties to client
 			Send.ZC_NORMAL.AccountProperties(character, PropertyName.AccountWareHouseExtend, PropertyName.BasicAccountWarehouseSlotCount);
@@ -256,6 +278,84 @@ namespace Melia.Zone.World.Storages
 			Send.ZC_ADDON_MSG(character, "ACCOUNT_UPDATE", 0, null);
 
 			return StorageResult.Success;
+		}
+
+		/// <summary>
+		/// Expands team storage using a voucher without charging silver or increasing
+		/// the silver-expansion counter. Item consumption is handled by the item-use caller.
+		/// </summary>
+		public StorageResult TryExtendStorageByItem(int addSize)
+		{
+			if (addSize <= 0)
+				return StorageResult.InvalidOperation;
+
+			var account = this.Owner.Connection.Account;
+			lock (account)
+			{
+				var currentSize = this.GetStorageSize();
+				var effectiveSize = Math.Max(currentSize, this.GetSavedSize());
+				var maxSize = CapacityLimit;
+				if (effectiveSize >= maxSize || addSize > maxSize - effectiveSize)
+					return StorageResult.InvalidOperation;
+
+				var newSize = effectiveSize + addSize;
+				var resizeResult = this.ModifySize(newSize - currentSize);
+				if (resizeResult != StorageResult.Success)
+					return resizeResult;
+
+				account.Properties.Modify(PropertyName.AccountWareHouseExtendByItem, addSize);
+				account.Variables.Perm.SetInt(SizeVariable, newSize);
+				this.UpdateClientCapacity(newSize);
+				Send.ZC_NORMAL.AccountProperties(this.Owner, PropertyName.AccountWareHouseExtend,
+					PropertyName.AccountWareHouseExtendByItem, PropertyName.BasicAccountWarehouseSlotCount);
+				this.Owner.AddonMessage(AddonMessage.ACCOUNT_WAREHOUSE_ITEM_LIST);
+				this.Owner.AddonMessage(AddonMessage.ACCOUNT_UPDATE);
+				return StorageResult.Success;
+			}
+		}
+
+		/// <summary>
+		/// Applies account slot rewards after loading, without granting them again.
+		/// During loading, FinalizeLoad applies the accumulated rewards instead.
+		/// </summary>
+		public StorageResult RefreshCapacity()
+		{
+			if (!_sizeFinalized)
+				return StorageResult.Success;
+
+			var account = this.Owner.Connection.Account;
+			lock (account)
+			{
+				var currentSize = this.GetStorageSize();
+				var newSize = Math.Min(CapacityLimit, Math.Max(currentSize, this.GetSavedSize()));
+				if (newSize != currentSize)
+				{
+					var result = this.SetStorageSize(newSize);
+					if (result != StorageResult.Success)
+						return result;
+				}
+
+				account.Variables.Perm.SetInt(SizeVariable, newSize);
+				this.UpdateClientCapacity(newSize);
+				Send.ZC_NORMAL.AccountProperties(this.Owner, PropertyName.AccountWareHouseExtend,
+					PropertyName.AccountWareHouseExtendByItem, PropertyName.MaxAccountWarehouseCount,
+					PropertyName.BasicAccountWarehouseSlotCount);
+				if (this.IsBrowsing)
+					this.Owner.AddonMessage(AddonMessage.ACCOUNT_WAREHOUSE_ITEM_LIST);
+				return StorageResult.Success;
+			}
+		}
+
+		/// <summary>
+		/// Projects the actual capacity into the existing client's base + silver + 1 formula.
+		/// Voucher slots remain tracked separately on the server.
+		/// </summary>
+		private void UpdateClientCapacity(int size)
+		{
+			size = Math.Clamp(size, 1, CapacityLimit);
+			var account = this.Owner.Connection.Account;
+			var silverExtensions = Math.Max(0, (int)account.Properties.GetFloat(PropertyName.AccountWareHouseExtend, 0));
+			account.Properties.SetFloat(PropertyName.BasicAccountWarehouseSlotCount, Math.Max(0, size - silverExtensions - 1));
 		}
 
 		/// <summary>
@@ -313,6 +413,7 @@ namespace Melia.Zone.World.Storages
 				// We just need to ensure its Amount is updated
 				_silverDummyItem.Amount = _silver;
 				silverItem = _silverDummyItem;
+				this.Owner.Connection.Account.Variables.Perm.SetInt(SilverVariable, _silver);
 			}
 
 			// This packet updates how much silver client knows there is in storage,
@@ -356,6 +457,7 @@ namespace Melia.Zone.World.Storages
 				// Retrieving
 				inventory.Add(ItemId.Silver, actualAmount, InventoryAddType.New);
 				_silver -= actualAmount;
+				this.Owner.Connection.Account.Variables.Perm.SetInt(SilverVariable, _silver);
 
 				// Get the object ID for the packet
 				silverObjectId = _silverDummyItem.ObjectId;
@@ -423,7 +525,43 @@ namespace Melia.Zone.World.Storages
 			// want to try to get this working.
 			// -- exec
 
-			this.SetStorageSize(this.GetSavedSize());
+			// Load with the maximum configured capacity first. This prevents items
+			// in previously purchased slots from being rejected before their saved
+			// size is restored. FinalizeLoad reduces it safely after loading.
+			this.SetStorageSize(CapacityLimit);
+		}
+
+		/// <summary>
+		/// Restores persistent size/silver and migrates silver that older builds
+		/// saved as a regular storage item.
+		/// </summary>
+		public void FinalizeLoad()
+		{
+			var account = this.Owner.Connection.Account;
+			var loadedItems = base.GetItems();
+			var legacySilverItems = loadedItems.Values.Where(item => item.Id == ItemId.Silver).ToList();
+			long legacySilver = 0;
+
+			foreach (var item in legacySilverItems)
+			{
+				legacySilver += item.Amount;
+				base.Remove(item, item.Amount, out _, out _);
+			}
+
+			var savedSilver = account.Variables.Perm.GetInt(SilverVariable, 0);
+			this.SetSilver((int)Math.Min(_silverMax, Math.Max(savedSilver, legacySilver)));
+
+			var normalItems = base.GetItems();
+			var requiredSize = normalItems.Count == 0 ? 1 : normalItems.Keys.Max() + 1;
+			var maxSize = CapacityLimit;
+			var finalSize = Math.Min(maxSize, Math.Max(this.GetSavedSize(), requiredSize));
+
+			if (this.SetStorageSize(finalSize) != StorageResult.Success)
+				throw new InvalidOperationException($"Unable to restore team storage size {finalSize} for account {account.Id}.");
+
+			account.Variables.Perm.SetInt(SizeVariable, finalSize);
+			this.UpdateClientCapacity(finalSize);
+			_sizeFinalized = true;
 		}
 
 		/// <summary>
@@ -434,47 +572,24 @@ namespace Melia.Zone.World.Storages
 		{
 			var account = this.Owner.Connection.Account;
 			var defaultSize = ZoneServer.Instance.Conf.World.TeamStorageDefaultSize;
+			var persistedSize = account.Variables.Perm.GetInt(SizeVariable, 0);
+			var configuredBase = Math.Max(0, defaultSize - 1);
+			var baseSlots = account.Variables.Perm.GetInt(BaseSlotsVariable, -1);
 
-			// NOTE: The client's GetAccountWarehouseSlotCount() function adds +1 to the slot count
-			// it displays (formula: BasicAccountWarehouseSlotCount + AccountWareHouseExtend + 1).
-			// To make the client display the correct number of slots as configured, we need to
-			// subtract 1 from the default size when setting BasicAccountWarehouseSlotCount.
-			//
-			// Example with team_storage_default_size = 5:
-			//   Server internal storage: 5 slots (can store 5 items)
-			//   BasicAccountWarehouseSlotCount: 4 (what we tell the client)
-			//   Client displays: 4 + 0 + 1 = 5 slots ✓ Correct!
+			// One-time migration from the old unprojected base property.
+			// Afterwards, never read the projected client base as a new source of slots.
+			if (baseSlots < 0)
+				baseSlots = Math.Max(0, (int)account.Properties.GetFloat(PropertyName.BasicAccountWarehouseSlotCount, 0));
+			baseSlots = Math.Max(baseSlots, configuredBase);
+			account.Variables.Perm.SetInt(BaseSlotsVariable, baseSlots);
 
-			// The client property needs to be defaultSize - 1
-			var clientBaseSlots = Math.Max(0, defaultSize - 1);
-
-			// Get the current BasicAccountWarehouseSlotCount property
-			var currentClientSlots = (int)account.Properties.GetFloat(PropertyName.BasicAccountWarehouseSlotCount, 0);
-
-			// If BasicAccountWarehouseSlotCount hasn't been set yet, initialize it
-			if (currentClientSlots == 0)
-			{
-				currentClientSlots = clientBaseSlots;
-				account.Properties.SetFloat(PropertyName.BasicAccountWarehouseSlotCount, clientBaseSlots);
-			}
-
-			// Get the number of extensions purchased
-			var extensions = (int)account.Properties.GetFloat(PropertyName.AccountWareHouseExtend, 0);
-
-			// Server's actual storage size = what the client WOULD show (before the +1)
-			// This gives us the correct number of usable slots
-			var totalSize = currentClientSlots + extensions + 1;
-
-			// Upgrade base slots if config default has increased
-			if (currentClientSlots < clientBaseSlots)
-			{
-				account.Properties.SetFloat(PropertyName.BasicAccountWarehouseSlotCount, clientBaseSlots);
-				totalSize = clientBaseSlots + extensions + 1;
-			}
-
-			// Enforce max size limit
-			var maxSize = ZoneServer.Instance.Conf.World.TeamStorageMaxSize;
-			return Math.Min(totalSize, maxSize);
+			var silverExtensions = Math.Max(0, (int)account.Properties.GetFloat(PropertyName.AccountWareHouseExtend, 0));
+			var itemExtensions = Math.Max(0, (int)account.Properties.GetFloat(PropertyName.AccountWareHouseExtendByItem, 0));
+			var collectionSlots = Math.Max(0, (int)account.Properties.GetFloat(PropertyName.MaxAccountWarehouseCount, 0));
+			var calculatedSize = (long)baseSlots + silverExtensions + itemExtensions + collectionSlots + 1;
+			var savedSize = Math.Max((long)persistedSize, calculatedSize);
+			var maxSize = CapacityLimit;
+			return (int)Math.Clamp(savedSize, 1L, (long)maxSize);
 		}
 	}
 }

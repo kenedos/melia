@@ -9,7 +9,6 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using Melia.Zone.Skills.SplashAreas;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
@@ -116,7 +115,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			aniTime = 100;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 6000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 6000f, 1, 50, -1, hits);
 		}
 	}
 
@@ -145,47 +144,55 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 100f), 30f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 30, angle: 120f);
+			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 2200;
 			var aniTime = 2500;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 100f), 30f);
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 30, angle: 120f);
+			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 200;
 			aniTime = 200;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 100f), 30f);
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 30, angle: 120f);
+			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 200;
 			aniTime = 200;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 100f), 30f);
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 30, angle: 120f);
+			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 200;
 			aniTime = 200;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 100f), 30f);
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 30, angle: 120f);
+			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 100;
 			aniTime = 100;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 100f), 30f);
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 30, angle: 120f);
+			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 200;
 			aniTime = 200;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 100f), 30f);
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 30, angle: 120f);
+			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 200;
 			aniTime = 200;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 100f), 30f);
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 30, angle: 120f);
+			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 100;
 			aniTime = 100;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 6000f, 1, 15, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 6000f, 1, 50, -1, hits);
 		}
 	}
 

@@ -54,13 +54,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("F_sys_target_boss##0.5", 1.2f),
 			};
 
-			if (!caster.Position.InRange2D(target.Position, 300))
-				return;
-
-			var throws = new List<Task>();
-			foreach (var position in GetScatteredPositions(GetLeadPosition(target, 500, caster), 8, 80, 35))
-				throws.Add(MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 200f), config));
-			await Task.WhenAll(throws);
+			for (var i = 0; i < 8; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetDistance, caster, target, distance: 80, rand: 70, height: 1);
+				await MissileThrow(skill, caster, position, config);
+			}
 		}
 	}
 
@@ -108,15 +106,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			}, hits);
 			await skill.Wait(TimeSpan.FromMilliseconds(2200));
-			var spawnPos = originPos.GetRelative(farPos, distance: 123f, angle: -141f);
+			var spawnPos = originPos.GetRelative(farPos, distance: 123.37439f);
 			MonsterSkillCreateMob(skill, caster, "TombLord_obj", spawnPos, 0f, "툼싱커", "BasicMonster_ATK", -1, 23f, "Boss_TombLord", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 97f, angle: -66f);
+			spawnPos = originPos.GetRelative(farPos, distance: 97.148727f);
 			MonsterSkillCreateMob(skill, caster, "TombLord_obj", spawnPos, 0f, "툼싱커", "BasicMonster_ATK", -1, 23f, "Boss_TombLord", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 69f, angle: 10f);
+			spawnPos = originPos.GetRelative(farPos, distance: 68.952873f);
 			MonsterSkillCreateMob(skill, caster, "TombLord_obj", spawnPos, 0f, "툼싱커", "BasicMonster_ATK", -1, 23f, "Boss_TombLord", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 102f, angle: 112f);
+			spawnPos = originPos.GetRelative(farPos, distance: 101.56216f);
 			MonsterSkillCreateMob(skill, caster, "TombLord_obj", spawnPos, 0f, "툼싱커", "BasicMonster_ATK", -1, 23f, "Boss_TombLord", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 67f, angle: 164f);
+			spawnPos = originPos.GetRelative(farPos, distance: 66.843513f);
 			MonsterSkillCreateMob(skill, caster, "TombLord_obj", spawnPos, 0f, "툼싱커", "BasicMonster_ATK", -1, 23f, "Boss_TombLord", "");
 			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 10000f, 1, 5, -1, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_fear, 1, 0f, 10000f, 1, 5, -1, hits);
@@ -169,10 +167,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			Position position;
 
-			var baseDir = originPos.GetDirection(farPos);
 			for (var i = 0; i < 6; i++)
-				_ = this.Blast(caster, skill, originPos.GetRelative(baseDir.AddDegreeAngle(i * 60f), 50f), effectHitConfig);
-
+			{
+				position = originPos.GetRelative(farPos, distance: 50f);
+				await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			}
 			await skill.Wait(TimeSpan.FromMilliseconds(3500));
 			var effectHitConfig2 = new EffectHitConfig
 			{
@@ -191,19 +190,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			if (!caster.Position.InRange2D(target.Position, 300))
-				return;
-
-			var blasts = new List<Task>();
-			foreach (var blastPos in GetScatteredPositions(GetLeadPosition(target, 1000, caster), 8, 140, 45))
-				blasts.Add(this.Blast(caster, skill, originPos.GetNearestPositionWithinDistance(blastPos, 250f), effectHitConfig2));
-			await Task.WhenAll(blasts);
-		}
-
-		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
-		{
-			var hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
+			for (var i = 0; i < 8; i++)
+			{
+				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 140, height: 3);
+				await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+			}
 			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 10000f, 1, 5, -1, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_fear, 1, 0f, 10000f, 1, 5, -1, hits);
 		}
@@ -252,7 +243,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			}, hits);
 			await skill.Wait(TimeSpan.FromMilliseconds(2700));
-			var spawnPos = originPos.GetRelative(farPos, distance: 102f, angle: 112f);
+			var spawnPos = originPos.GetRelative(farPos, distance: 101.56216f);
 			MonsterSkillCreateMob(skill, caster, "TombLord_obj", spawnPos, 0f, "툼싱커", "BasicMonster_ATK", -1, 23f, "Boss_TombLord", "");
 			await skill.Wait(TimeSpan.FromMilliseconds(1100));
 			spawnPos = originPos.GetRelative(farPos, distance: 150f);
@@ -285,8 +276,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			var targetPos = originPos.GetRelative(farPos);
+			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 200f, 20));
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
-			_ = this.Slam(caster, skill, originPos, new EffectHitConfig
+			var hits = new List<SkillHitInfo>();
+			var position = originPos.GetRelative(farPos);
+			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 8f),
 				PositionDelay = 1500,
@@ -301,8 +296,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				KnockType = 1,
 				VerticalAngle = 60f,
 				InnerRange = 0,
-			});
-
+			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 10000f, 1, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			var config = new MissileConfig
 			{
@@ -321,13 +317,17 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("F_sys_target_boss##0.5", 1.2f),
 			};
 
-			if (caster.Position.InRange2D(target.Position, 300))
+			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 170);
+			await MissileFall(caster, skill, position, config);
+			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 170);
+			await MissileFall(caster, skill, position, config);
+			for (var i = 0; i < 6; i++)
 			{
-				foreach (var position in GetScatteredPositions(GetLeadPosition(target, 2700, caster), 8, 150, 45))
-					_ = MissileFall(caster, skill, originPos.GetNearestPositionWithinDistance(position, 250f), config);
+				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 170);
+				await MissileFall(caster, skill, position, config);
 			}
-
-			await this.Slam(caster, skill, originPos, new EffectHitConfig
+			position = originPos.GetRelative(farPos);
+			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 8f),
 				PositionDelay = 1800,
@@ -342,15 +342,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				KnockType = 4,
 				VerticalAngle = 60f,
 				InnerRange = 60f,
-			});
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
-		}
-
-		private async Task Slam(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
-		{
-			var hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 10000f, 1, 30, -1, hits);
+			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 10000f, 1, 100, -1, hits);
 		}
 	}
 }

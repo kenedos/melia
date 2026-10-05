@@ -15,12 +15,6 @@
 	</PropertyGroup>
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 	<ItemGroup>
-		<!-- The upstream content trees are superseded by content/world and left out
-		     of the loaded script lists, the same way the world packages leave them out. -->
-		<Compile Remove="content\r1\**\*.cs" />
-		<Compile Remove="content\test\**\*.cs" />
-	</ItemGroup>
-	<ItemGroup>
 		<ProjectReference Include="..\..\..\src\ZoneServer\ZoneServer.csproj" />
 		<ProjectReference Include="..\..\..\src\Shared\Shared.csproj" />
 	</ItemGroup>

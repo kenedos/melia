@@ -97,9 +97,6 @@ namespace Melia.Zone.Scripting
 					if (!registered)
 						throw new Exception($"Unknown method signature for scriptable function '{method.Name}' on '{obj.GetType().Name}'.");
 				}
-
-				foreach (var attribute in method.GetCustomAttributes<CaptionOverrideDependsOnAttribute>(false))
-					CaptionOverrideDependencies.Register(attribute.PropertyNames);
 			}
 		}
 	}

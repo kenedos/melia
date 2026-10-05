@@ -18,4 +18,4 @@ ServerHeaderFixed header;
 
 int handle;
 int64 shield;
-byte refreshTargetGauge;
+byte b1;

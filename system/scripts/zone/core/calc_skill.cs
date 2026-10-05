@@ -1,11 +1,10 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Skill Calculation Script
 //--- Description -----------------------------------------------------------
 // Functions that calculate skill-related values, such as properties.
 //---------------------------------------------------------------------------
 
 using System;
-using System.Reflection.Emit;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone;
@@ -14,19 +13,11 @@ using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
-using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Logging;
-using static g4.RoundRectGenerator;
 
 public class SkillCalculationsScript : GeneralScript
 {
-	// Cooldown every skill cast from a skill scroll shares, in milliseconds
-	private const float ScrollCooldown = 60000f;
-
-	// Amount of scrolls that can be used before the shared cooldown starts
-	private const float ScrollOverheatCount = 3f;
-
 	/// <summary>
 	/// Returns skill's AoE Attack Ratio?
 	/// </summary>
@@ -38,11 +29,19 @@ public class SkillCalculationsScript : GeneralScript
 		var baseValue = skill.Properties.GetFloat(PropertyName.SklSR);
 
 		var byOwner = 0f;
-		byOwner += skill.Owner.Properties.GetFloat(PropertyName.SR);
+		if (skill.Owner is Character character)
+			byOwner += character.Properties.GetFloat(PropertyName.SR);
 
 		return Math.Max(1, baseValue + byOwner);
 	}
 
+
+	/// <summary>
+	/// Returns the effective skill level, accounting for fixed levels
+	/// and bonus levels from buffs/gems.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
 	[ScriptableFunction]
 	public float SCR_Get_SkillLv(Skill skill)
 	{
@@ -56,9 +55,6 @@ public class SkillCalculationsScript : GeneralScript
 			value += skill.Properties.GetFloat(PropertyName.Level_BM, 0);
 
 		value += skill.Properties.GetFloat(PropertyName.GemLevel_BM, 0);
-
-		if (skill.Owner is Character character)
-			value += ItemEquipEffects.GetSkillBonus(character, skill.Id);
 
 		if (value == 0)
 			return 0;
@@ -130,7 +126,7 @@ public class SkillCalculationsScript : GeneralScript
 		var sklFactor = skill.Properties.GetFloat(PropertyName.SklFactor);
 		var sklFactorByLevel = skill.Properties.GetFloat(PropertyName.SklFactorByLevel);
 
-		var value = sklFactor + (sklFactorByLevel * skill.Level);
+		var value = sklFactor + (sklFactorByLevel * (skill.Level - 1));
 
 		var byReinforceRate = SCR_Get_AbilityReinforceRate(skill);
 		value += value * byReinforceRate;
@@ -173,82 +169,6 @@ public class SkillCalculationsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Returns a skill's default caption ratio 1, resolved against the
-	/// skill's level and reinforce ability. Skills whose caption depends
-	/// on more than that (a live stat, an ability check, a clamp) declare
-	/// a "SCR_Get_CaptionRatio_{ClassName}" override instead, which
-	/// SkillProperties.CalculateProperty picks up automatically.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_CaptionRatio(Skill skill)
-	{
-		return this.CalculateCaptionRatio(skill, skill.Data.CaptionRatio1, skill.Data.CaptionRatio1ByLevel, skill.Data.CaptionRatio1Max);
-	}
-
-	/// <summary>
-	/// Returns a skill's default caption ratio 2. See <see cref="SCR_Get_CaptionRatio"/>.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_CaptionRatio2(Skill skill)
-	{
-		return this.CalculateCaptionRatio(skill, skill.Data.CaptionRatio2, skill.Data.CaptionRatio2ByLevel, skill.Data.CaptionRatio2Max);
-	}
-
-	/// <summary>
-	/// Returns a skill's default caption ratio 3. See <see cref="SCR_Get_CaptionRatio"/>.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_CaptionRatio3(Skill skill)
-	{
-		return this.CalculateCaptionRatio(skill, skill.Data.CaptionRatio3, skill.Data.CaptionRatio3ByLevel, skill.Data.CaptionRatio3Max);
-	}
-
-	/// <summary>
-	/// Returns a skill's default caption ratio value, resolved against
-	/// the skill's level and reinforce ability, and capped at maxValue
-	/// if one is declared (0 means uncapped) - the data-only equivalent
-	/// of a handler clamping its own effect, e.g. a damage reduction
-	/// buff that never lets the total go above some percentage.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <param name="baseValue"></param>
-	/// <param name="byLevel"></param>
-	/// <param name="maxValue"></param>
-	/// <returns></returns>
-	private float CalculateCaptionRatio(Skill skill, float baseValue, float byLevel, float maxValue)
-	{
-		var value = baseValue + (byLevel * skill.Level);
-
-		var byReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate")(skill);
-		value += value * byReinforceRate;
-
-		if (maxValue != 0)
-			value = MathF.Min(maxValue, value);
-
-		return value;
-	}
-
-	/// <summary>
-	/// Returns a skill's caption duration, resolved against the skill's
-	/// level. Not reinforced: the ability makes an effect stronger, not
-	/// longer. Skills whose duration depends on more than that declare
-	/// a "SCR_Get_CaptionTime_{ClassName}" override instead.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_CaptionTime(Skill skill)
-	{
-		return skill.Data.CaptionTime + (skill.Data.CaptionTimeByLevel * skill.Level);
-	}
-
-	/// <summary>
 	/// Returns skill's bonus damage.
 	/// </summary>
 	/// <example>
@@ -273,41 +193,37 @@ public class SkillCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_SpendSP(Skill skill)
 	{
-		var value = skill.Data.BasicSp;
+		var SCR_Get_SpendSP_AbilityModifier = ScriptableFunctions.Skill.Get(nameof(SCR_Get_SpendSP_AbilityRate));
 
-		if (value == 0)
+		var baseValue = skill.Data.BasicSp;
+		if (baseValue == 0)
 			return 0;
 
-		// Mirrors the client's SCR_GET_SpendSP, so the tooltip matches what is
-		// spent; floored because the level term is the only fractional source
-		// and the client floors its own result before displaying it.
-		value = (float)Math.Floor(value + ((skill.Level - 1) * skill.Data.LvUpSpendSp));
+		var ownerLevel = skill.Owner.Level;
+		var levelCorrection = ownerLevel - 300f;
 
-		// TODO: Abilities multiplier
-		// var abilAddSP = this.GetAbilityAddSpendValue(pc, skill.Data.ClassName, "SP");
+		// The value starts at ~18% at level 1 and keeps going up as the
+		// owner's level increases. At level 100 it's 45%, at level 200
+		// it's 72.5%, at 300 it's 100%, and it goes past that afterwards.
+		if (levelCorrection < 0)
+			levelCorrection = levelCorrection * 2.75f / 1000f;
+		else if (levelCorrection >= 0)
+			levelCorrection = levelCorrection * 1.25f / 1000f;
 
-		var owner = skill.Owner;
+		var value = baseValue * (levelCorrection + 1);
 
-		// CarveZemina buff: Reduce SP cost by 20% + 2% per skill level
-		if (skill.Data.CooldownGroup != CooldownId.ItemSetSkill && owner.TryGetBuff(BuffId.CarveZemina_Buff, out var zeminaBuff))
-		{
-			var zeminaSkillLevel = zeminaBuff.NumArg1;
-			var reductionRate = 0.20f + (0.02f * zeminaSkillLevel);
-			var reduction = value * reductionRate;
-			value -= reduction;
-		}
+		var byAbilityRate = SCR_Get_SpendSP_AbilityModifier(skill);
+		value += value * (byAbilityRate / 100f);
 
-		if (value < 1)
-			value = 0;
+		// TODO: Add ExProp "ZEMINA_BUFF_SP", reducing SpendSP by its
+		// value times ZEMINA_BUFF_SP.
 
-		if (skill.Id == SkillId.Scout_Cloaking)
-			return 0;
-
-		return (float)Math.Floor(value);
+		return (int)Math.Max(0, value);
 	}
 
 	/// <summary>
-	/// Returns the amount of SP spent when using the skill.
+	/// Returns the amount of SP spent when using a magic skill,
+	/// applying buff modifiers.
 	/// </summary>
 	/// <param name="skill"></param>
 	/// <returns></returns>
@@ -326,10 +242,22 @@ public class SkillCalculationsScript : GeneralScript
 		return (int)Math.Max(0, value);
 	}
 
-	public float SCR_Get_SpendSP_Common_MovingForward(Skill skill)
+	/// <summary>
+	/// Returns the modifier for the skill's SP usage based on the owner's
+	/// active abilities. The result is a relative percentage, such as
+	/// 10 for a +10% increase.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_SpendSP_AbilityRate(Skill skill)
 	{
-		var baseValue = .07f * skill.Owner.Properties.GetFloat(PropertyName.MSP);
-		return (int)Math.Max(0, baseValue);
+		var result = 0;
+
+		if (skill.Owner.Components.TryGet<AbilityComponent>(out var abilities))
+			result += abilities.GetModifier(skill.Id.ToString(), AbilityModifierType.SP);
+
+		return result;
 	}
 
 	/// <summary>
@@ -507,7 +435,7 @@ public class SkillCalculationsScript : GeneralScript
 
 		var baseValue = skill.Properties.GetFloat(PropertyName.SklSpdRateValue);
 		var byDex = 0f;
-		var byCharBonuses = 0f;
+		var byBuff = 0f;
 
 		if (skill.Owner is IMonster)
 		{
@@ -517,20 +445,20 @@ public class SkillCalculationsScript : GeneralScript
 		if (skill.Data.SpeedRateAffectedByDex)
 		{
 			var dex = skill.Owner.Properties.GetFloat(PropertyName.DEX);
-			byDex = (float)dex / 500;
+			byDex = (float)Math.Pow(dex / 500f, 0.46f);
 		}
 
 		if (skill.Data.SpeedRateAffectedByBuff)
 		{
-			var aspd = skill.Owner.Properties.GetFloat(PropertyName.NormalASPD, 0);
-			byCharBonuses = aspd / 1000f;
+			var spdBm = skill.Owner.Properties.GetFloat(PropertyName.SPD_BM, 0);
+			byBuff = spdBm / 1000f;
 		}
 
 		// Don't let the result go to 0, as such a speed rate would result
 		// in an infinite damage delay. Limiting it to 0.01 effectively
 		// means that a skill can't be modified to be more than 100
 		// times slower than normal.
-		return (float)Math.Max(0.01f, baseValue + byDex + byCharBonuses);
+		return (float)Math.Max(0.01f, baseValue + byDex + byBuff);
 	}
 
 	/// <summary>
@@ -544,200 +472,62 @@ public class SkillCalculationsScript : GeneralScript
 		var sklSpdRate = skill.Properties.GetFloat(PropertyName.SklSpdRate, 1);
 		var baseValue = skill.Data.ShootTime.TotalMilliseconds;
 
-		var result = (float)(baseValue / sklSpdRate);
-
-		if (skill.Owner is Mob mob && mob.Vars.TryGet<float>("Melia.ShootTimeMultiplier", out var mult))
-			result *= mult;
-
-		return result;
+		return (float)(baseValue / sklSpdRate);
 	}
 
 	/// <summary>
 	/// Calculates and returns the skill's cooldown time in milliseconds.
 	/// </summary>
-	/// <param name="skill">The skill to calculate the cooldown for.</param>
-	/// <returns>The calculated cooldown in milliseconds.</returns>
+	/// <param name="skill"></param>
+	/// <returns></returns>
 	[ScriptableFunction]
 	public float SCR_GET_COOLDOWN(Skill skill)
 	{
-		// Every scroll shares one cooldown, so the skill's own is ignored
-		if (skill.IsItemSkill)
-			return ScrollCooldown;
-
-		var owner = skill.Owner;
 		var basicCooldown = (float)skill.Data.CooldownTime.TotalMilliseconds;
 
-		var (coolDownClassify, zoneAddCoolDown) = ("None", 0f);
-
-		if (skill.Id == SkillId.Chronomancer_BackMasking)
-		{
-			var level = skill.Level;
-			var cooldownSec = Math.Max(10, 40 - 2 * level);
-			basicCooldown = cooldownSec * 1000f;
-		}
-
 		if (skill.Data.Tags.Has(SkillTag.BasicSkill))
-		{
 			return basicCooldown;
-		}
-		// Seems to be a Legacy System, couldn't find an modern ies ref.
-		// In Lua: GetClass('enchant_skill_list', skill_name) ~= nil
-		// Return early for enchant skills.
-		else
-		{
-			// CarveLaima buff: Reduce cooldown by 20% + 2% per skill level
-			if (owner.IsBuffActive(BuffId.CarveLaima_Buff) && skill.Data.CooldownGroup != CooldownId.ItemSetSkill)
-			{
-				if (owner.TryGetBuff(BuffId.CarveLaima_Buff, out var laimaBuff))
-				{
-					var laimaSkillLevel = laimaBuff.NumArg1;
-					var reductionRate = 0.20f + (0.02f * laimaSkillLevel);
-					basicCooldown *= (1f - reductionRate);
-				}
-			}
 
-			// Catena Chain Arrow buff: Reduce Fletcher arrow skill cooldowns
-			if (owner.IsBuffActive(BuffId.Fletcher_CatenaChainArrow_Buff)
-				&& (skill.Id == SkillId.Fletcher_BodkinPoint || skill.Id == SkillId.Fletcher_BodkinPoint_2
-					|| skill.Id == SkillId.Fletcher_BarbedArrow || skill.Id == SkillId.Fletcher_BarbedArrow_2
-					|| skill.Id == SkillId.Fletcher_CrossFire || skill.Id == SkillId.Fletcher_CrossFire_2
-					|| skill.Id == SkillId.Fletcher_Singijeon || skill.Id == SkillId.Fletcher_Singijeon_2))
-			{
-				if (owner.TryGetBuff(BuffId.Fletcher_CatenaChainArrow_Buff, out var catenaBuff))
-				{
-					var catenaReduction = 0.40f + 0.04f * catenaBuff.NumArg1;
-					if (owner.TryGetActiveAbilityLevel(AbilityId.Fletcher37, out var fletcher37Level))
-						catenaReduction *= 1f + 0.005f * fletcher37Level;
-					catenaReduction = Math.Min(catenaReduction, 0.90f);
-					basicCooldown *= (1f - catenaReduction);
-				}
-			}
+		return (int)Math.Floor(Math.Floor(basicCooldown / 1000f) * 1000f);
+	}
 
-			// AyinSof CoolTime Buff
-			var ayinSofCoolTime = owner.GetTempVar("AyinSof_BUFF_COOLDOWN");
-			if (ayinSofCoolTime != 0 && skill.Data.CooldownGroup != CooldownId.ItemSetSkill)
-			{
-				basicCooldown *= (1 - ayinSofCoolTime);
-			}
+	/// <summary>
+	/// Calculates and returns the skill's overheat cooldown time in
+	/// milliseconds.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_USEOVERHEAT(Skill skill)
+	{
+		var getAbilityRate = ScriptableFunctions.Skill.Get(nameof(SCR_GET_USEOVERHEAT_AbilityRate));
 
-			// Laima CoolTime Debuff
-			if (!owner.IsBuffActive(BuffId.CarveLaima_Buff) && owner.IsBuffActive(BuffId.CarveLaima_Debuff) && skill.Data.CooldownGroup != CooldownId.ItemSetSkill)
-			{
-				basicCooldown *= 1.2f;
-			}
+		var baseValue = (int)skill.Data.CooldownTime.TotalMilliseconds;
+		var buffModifier = 1f;
 
-			// Various Buffs (Event, Field Dungeon)
-			// TODO: Implement logic for these buffs by calling their respective script functions.
-			if (owner.IsBuffActive(BuffId.Event_Cooldown_SPamount_Decrease)) { /* SCR_COOLDOWN_SPAMOUNT_DECREASE */ }
-			if (owner.IsBuffActive(BuffId.FIELD_COOLDOWNREDUCE_BUFF) || owner.IsBuffActive(BuffId.FIELD_DEFAULTCOOLDOWN_BUFF) || owner.IsBuffActive(BuffId.FIELD_COOLDOWNREDUCE_MIN_BUFF)) { /* SCR_FIELD_DUNGEON_CONSUME_DECREASE */ }
+		if (skill.Owner.Properties.TryGetFloat(PropertyName.OverHeat_BM, out var overheatBm))
+			buffModifier += overheatBm / 100f;
 
-			// (WEEKLY BOSS RAID) Star Fall
-			var monCoolDownRate = Math.Max(-9, owner.GetTempVar("MON_COOLDOWN_RATE")) * 0.1f;
-			if (monCoolDownRate != 0)
-			{
-				basicCooldown += (basicCooldown * monCoolDownRate);
-			}
+		var abilityModifier = getAbilityRate(skill);
 
-			// GM Buff
-			if (owner.IsBuffActive(BuffId.GM_Cooldown_Buff))
-			{
-				basicCooldown *= 0.9f;
-			}
+		return (int)Math.Max(0, baseValue * buffModifier + abilityModifier);
+	}
 
-			// RootCrystal
-			if (owner.IsBuffActive(BuffId.RootCrystalCoolDown_BUFF))
-			{
-				basicCooldown *= 0.5f;
-			}
+	/// <summary>
+	/// Returns the cooldown modifier for the skill, in milliseconds,
+	/// based on the skill owner's active abilities.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_USEOVERHEAT_AbilityRate(Skill skill)
+	{
+		var result = 0;
 
-			// Goddess Armor Set Effects
-			// TODO: Implement logic for Goddess Armor Set effects by adding support for skill data for casting categories in the database.
-			if (owner is Character character && !owner.Map.IsPVP && !ZoneServer.Instance.World.IsPVP) // Hypothetical checks
-			{
-				var daliaStack = character.GetTempVar("ep12_dalia_leather_stack");
-				if (daliaStack > 0 && skill.Data.CastingType == SkillCastingType.Channeling && skill.Data.Type == SkillType.Attack)
-				{
-					basicCooldown *= (1 - (0.05f * daliaStack));
-				}
+		if (skill.Owner.Components.TryGet<AbilityComponent>(out var abilities))
+			result += abilities.GetModifier(skill.Id.ToString(), AbilityModifierType.CoolDown);
 
-				var gabijaStack = character.GetTempVar("ep12_gabija_casting_stack");
-				if (gabijaStack > 0 && (skill.Data.CastingType == SkillCastingType.Casting || skill.Data.CastingType == SkillCastingType.DynamicCasting) && skill.Data.Type == SkillType.Attack)
-				{
-					basicCooldown *= (1 - (0.05f * gabijaStack));
-				}
-			}
-
-			// Rada/Jurate/Earring Options
-			var radaCooldown = owner.GetTempVar("rada_cooldown");
-			if (radaCooldown > 0) basicCooldown *= (1 - radaCooldown / 100f);
-
-			var jurateCooldown = owner.GetTempVar("jurate_cooldown");
-			if (jurateCooldown > 0) basicCooldown *= (1 - jurateCooldown / 100f);
-
-			var earringRaidCooldown = owner.GetTempVar("earring_raid_cooldown");
-			if (earringRaidCooldown > 0) basicCooldown *= (1 - earringRaidCooldown / 100f);
-
-			// Tribulation Cooldown Increase
-			var tribulationCooldown = owner.GetTempVar("tribulation_cooldown");
-			if (tribulationCooldown > 0) basicCooldown *= (1 + (tribulationCooldown / 100f));
-
-			// 2021 Seal Buff
-			if (owner.IsBuffActive(BuffId.premium_seal_2021_buff) && !owner.IsBuffActive(BuffId.Event_Cooldown_SPamount_Decrease) && owner.Map.IsInstance) // Hypothetical check
-			{
-				basicCooldown *= 0.5f;
-			}
-
-			// Buff doesn't seem to exist in the database, but it is used in the client.
-			// if (owner.IsBuffActive(BuffId.TOSHero_MonsterBuff_SkillCoolDownUp)) basicCooldown *= 1.1f;
-
-			// Hero's Tale Zone
-			if (owner.Map != null
-				&& owner.Map.IsTOSHeroZone
-				&& skill.Data.Type == SkillType.Attack
-				&& !skill.IsNormalAttack) // Hypothetical checks
-			{
-				var tosHeroCooldownRate = owner.GetTempVar("TOSHero_CoolDownRate");
-				if (tosHeroCooldownRate != 0) basicCooldown *= tosHeroCooldownRate;
-			}
-
-			// Legend Card
-			var cardSkillCooldown = owner.GetTempVar("card_SkillCoolDown");
-			if (cardSkillCooldown > 0) basicCooldown *= (1 - (cardSkillCooldown / 100f));
-
-			// Hero's Tale Necklace
-			if (owner.Map.IsTOSHeroZone
-				&& skill.Data.Type == SkillType.Attack
-				&& basicCooldown <= 20000
-				&& owner.TryGetEquipItem(EquipSlot.Necklace, out var neck)
-				&& owner.TryGetBuff(BuffId.TOSHero_Buff_Tear3_AttackSPD, out var buff)
-				&& buff.OverbuffCounter >= 5 && neck.Id == ItemId.TOSHero_NECK_AS)
-			{
-				basicCooldown = 5000;
-			}
-
-			// Minimum cooldown for certain expert skills
-			// TODO: Add support CooldownStartType in the skill data.
-			// if (skill.Data.CoolDownStartType == "None" && 
-			if (skill.IsExpertSkill && basicCooldown > 0 && basicCooldown < 1000)
-			{
-				basicCooldown = 1000;
-			}
-		}
-
-		// Floor cooldown to the nearest second, then convert back to milliseconds.
-		var ret = (float)Math.Floor(basicCooldown / 1000f) * 1000f;
-
-		if (coolDownClassify == "Fix") ret = zoneAddCoolDown;
-		else if (coolDownClassify == "Add") ret += zoneAddCoolDown;
-
-		// Trial Skill Cooldown Increase
-		var tbAddCoolDownRate = owner.GetTempVar("tb_add_cool_down_rate");
-		if (tbAddCoolDownRate > 0)
-		{
-			ret += (float)Math.Floor(ret * tbAddCoolDownRate);
-		}
-
-		return (int)Math.Max(0, Math.Floor(ret));
+		return result;
 	}
 
 	/// <summary>
@@ -750,12 +540,9 @@ public class SkillCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float GET_SKILL_OVERHEAT_COUNT(Skill skill)
 	{
-		// Every scroll shares one overheat counter, so a set amount of
-		// scrolls can be used before the shared cooldown starts
-		if (skill.IsItemSkill)
-			return ScrollOverheatCount;
+		var baseValue = skill.Data.OverheatCount;
 
-		return Math.Max(0, skill.Data.OverheatCount);
+		return Math.Max(0, baseValue);
 	}
 
 	/// <summary>
@@ -771,101 +558,5 @@ public class SkillCalculationsScript : GeneralScript
 		// TODO: Apply skill speed rate and other modifiers here? Probably.
 
 		return (float)Math.Floor(baseValue);
-	}
-
-	/// <summary>
-	/// Returns the DEF transfer ratio for Sorcerer's Summoning skill,
-	/// used by the client to compute summoned boss card defense stats.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_Summoning_Ratio(Skill skill)
-	{
-		return 16f + (skill.Level * 5.6f);
-	}
-
-	/// <summary>
-	/// Returns the MHP transfer ratio for Sorcerer's Summoning skill,
-	/// used by the client to compute summoned boss card HP stats.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_Summoning_Ratio2(Skill skill)
-	{
-		return 24f + (skill.Level * 8.4f);
-	}
-
-	/// <summary>
-	/// Returns the ATK transfer ratio for Sorcerer's Summoning skill,
-	/// used by the client to compute summoned boss card attack stats.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_Summoning_Ratio3(Skill skill)
-	{
-		return 18.4f + (skill.Level * 6.44f);
-	}
-
-	/// <summary>
-	/// Returns the ATK transfer ratio for Sorcerer's Summon Salamion skill,
-	/// used by the client to compute the salamion's attack stats.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_SummonSalamion_Ratio(Skill skill)
-	{
-		return 14.72f + (skill.Level * 5.152f);
-	}
-
-	/// <summary>
-	/// Returns the DEF transfer ratio for Sorcerer's Summon Salamion skill,
-	/// used by the client to compute the salamion's defense stats.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_SummonSalamion_Ratio2(Skill skill)
-	{
-		return 16f + (skill.Level * 5.6f);
-	}
-
-	/// <summary>
-	/// Returns the MHP transfer ratio for Sorcerer's Summon Salamion skill,
-	/// used by the client to compute the salamion's HP stats.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_SummonSalamion_Ratio3(Skill skill)
-	{
-		return 24f + (skill.Level * 8.4f);
-	}
-
-	/// <summary>
-	/// Returns the ATK transfer ratio for Necromancer's Create Shoggoth skill,
-	/// used by the client to compute the shoggoth's attack stats.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_CreateShoggoth_Ratio(Skill skill)
-	{
-		return (float)Math.Floor(69f + skill.Level * 11.5f);
-	}
-
-	/// <summary>
-	/// Returns the DEF transfer ratio for Necromancer's Create Shoggoth skill,
-	/// used by the client to compute the shoggoth's defense stats.
-	/// </summary>
-	/// <param name="skill"></param>
-	/// <returns></returns>
-	[ScriptableFunction]
-	public float SCR_Get_CreateShoggoth_Ratio2(Skill skill)
-	{
-		return (float)Math.Floor(60f + skill.Level * 10f);
 	}
 }

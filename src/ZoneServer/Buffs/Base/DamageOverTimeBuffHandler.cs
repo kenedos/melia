@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Yggdrasil.Logging;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.Buffs.Base
 {
@@ -39,7 +38,12 @@ namespace Melia.Zone.Buffs.Base
 	/// - Override GetHitType() if you need a specific hit type (Poison, Bleed, etc.)
 	/// - Override GetSkillId() if the buff uses a different skill ID than buff.SkillId
 	/// </remarks>
-	public abstract class DamageOverTimeBuffHandler : BuffHandler
+	/// 
+	public interface IDamageOverTimeBuffHandler
+	{
+	}
+
+	public abstract class DamageOverTimeBuffHandler : BuffHandler, IDamageOverTimeBuffHandler
 	{
 		private const string DamageInstancesVarName = "Melia.DoT.DamageInstances";
 		private const string InstanceAddedFlagName = "Melia.DoT.InstanceAddedThisCycle";
@@ -105,7 +109,7 @@ namespace Melia.Zone.Buffs.Base
 			var instance = new DamageInstance
 			{
 				Damage = newDamage,
-				ExpirationTime = GameClock.LocalNow.Add(buff.Duration)
+				ExpirationTime = DateTime.Now.Add(buff.Duration)
 			};
 
 			instances.Add(instance);
@@ -141,7 +145,7 @@ namespace Melia.Zone.Buffs.Base
 
 			var attacker = buff.Caster;
 			var target = buff.Target;
-			var now = GameClock.LocalNow;
+			var now = DateTime.Now;
 
 			var instances = this.GetDamageInstances(buff);
 

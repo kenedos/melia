@@ -12,6 +12,7 @@ namespace Melia.Shared.Data
 		public AccountOptionDb AccountOptionDb { get; } = new AccountOptionDb();
 		public AchievementDb AchievementDb { get; } = new AchievementDb();
 		public AchievementPointDb AchievementPointDb { get; } = new AchievementPointDb();
+		public AchievementStatRewardDb AchievementStatRewardDb { get; } = new AchievementStatRewardDb();
 		public BarrackDb BarrackDb { get; } = new BarrackDb();
 		public BuffDb BuffDb { get; } = new BuffDb();
 		public BuffOverrideDb BuffOverrideDb { get; }
@@ -53,10 +54,10 @@ namespace Melia.Shared.Data
 		public JobDb JobDb { get; } = new JobDb();
 		public MapDb MapDb { get; } = new MapDb();
 		public MapBonusDropsDb MapBonusDropsDb { get; }
-		public MapRankDb MapRankDb { get; } = new MapRankDb();
 		public MonsterDb MonsterDb { get; } = new MonsterDb();
 
 		public MonsterIconDb MonsterIconDb { get; } = new MonsterIconDb();
+		public NavGraphDb NavGraphDb { get; } = new NavGraphDb();
 		public NormalTxDb NormalTxDb { get; } = new NormalTxDb();
 		public PacketStringDb PacketStringDb { get; } = new PacketStringDb();
 		public PropertiesDb PropertiesDb { get; } = new PropertiesDb();

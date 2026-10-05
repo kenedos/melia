@@ -10,7 +10,6 @@ using Melia.Zone.World.Items;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Properties;
 using Melia.Zone.World.Actors.Characters.Components;
-using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Util;
 
@@ -127,6 +126,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Create(PropertyName.DEF, "SCR_Get_Character_DEF");
 			this.Create(PropertyName.MDEF, "SCR_Get_Character_MDEF");
 			this.Create(PropertyName.CRTATK, "SCR_Get_Character_CRTATK");
+			this.Create(PropertyName.CRTMATK, "SCR_Get_Character_CRTMATK");
 			this.Create(PropertyName.CRTHR, "SCR_Get_Character_CRTHR");
 			this.Create(PropertyName.CRTDR, "SCR_Get_Character_CRTDR");
 			this.Create(PropertyName.HR, "SCR_Get_Character_HR");
@@ -243,6 +243,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.AutoUpdate(PropertyName.DEF, [PropertyName.Lv, PropertyName.DEF_BM, PropertyName.DEF_RATE_BM]);
 			this.AutoUpdate(PropertyName.MDEF, [PropertyName.Lv, PropertyName.MNA, PropertyName.MDEF_BM, PropertyName.MDEF_RATE_BM]);
 			this.AutoUpdate(PropertyName.CRTATK, [PropertyName.Lv, PropertyName.DEX, PropertyName.CRTATK_BM]);
+			this.AutoUpdate(PropertyName.CRTMATK, [PropertyName.Lv, PropertyName.DEX, PropertyName.CRTMATK_BM]);
 			this.AutoUpdate(PropertyName.CRTHR, [PropertyName.Lv, PropertyName.DEX, PropertyName.CRTHR_BM, PropertyName.CRTHR_RATE_BM]);
 			this.AutoUpdate(PropertyName.CRTDR, [PropertyName.Lv, PropertyName.CON, PropertyName.CRTDR_BM, PropertyName.CRTDR_RATE_BM]);
 			this.AutoUpdate(PropertyName.HR, [PropertyName.Lv, PropertyName.DEX, PropertyName.HR_BM, PropertyName.HR_RATE_BM]);
@@ -511,16 +512,13 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
-		/// Recalculates and updates HP and SP recovery amount and time properties.
+		/// Recalculates and updates HP and SP recovery time properties.
 		/// </summary>
 		/// <param name="character"></param>
 		private void SitStatusChanged(Character character)
 		{
-			this.Invalidate(PropertyName.RHP, PropertyName.RHPTIME, PropertyName.RSP, PropertyName.RSPTIME);
-			Send.ZC_OBJECT_PROPERTY(this.Character, PropertyName.RHP, PropertyName.RHPTIME, PropertyName.RSP, PropertyName.RSPTIME);
-
-			if (character.Components.TryGet<RecoveryComponent>(out var recoveryComponent))
-				recoveryComponent.ScaleRecoveryTimes();
+			this.Invalidate(PropertyName.RHPTIME, PropertyName.RSPTIME);
+			Send.ZC_OBJECT_PROPERTY(this.Character, PropertyName.RHPTIME, PropertyName.RSPTIME);
 
 			if (character.IsSitting)
 			{
@@ -608,6 +606,14 @@ namespace Melia.Zone.World.Actors.Characters
 
 			if (this.Character == null)
 				return 0;
+
+			if (this.Character is DummyCharacter clone &&
+				clone.Owner != null &&
+				clone.Variables.Temp.GetBool("Melia.Clone.InheritOwnerProperties") &&
+				calcFuncName != "SCR_Get_Character_MSPD")
+			{
+				return func(clone.Owner);
+			}
 
 			return func(this.Character);
 		}

@@ -1,4 +1,4 @@
-﻿// ===================================================================
+// ===================================================================
 // CharacterUtilities.cs - Miscellaneous helper methods and properties
 // ===================================================================
 using System;
@@ -11,7 +11,6 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.Characters
 {
@@ -284,12 +283,7 @@ namespace Melia.Zone.World.Actors.Characters
 		/// <param name="enabled">Value for the enabled flag on the layer change packet (ignored when silent).</param>
 		public void SetLayer(int layer, bool silent = false, bool enabled = true)
 		{
-			var previousLayer = this.Layer;
-
 			this.Layer = layer;
-
-			if (previousLayer != layer)
-				this.DropHateOnLayer(previousLayer);
 
 			if (!silent)
 				Send.ZC_SET_LAYER(this, this.Layer, enabled);
@@ -314,30 +308,6 @@ namespace Melia.Zone.World.Actors.Characters
 			}
 
 			this.LookAround();
-		}
-
-		/// <summary>
-		/// Makes every monster on the given layer forget the character.
-		/// </summary>
-		/// <remarks>
-		/// A cutscene or an instance takes the character out of reach of
-		/// whatever was chasing them, which would otherwise be left running
-		/// at a target it can no longer see.
-		/// </remarks>
-		/// <param name="layer"></param>
-		private void DropHateOnLayer(int layer)
-		{
-			var map = this.Map;
-			if (map == null)
-				return;
-
-			var monsters = map.GetMonsters(m => m.Layer == layer && m is ICombatEntity);
-
-			foreach (var monster in monsters)
-			{
-				if (monster is ICombatEntity combatEntity)
-					combatEntity.ForgetHate(this);
-			}
 		}
 
 		/// <summary>
@@ -378,7 +348,7 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public void ShowItemBalloon(string style, string systemMsg, string v3, Item item, float duration, float delaySec, string type)
 		{
-			GameClock.Delay(TimeSpan.FromSeconds(delaySec)).ContinueWith(_ =>
+			Task.Delay(TimeSpan.FromSeconds(delaySec)).ContinueWith(_ =>
 			{
 				Send.ZC_NORMAL.ShowItemBalloon(this, item, type, style, systemMsg, duration);
 			});

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Melia.Shared.Util;
 using Yggdrasil.Util;
 
 namespace Melia.Zone.Util
@@ -20,7 +19,7 @@ namespace Melia.Zone.Util
 		{
 			if (_totalWeight == 0) return default(T);
 
-			int randomNumber = GameRandom.Get().Next(1, _totalWeight + 1);
+			int randomNumber = RandomProvider.Get().Next(1, _totalWeight + 1);
 			int cumulativeWeight = 0;
 
 			foreach (var (item, weight) in _items)

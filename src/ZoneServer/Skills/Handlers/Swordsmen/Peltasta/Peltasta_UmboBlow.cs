@@ -6,7 +6,6 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Abilities.Handlers.Swordsmen.Peltasta;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
@@ -112,7 +111,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 
 				// Note: This ability was repurposed to Rim Blow after Umbo Blow was removed,
 				// which is why the description mentions it affects Umbo Blow.
-				if (caster.TryGetActiveAbilityLevel(AbilityId.Impact, out var stunLevel) && GameRandom.Get().Next(100) < stunLevel * StunChancePerLevel)
+				if (caster.TryGetActiveAbilityLevel(AbilityId.Impact, out var stunLevel) && RandomProvider.Get().Next(100) < stunLevel * StunChancePerLevel)
 					target.StartBuff(BuffId.Stun, stunLevel, 0, StunDuration, caster);
 
 				var buffRemoveChance = BuffRemoveChancePerLevel * skill.Level;

@@ -60,12 +60,6 @@ namespace Melia.Zone.World.Quests
 		public bool AutoTrack { get; set; } = false;
 
 		/// <summary>
-		/// Gets or sets whether characters who can take the quest may warp
-		/// to its giver before accepting it.
-		/// </summary>
-		public bool PossibleWarp { get; set; } = false;
-
-		/// <summary>
 		/// Gets or sets the start delay between meeting the quests
 		/// prerequisites and receiving it automatically. Applies only
 		/// to quests that start automatically.
@@ -102,25 +96,6 @@ namespace Melia.Zone.World.Quests
 		/// Returns a list of the quest's modifiers.
 		/// </summary>
 		public List<QuestModifier> Modifiers { get; } = new List<QuestModifier>();
-
-		/// <summary>
-		/// Returns the quest's phases, indexed by the status the quest is
-		/// in while the phase is active.
-		/// </summary>
-		/// <remarks>
-		/// Only the Possible, InProgress and Success statuses are used.
-		/// </remarks>
-		public Dictionary<QuestStatus, QuestPhase> Phases { get; } = new Dictionary<QuestStatus, QuestPhase>();
-
-		/// <summary>
-		/// Returns the phase for the given status via out, returns false
-		/// if the quest doesn't define one.
-		/// </summary>
-		/// <param name="status"></param>
-		/// <param name="phase"></param>
-		/// <returns></returns>
-		public bool TryGetPhase(QuestStatus status, out QuestPhase phase)
-			=> this.Phases.TryGetValue(status, out phase);
 
 		/// <summary>
 		/// Returns the quest giver npc.

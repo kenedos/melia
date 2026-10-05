@@ -8,7 +8,6 @@ using Melia.Shared.L10N;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Commands;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting.Dialogues;
@@ -158,6 +157,53 @@ namespace Melia.Zone.Scripting
 		/// <summary>
 		/// Spawning a monster for a track.
 		/// </summary>
+		/// <param name="monsterId"></param>
+		/// <param name="mapName"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="z"></param>
+		/// <param name="direction"></param>
+		/// <param name="faction"></param>
+		/// <param name="tendency"></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException"></exception>
+		/// Shortcuts.AddMonster(0, 400001, "", "f_siauliai_west", -1231.022, 260.8354, -547.764, 16.875, "");
+		public static Mob AddMonster(Character character, int monsterId, string name, string mapName, double x, double y, double z, double direction, string faction = "Monster", string tendency = "")
+		{
+			if (!ZoneServer.Instance.Data.MonsterDb.TryFind(monsterId, out var monsterData))
+			{
+				Log.Warning("AddMonster: Failed monster not found with id: {0}", monsterId);
+				throw new ArgumentException($"AddMonster: Monster '{monsterId}'  not found.");
+			}
+
+			Map map;
+			if (mapName != "None")
+				map = GetMapOrThrow(mapName);
+			else
+				map = character.Map;
+
+			var monster = new Mob(monsterData.Id, faction == "Our_Forces" ? RelationType.Friendly : RelationType.Enemy);
+			monster.Name = name;
+			monster.Position = new Position((float)x, (float)y, (float)z);
+			monster.Direction = new Direction(direction);
+			monster.Layer = character.Layer;
+			monster.SpawnPosition = monster.Position;
+			if (!string.IsNullOrEmpty(faction) && Enum.TryParse(typeof(FactionType), faction, true, out var factionType))
+				monster.Faction = (FactionType)factionType;
+
+			monster.SetVisibilty(ActorVisibility.Track, character.ObjectId);
+			monster.AddEffect(new ScriptInvisibleEffect());
+			var ai = new AiComponent(monster, "BasicMonster");
+			monster.Components.Add(ai);
+
+			map.AddMonster(monster);
+
+			return monster;
+		}
+
+		/// <summary>
+		/// Spawning a monster for a track.
+		/// </summary>
 		/// <param name="genType"></param>
 		/// <param name="monsterId"></param>
 		/// <param name="map"></param>
@@ -264,7 +310,7 @@ namespace Melia.Zone.Scripting
 		/// <returns></returns>
 		public static int Random(int max)
 		{
-			return GameRandom.Get().Next(max);
+			return RandomProvider.Next(max);
 		}
 
 		/// <summary>
@@ -275,20 +321,18 @@ namespace Melia.Zone.Scripting
 		/// <returns></returns>
 		public static int Random(int min, int max)
 		{
-			return GameRandom.Get().Next(min, max);
+			return RandomProvider.Next(min, max);
 		}
 
 		/// <summary>
-		/// Plays chest opening animations and makes the chest disappear,
-		/// handing out the chest's contents via onOpened once the animation
-		/// is under way. Returns after the animation played.
+		/// Plays chest opening animations and makes the chest disappear.
+		/// Returns after the animation played and the chest's contents
+		/// can be distributed.
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="npc"></param>
-		/// <param name="disappearOnOpen"></param>
-		/// <param name="onOpened"></param>
 		/// <returns></returns>
-		public static async Task OpenChest(Character character, Npc npc, bool disappearOnOpen = false, Action onOpened = null)
+		public static async Task OpenChest(Character character, Npc npc, bool disappearOnOpen = false)
 		{
 			character.ShowHelp("MINI_E_BUFFBOX");
 
@@ -298,12 +342,8 @@ namespace Melia.Zone.Scripting
 			Send.ZC_PLAY_ANI(character, AnimationName.KickBox);
 			Send.ZC_PLAY_ANI(npc, anim, true);
 
-			// Hand out the contents while the animation is still playing
-			await Task.Delay(TimeSpan.FromSeconds(1.5));
-			onOpened?.Invoke();
-
-			// Wait for the rest of the animation
-			await Task.Delay(TimeSpan.FromSeconds(1.5));
+			// Wait a second, so the animations can play
+			await Task.Delay(TimeSpan.FromSeconds(3));
 
 			// Make chest disappear
 			Send.ZC_NORMAL.FadeOut(npc, TimeSpan.FromSeconds(3));
@@ -342,7 +382,7 @@ namespace Melia.Zone.Scripting
 		/// <returns></returns>
 		public static T RandomElement<T>(params T[] values)
 		{
-			return values[GameRandom.Get().Next(values.Length)];
+			return values[RandomProvider.Next(values.Length)];
 		}
 
 		/// <summary>

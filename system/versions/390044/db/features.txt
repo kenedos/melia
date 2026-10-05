@@ -3,12 +3,6 @@
 //---------------------------------------------------------------------------
 
 [
-// Base features of the game that are presumed to always have been there.
-{ name: "Base", enabled: true, children: [
-	// Enables bonus stats from jobs
-	{ name: "JobStatBonuses", enabled: true },
-]},
-
 // Second Closed Beta Phase, which ran between Winter 2015 and Spring 2016.
 { name: "iCBT2", enabled: true, children: [
 	// Removes Centurion from the Swordman job tree
@@ -28,68 +22,70 @@
 	{ name: "MovementRevamp", enabled: true, children: [
 		// Disables stamina drain while running
 		{ name: "FreeRunning", enabled: true },
-
+		
 		// Disables stamina drain while dashing in cities
 		{ name: "FreeDashingInCities", enabled: true },
-
+		
 		// Enables dashing for all classes
 		{ name: "DashingForAll", enabled: true },
-
+		
 		// Disables jumping costing stamina
 		{ name: "FreeJumping", enabled: true },
 	]},
-
+	
 	// Enables job-related changes
 	{ name: "JobRevamp", enabled: true, children: [
 		// Enables the Scout job as an option for character creation
 		{ name: "ScoutJob", enabled: true },
-
+		
 		// Shuffles jobs and skills around to, quote, "maximize compatibility
 		// between classes and synergy between players."
 		//{ name: "JobTreeReassignment", enabled: true },
 	]},
-
+	
 	// Enables changes to the way max weight is calculated
 	{ name: "InventoryWeightRevamp", enabled: true, children: [
 		// Raises default max weight
 		{ name: "IncreasedMaxWeight", enabled: true },
-
+		
 		// Removes stats adding to the max weight
 		{ name: "StaticInventoryWeight", enabled: true },
 	]},
-
+	
 	// Enables changes to how player stats are calculated
 	{ name: "PlayerStatsRevamp", enabled: true, children: [
 		// Disables stat points per level, removing the ability to freely
 		// assign points to stats
 		{ name: "NoStatByLevel", enabled: true },
-
+		
 		// Enables increased base stats per job and level, increasing
 		// stats automatically over time
 		{ name: "IncreasedStatRatio", enabled: true },
-
-		// Enables the defense formula that mitigates the attack by a ratio,
-		// instead of subtracting the defense from it
-		{ name: "NewDefenseFormula", enabled: false },
 	]},
-
+	
+	// Lowers ability costs
+	{ name: "AbilityCostRevamp", enabled: true },
+	
 	// Simplifies attribute bonuses
 	{ name: "AttributeBonusRevamp", enabled: true },
-
+	
+	// Simplified and both buffed and nerfed attack bonuses
+	{ name: "AttackTypeBonusRevamp1", enabled: true },
+	
+	// Changed attacke type bonuses for the absolute worst
+	{ name: "AttackTypeBonusRevamp2", enabled: true },
+	
 	// Changes how blocks behave
 	{ name: "BlockRevamp", enabled: true, children: [
 		// Changes blocks to not nullify damage
 		{ name: "NonNullifyBlocks", enabled: true },
-
+		
 		// Increases max block chance to compensate for not nullifying damage
 		{ name: "IncreasedBlockRate", enabled: true },
-
+		
 		// Changes guard bonus for active blocking to a flat number
 		{ name: "FlatGuardBonus", enabled: true },
 	]},
-
-	// Lowers ability costs
-	{ name: "AbilityCostRevamp", enabled: true },
 
 	// Gives Clerics the Guard skill, allowing them to use shields actively
 	{ name: "GuardingClerics", enabled: true },
@@ -130,10 +126,6 @@
 // to get categorized.
 { name: "Misc", enabled: true, children: [
 
-	// Selects Laima's custom formulas for stats, combat and regeneration.
-	// If disabled, the formulas of the 2016 game are used.
-	{ name: "LaimaFormulas", enabled: false },
-
 	// Enables new characters receiving growth equipment
 	{ name: "GrowthEquipOnStart", enabled: true },
 	
@@ -147,42 +139,9 @@
 		// member target selection wheel
 		{ name: "ClericHealPartySelect", enabled: true },
 	]},		
-
-	// Enables overriding skintones available at character creation
-	{ name: "OverrideSkintones", enabled: false },
-
-	// Enables day and night cycle
-	{ name: "DayNightCycle", enabled: true },
-
-	// Enables custom quest system
-	{ name: "CustomQuestSystem", enabled: true },
-
-	// Enables custom random options based off item grade
-	{ name: "GradeRandomOptions", enabled: true },
-
-	// Allows character resurrection in PvP Maps
-	{ name: "AllowPVPResurrection", enabled: true },
-
-	// Headgear enchants consume potential when used
-	{ name: "HeadgearEnchantsConsumePotential", enabled: false },
-
-	// Enables the service NPCs placed in the cities (stylist, exchanger,
-	// guild, arenas and so on)
-	{ name: "CustomNpcs", enabled: true },
-
-	// Enables Mixing Table system
-	{ name: "MixingTable", enabled: true },
-
-	// Grants all weapon/armor equip abilities to every character,
-	// allowing them to equip any weapon type their class supports
-	{ name: "UnlockAllWeaponTypes", enabled: true },
 ]},
 
 // Let's disable certain features for now to hide things that aren't
 // fully implemented
 { name: "GrowthEquipOnStart", enabled: false },
-{ name: "BattleManager", enabled: false },
-{ name: "BountyHunterSystem", enabled: false },
-{ name: "MobaSystem", enabled: false },
-{ name: "TerritoryWarSystem", enabled: false },
 ]

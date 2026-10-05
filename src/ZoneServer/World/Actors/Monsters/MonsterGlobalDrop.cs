@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Items;
 using Yggdrasil.Logging;
@@ -173,7 +172,7 @@ namespace Melia.Zone.World.Actors.Monsters
 			// eligible item list.
 			var eligibleItems = new List<GlobalDropData>();
 			var currentLevel = highestLevel;
-			var targetCount = GameRandom.Get().Next(10, 51);
+			var targetCount = RandomProvider.Get().Next(10, 51);
 			foreach (var item in sortedItems)
 			{
 				if (eligibleItems.Count >= targetCount && item.Item.MinLevel < currentLevel)
@@ -186,7 +185,7 @@ namespace Melia.Zone.World.Actors.Monsters
 			// Gets the global drop chance for the given type
 			this.GetGlobalDropChance(killer, type, out var typeDropChance, out var typeAdjustedDropChance);
 
-			var rng = GameRandom.Get().NextDouble();
+			var rng = RandomProvider.Get().NextDouble();
 			// Log.Debug($"Global Drop Chance {type} - {typeAdjustedDropChance}");
 
 			// Checks if we dropped an item from this type
@@ -195,7 +194,7 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			// Calculate total weight based on probability factors
 			var totalWeight = eligibleItems.Sum(drop => drop.ProbabilityFactor);
-			var randomNumber = GameRandom.Get().NextDouble() * totalWeight;
+			var randomNumber = RandomProvider.Get().NextDouble() * totalWeight;
 
 			// Choose item based on weighted probability
 			var chosenItem = eligibleItems.First(drop => (randomNumber -= drop.ProbabilityFactor) <= 0);

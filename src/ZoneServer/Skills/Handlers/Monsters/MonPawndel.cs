@@ -9,7 +9,6 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using Melia.Zone.Skills.SplashAreas;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 
@@ -77,16 +76,19 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay, int aniTime)
 		{
-			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 0f), 30f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 40, angle: 30f);
+			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 0f), 30f);
-			hitDelay = 200;
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 40, angle: 30f);
+			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			hitDelay = 1000;
 			aniTime = 200;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 0f), 30f);
-			hitDelay = 200;
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 40, angle: 30f);
+			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			hitDelay = 1200;
 			aniTime = 200;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
@@ -115,7 +117,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
@@ -131,7 +133,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 30, angle: 30f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 300;
+			hitDelay = 1300;
 			aniTime = 300;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);

@@ -180,7 +180,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				ArrowLifeTime = 1f,
 				PositionDelay = 0f,
 				HitEffect = EffectConfig.None,
-				Range = 15f,
+				Range = 0,
 				KnockdownPower = 100f,
 				Delay = 0f,
 				HitEffectSpacing = 17f,

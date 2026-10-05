@@ -394,6 +394,7 @@ namespace Melia.Barracks.Network
 			character.Gender = gender;
 			character.Hair = hair;
 			character.SkinColor = skinColor;
+			character.VisualJobId = job;
 
 			character.MapId = startMapData.Id;
 			character.Position = startPosition;

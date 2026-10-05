@@ -1,5 +1,4 @@
 ﻿using Melia.Shared.Network;
-using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.World.Maps
 {
@@ -26,15 +25,6 @@ namespace Melia.Zone.World.Maps
 		public override void Broadcast(Packet packet)
 		{
 			//Log.Warning("Broadcast in Limbo.");
-		}
-
-		/// <summary>
-		/// Does nothing.
-		/// </summary>
-		/// <param name="packet"></param>
-		/// <param name="source"></param>
-		public override void BroadcastToViewers(Packet packet, IActor source)
-		{
 		}
 	}
 }

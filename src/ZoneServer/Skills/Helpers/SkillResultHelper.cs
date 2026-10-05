@@ -13,7 +13,6 @@ using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
 using static Melia.Zone.Skills.Helpers.SkillUtilHelper;
 using static Melia.Zone.Skills.SkillUseFunctions;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.Skills.Helpers
 {
@@ -65,7 +64,7 @@ namespace Melia.Zone.Skills.Helpers
 			var drStackKey = $"{drKey}.Stacks";
 
 			// Use milliseconds since a fixed epoch for time tracking (fits in float)
-			var nowMs = (float)(GameClock.Now - DateTime.UnixEpoch).TotalMilliseconds;
+			var nowMs = (float)(DateTime.UtcNow - DateTime.UnixEpoch).TotalMilliseconds;
 			var lastApplicationMs = target.GetTempVar(drTimeKey);
 			var currentStacks = (int)target.GetTempVar(drStackKey);
 
@@ -167,7 +166,7 @@ namespace Melia.Zone.Skills.Helpers
 					continue;
 
 				var finalChance = SCR_Calc_Status_Chance(caster, target, skill, buffId, percent);
-				if (finalChance < 100 && GameRandom.Get().Next(1, 101) > finalChance)
+				if (finalChance < 100 && RandomProvider.Next(1, 101) > finalChance)
 					continue;
 
 				var finalDuration = SCR_Calc_Status_Duration(caster, target, skill, buffId, buffTime);
@@ -175,6 +174,9 @@ namespace Melia.Zone.Skills.Helpers
 				{
 					var key = GetSkillSyncKey(caster, ret);
 					StartSyncPacket(caster, key);
+
+					if (buffId == BuffId.BlandirCadena_Debuff)
+						arg2 = ret.Damage;
 
 					var buff = target.StartBuff(buffId, level, arg2, TimeSpan.FromMilliseconds(finalDuration), caster, skill.Id);
 					if (buff != null)
@@ -201,16 +203,11 @@ namespace Melia.Zone.Skills.Helpers
 			}
 		}
 
-		public static void SkillResultKnockTarget(ICombatEntity caster, Skill skill, KnockType knockType, KnockDirection knockDirection, float power, float verticalAngle, float horizontalAngle, int bound, int knockdownRank, List<SkillHitInfo> hits = null, int percent = 100)
+		public static void SkillResultKnockTarget(ICombatEntity caster, Skill skill, KnockType knockType, KnockDirection knockDirection, float power, float verticalAngle, float horizontalAngle, int bound, int knockdownRank, List<SkillHitInfo> hits = null)
 		{
-			if (hits == null)
-				return;
-
 			foreach (var hit in hits)
 			{
 				if (hit.HitInfo.ResultType == HitResultType.Dodge || hit.HitInfo.ResultType == HitResultType.Block)
-					continue;
-				if (percent < 100 && GameRandom.Get().Next(1, 101) > percent)
 					continue;
 				var key = GetSkillSyncKey(caster, hit.HitInfo);
 				StartSyncPacket(caster, key);
@@ -219,15 +216,15 @@ namespace Melia.Zone.Skills.Helpers
 			}
 		}
 
-		public static void SkillResultSelfBuff(ICombatEntity caster, Skill skill, BuffId buffId, int level, int arg2, float buffTime, int over, int percent, int updateTime, SkillId skillId = SkillId.Normal_Attack)
+		public static void SkillResultSelfBuff(ICombatEntity caster, Skill skill, BuffId buffId, int level, int arg2, float buffTime, int over, int percent, int updateTime)
 		{
 			if (caster is not Character && caster.CheckBoolTempVar("BUNSIN"))
 				return;
 
-			if (percent < 100 && GameRandom.Get().Next(1, 101) > percent)
+			if (percent < 100 && RandomProvider.Next(1, 101) > percent)
 				return;
 
-			var buff = caster.StartBuff(buffId, level, arg2, TimeSpan.FromMilliseconds(buffTime), caster, skillId);
+			var buff = caster.StartBuff(buffId, level, arg2, TimeSpan.FromMilliseconds(buffTime), caster);
 			if (buff == null)
 			{
 				Log.Warning($"SkillResultSelfBuff: Buff {buffId} is null.");

@@ -215,6 +215,106 @@ namespace Melia.Zone.World
 		}
 
 		/// <summary>
+		/// Restores exactly one consumed daily dungeon entry.
+		/// Returns false when the character has no consumed daily entries.
+		/// </summary>
+		public bool TryRestoreOneDailyEntry(Character character)
+		{
+			if (character?.Connection == null)
+				return false;
+
+			var accountProperties =
+				character.Connection.Account.Properties;
+
+			var etcProperties =
+				character.Etc.Properties;
+
+			foreach (var resetType in _dailyResetTypes)
+			{
+				var propertyName =
+					"InDunCountType_" + resetType;
+
+				var accountCount =
+					accountProperties.GetFloat(propertyName);
+
+				var etcCount =
+					etcProperties.GetFloat(propertyName);
+
+				var usedCount =
+					Math.Max(accountCount, etcCount);
+
+				if (usedCount <= 0)
+					continue;
+
+				var newCount =
+					usedCount - 1;
+
+				if (PropertyTable.Exists(
+					accountProperties.Namespace,
+					propertyName))
+				{
+					accountProperties.SetFloat(
+						propertyName,
+						newCount);
+
+					Send.ZC_OBJECT_PROPERTY(
+						character.Connection,
+						character.Connection.Account,
+						propertyName);
+				}
+
+				if (PropertyTable.Exists(
+					etcProperties.Namespace,
+					propertyName))
+				{
+					etcProperties.SetFloat(
+						propertyName,
+						newCount);
+
+					Send.ZC_OBJECT_PROPERTY(
+						character,
+						propertyName);
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Returns true if the character has at least one consumed daily dungeon entry.
+		/// </summary>
+		public bool HasConsumedDailyEntry(Character character)
+		{
+			if (character?.Connection == null)
+				return false;
+
+			var accountProperties =
+				character.Connection.Account.Properties;
+
+			var etcProperties =
+				character.Etc.Properties;
+
+			foreach (var resetType in _dailyResetTypes)
+			{
+				var propertyName =
+					"InDunCountType_" + resetType;
+
+				var accountCount =
+					accountProperties.GetFloat(propertyName);
+
+				var etcCount =
+					etcProperties.GetFloat(propertyName);
+
+				if (Math.Max(accountCount, etcCount) > 0)
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Resets weekly dungeon entry counters for a character (public API for GM commands).
 		/// </summary>
 		/// <param name="character">The character to reset.</param>

@@ -44,6 +44,90 @@ namespace Melia.Zone.Scripting
 		/// <remarks>
 		/// Used in generated scripts.
 		/// </remarks>
+		/// <param name="character"></param>
+		/// <param name="monsterId"></param>
+		/// <param name="name"></param>
+		/// <param name="map"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="z"></param>
+		/// <param name="direction"></param>
+		/// <param name="dialogFuncName"></param>
+		/// <param name="enterFuncName"></param>
+		/// <param name="leaveFuncName"></param>
+		/// <param name="range"></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static Npc AddNpc(Character character, int monsterId, string name, string map, double x, double y, double z, double direction, string dialogFuncName = "", string enterFuncName = "", string leaveFuncName = "", int state = -2, double range = 100, double scale = 1)
+		{
+			var mapObj = GetMapOrThrow(map);
+
+			var pos = new Position((float)x, (float)y, (float)z);
+
+			// Wrap name in localization code if applicable
+			if (Dialog.IsLocalizationKey(name))
+			{
+				name = Dialog.WrapLocalizationKey(name);
+			}
+			// Insert line breaks in tagged NPC names that don't have one
+			else if (name.StartsWith('[') && !name.Contains("{nl}"))
+			{
+				var endIndex = name.LastIndexOf("] ");
+				if (endIndex != -1)
+				{
+					// Remove space and insert new line instead.
+					name = name.Remove(endIndex + 1, 1);
+					name = name.Insert(endIndex + 1, "{nl}");
+				}
+			}
+
+			var location = new Location(mapObj.Id, pos);
+			var dir = new Direction(direction);
+
+			ZoneServer.Instance.DialogFunctions.TryGet(dialogFuncName, out var dialog);
+			ZoneServer.Instance.TriggerFunctions.TryGet(enterFuncName, out var enter);
+			ZoneServer.Instance.TriggerFunctions.TryGet(leaveFuncName, out var leave);
+
+			var uniqueId = Interlocked.Increment(ref UniqueNpcNameId);
+			var uniqueName = $"__NPC{uniqueId}__";
+			var monster = new Npc(monsterId, name, location, dir, 0);
+			monster.UniqueName = uniqueName;
+			if (dialog != null)
+			{
+				monster.SetClickTrigger(dialogFuncName, dialog);
+				var uniqueDialogName = $"{dialogFuncName}_{mapObj.Data.ClassName}";
+				// Account for multiple npcs using the same dialogue.
+				ZoneServer.Instance.World.NPCs.TryAdd(uniqueDialogName, monster);
+			}
+			if (enter != null || leave != null)
+				monster.SetTriggerArea(Spot(monster.Position.X, monster.Position.Z, range));
+			if (enter != null)
+				monster.SetEnterTrigger(enterFuncName, enter);
+			if (leave != null)
+				monster.SetLeaveTrigger(leaveFuncName, leave);
+
+			if (state != -2)
+				monster.State = (NpcState)state;
+			if (range != 0)
+				monster.Properties.SetFloat(PropertyName.Range, (float)range);
+			if (scale != 1)
+				monster.Properties.SetFloat(PropertyName.Scale, (float)scale);
+
+			monster.SetVisibilty(ActorVisibility.Track, character.ObjectId);
+			monster.AddEffect(new ScriptInvisibleEffect());
+			monster.Layer = character.Layer;
+
+			mapObj.AddMonster(monster);
+
+			return monster;
+		}
+
+		/// <summary>
+		/// Adds new NPC to the world.
+		/// </summary>
+		/// <remarks>
+		/// Used in generated scripts.
+		/// </remarks>
 		/// <param name="genType"></param>
 		/// <param name="monsterId"></param>
 		/// <param name="name"></param>
@@ -247,36 +331,12 @@ namespace Melia.Zone.Scripting
 		{
 			var mapObj = GetMapOrThrow(map);
 
-			var pos = new Position((float)x, 0, (float)z);
-			if (mapObj.Ground.TryGetHeightAt(pos, out var height))
-				pos.Y = height;
-
-			return AddNpc(monsterId, name, uniqueName, map, pos.X, pos.Y, pos.Z, direction, dialog);
-		}
-
-		/// <summary>
-		/// Adds an NPC with a unique name and a dialog at the exact given
-		/// height, for places where the ground lookup would pick the wrong
-		/// surface.
-		/// </summary>
-		/// <param name="monsterId"></param>
-		/// <param name="name"></param>
-		/// <param name="uniqueName"></param>
-		/// <param name="map"></param>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="z"></param>
-		/// <param name="direction"></param>
-		/// <param name="dialog"></param>
-		/// <returns></returns>
-		public static Npc AddNpc(int monsterId, string name, string uniqueName, string map, double x, double y, double z, double direction, DialogFunc dialog = null)
-		{
-			var mapObj = GetMapOrThrow(map);
-
 			if (ZoneServer.Instance.World.TryGetMonster(a => a.UniqueName == uniqueName, out _))
 				throw new ArgumentException($"An NPC with the unique name '{uniqueName}' already exists.");
 
-			var pos = new Position((float)x, (float)y, (float)z);
+			var pos = new Position((float)x, 0, (float)z);
+			if (mapObj.Ground.TryGetHeightAt(pos, out var height))
+				pos.Y = height;
 
 			// Wrap name in localization code if applicable
 			if (Dialog.IsLocalizationKey(name))
@@ -307,88 +367,6 @@ namespace Melia.Zone.Scripting
 			// Log.Debug("Npc {0} ({1}) added to map {2} at {3}.", npc.Name, npc.Id, mapObj.Data.ClassName, pos);
 
 			mapObj.AddMonster(npc);
-
-			return npc;
-		}
-
-		/// <summary>
-		/// Adds an NPC that only exists for the characters the given
-		/// condition accepts.
-		/// </summary>
-		/// <remarks>
-		/// The world shows some NPCs only during part of a quest chain - a
-		/// captive who is not there until he is rescued, a barricade that is
-		/// gone once it is blown up. Two of them may stand on the same map at
-		/// once, each visible to a different set of players.
-		/// </remarks>
-		/// <param name="monsterId"></param>
-		/// <param name="name"></param>
-		/// <param name="uniqueName"></param>
-		/// <param name="map"></param>
-		/// <param name="x"></param>
-		/// <param name="z"></param>
-		/// <param name="direction"></param>
-		/// <param name="visibleTo">Condition deciding whether the NPC is there for a character.</param>
-		/// <param name="dialog"></param>
-		/// <returns></returns>
-		public static Npc AddConditionalNpc(int monsterId, string name, string uniqueName, string map, double x, double z, double direction, Func<Character, bool> visibleTo, DialogFunc dialog = null)
-		{
-			var npc = AddNpc(monsterId, name, uniqueName, map, x, z, direction, dialog);
-
-			if (npc != null)
-				npc.VisibleTo = visibleTo;
-
-			return npc;
-		}
-
-		/// <summary>
-		/// Adds an NPC that only exists for the characters the given
-		/// condition accepts, at the exact given height.
-		/// </summary>
-		/// <param name="monsterId"></param>
-		/// <param name="name"></param>
-		/// <param name="uniqueName"></param>
-		/// <param name="map"></param>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="z"></param>
-		/// <param name="direction"></param>
-		/// <param name="visibleTo">Condition deciding whether the NPC is there for a character.</param>
-		/// <param name="dialog"></param>
-		/// <returns></returns>
-		public static Npc AddConditionalNpc(int monsterId, string name, string uniqueName, string map, double x, double y, double z, double direction, Func<Character, bool> visibleTo, DialogFunc dialog = null)
-		{
-			var npc = AddNpc(monsterId, name, uniqueName, map, x, y, z, direction, dialog);
-
-			if (npc != null)
-				npc.VisibleTo = visibleTo;
-
-			return npc;
-		}
-
-		/// <summary>
-		/// Adds an invisible area trigger to the world, which runs the given
-		/// function when a character steps into it.
-		/// </summary>
-		/// <remarks>
-		/// The counterpart to the client's hidden trigger objects, which is
-		/// how a quest phase is bound to a place rather than an NPC.
-		/// </remarks>
-		/// <param name="uniqueName">Name the trigger is addressed by, such as a quest's phase NPC.</param>
-		/// <param name="map">Map class name to place the trigger on.</param>
-		/// <param name="x"></param>
-		/// <param name="z"></param>
-		/// <param name="radius">Radius of the area that triggers the function.</param>
-		/// <param name="onEnter"></param>
-		/// <returns></returns>
-		public static Npc AddQuestTrigger(string uniqueName, string map, double x, double z, double radius, TriggerActorFuncAsync onEnter)
-		{
-			var npc = AddNpc(MonsterId.HiddenTrigger, "", uniqueName, map, x, z, 0);
-			if (npc == null)
-				return null;
-
-			npc.SetTriggerArea(Spot(npc.Position.X, npc.Position.Z, radius));
-			npc.SetEnterTrigger(uniqueName, onEnter);
 
 			return npc;
 		}
@@ -455,27 +433,6 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
-		/// Creates an area trigger that shows a tutorial to characters
-		/// entering it.
-		/// </summary>
-		/// <param name="map"></param>
-		/// <param name="x"></param>
-		/// <param name="z"></param>
-		/// <param name="className"></param>
-		/// <param name="radius"></param>
-		/// <returns></returns>
-		public static Npc AddTutorialTrigger(string map, double x, double z, string className, double radius = 50)
-		{
-			return AddAreaTrigger(map, x, z, radius, args =>
-			{
-				if (args.Initiator is Character character && !character.IsDead)
-					character.ShowHelp(className);
-
-				return Task.CompletedTask;
-			});
-		}
-
-		/// <summary>
 		/// Helper function to create a treasure chest with a specific item and amount.
 		/// </summary>
 		/// <param name="map"></param>
@@ -517,7 +474,10 @@ namespace Melia.Zone.Scripting
 					return;
 
 				if (npc.Vars.ActivateOnce($"Npc.{uniqueName}"))
-					await OpenChest(character, npc, true, () => character.Inventory.Add(itemId, amount, InventoryAddType.PickUp));
+				{
+					await OpenChest(character, npc, true);
+					character.Inventory.Add(itemId, amount, InventoryAddType.PickUp);
+				}
 			});
 
 			return chest;
@@ -568,7 +528,10 @@ namespace Melia.Zone.Scripting
 					return;
 
 				if (npc.Vars.ActivateOnce($"Npc.{uniqueName}"))
-					await OpenChest(character, npc, true, () => character.Inventory.Add(itemId, amount, InventoryAddType.PickUp));
+				{
+					await OpenChest(character, npc, true);
+					character.Inventory.Add(itemId, amount, InventoryAddType.PickUp);
+				}
 			});
 
 			mapObj.AddMonster(chest);
@@ -751,6 +714,40 @@ namespace Melia.Zone.Scripting
 				npc.DisappearTime = DateTime.Now.Add(lifeTime);
 			}
 
+			return npc;
+		}
+
+		/// <summary>
+		/// Adds a Track NPC, these are elevators, cable cars, 
+		/// moving platforms, etc. They work with the "Track" system of the
+		/// client. The client handles ALL of the track position calculation
+		/// and traversing.
+		/// </summary>
+		/// <param name="monsterId"></param>
+		/// <param name="name"></param>
+		/// <param name="map"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="z"></param>
+		/// <param name="direction"></param>
+		/// <param name="trackString"></param>
+		/// <param name="i1"></param>
+		/// <param name="i2"></param>
+		/// <returns></returns>
+		public static Npc AddTrackNPC(int monsterId, string name, string map, double x, double y, double z, double direction, string trackString, int i1 = 2, int i2 = 5)
+		{
+			if (string.IsNullOrEmpty(map) || map == "None")
+			{
+				Log.Debug($"Skipped adding Track NPC {monsterId} - {name} at {x},{y},{z} because of invalid map: {map}");
+				return null;
+			}
+			var npc = AddNpc(0, monsterId, name, map, x, y, z, direction);
+			npc.Visibility = ActorVisibility.Always;
+			npc.AddEffect(new ReviveEffect());
+			npc.AddEffect(new SetTrackPosition());
+			npc.AddEffect(new DirectionAPC(trackString, i1, i2));
+			//if (ZoneServer.Instance.Data.MapDb.TryFind(map, out var mapData))
+			//Log.Debug($"Adding Track NPC {monsterId} - {name} at {x},{y},{z} on {mapData.Name}");
 			return npc;
 		}
 

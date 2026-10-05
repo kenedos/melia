@@ -4,6 +4,7 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.Network;
 using Melia.Zone.Network;
 using Melia.Zone.Network.Helpers;
+using Melia.Zone.Packages.Laima.Skills.Wizards.Sage;
 using Melia.Zone.Skills.Combat;
 
 namespace Melia.Zone.World.Actors.Characters
@@ -170,10 +171,29 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
+		/// Removes Bunshin clones without executing the normal player death flow.
+		/// </summary>
+		public override void Kill(ICombatEntity killer)
+		{
+			if (this.IsBuffActive(BuffId.Bunshin_Buff) || SageBlinkHelper.IsBlinkClone(this))
+			{
+				this.Despawn();
+				return;
+			}
+
+			base.Kill(killer);
+		}
+
+		/// <summary>
 		/// Despawns/Removes this entity from the map.
 		/// </summary>
 		public void Despawn()
 		{
+			SageBlinkHelper.OnCloneDespawn(this);
+
+			if (this.Map == null)
+				return;
+
 			Send.ZC_OWNER(this.Owner, this);
 			Send.ZC_LEAVE(this);
 

@@ -5,7 +5,6 @@ List of maps that are normally accessible by players
 -----------------------------------------------------------------------------
 c_fedimian
 c_Klaipe
-c_klaipe_cathedral_medium
 c_orsha
 d_abbey_22_4
 d_abbey_22_5

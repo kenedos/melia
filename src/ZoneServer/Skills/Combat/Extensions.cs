@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
 using Melia.Zone.World.Actors;
 using Yggdrasil.Util;
 
@@ -61,7 +60,7 @@ namespace Melia.Zone.Skills.Combat
 		/// <returns></returns>
 		public static IEnumerable<ICombatEntity> LimitRandom(this IEnumerable<ICombatEntity> targets, int maxAmount)
 		{
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 			targets = targets.OrderBy(a => rnd.Next());
 
 			return targets.Limit(maxAmount);
@@ -124,7 +123,7 @@ namespace Melia.Zone.Skills.Combat
 
 			// Consider closest 50% of targets
 			var consideredCount = Math.Max(1, (int)(targets.Count * 0.5));
-			bounceTarget = targets[GameRandom.Get().Next(consideredCount)];
+			bounceTarget = targets[RandomProvider.Get().Next(consideredCount)];
 			return true;
 		}
 	}

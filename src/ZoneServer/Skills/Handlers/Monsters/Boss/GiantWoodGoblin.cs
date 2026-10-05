@@ -41,13 +41,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			if (!caster.Position.InRange2D(target.Position, 300))
-				return;
 
-			var positions = GetScatteredPositions(GetLeadPosition(target, 1200, caster), 9, 130, 40);
-			for (var i = 0; i < positions.Count; i++)
+			for (var i = 0; i < 9; i++)
 			{
-				var position = originPos.GetNearestPositionWithinDistance(positions[i], 200f);
+				var position = originPos.GetNearestPositionWithinDistance(target.Position, 150f);
 				_ = EffectAndHit(skill, caster, position, new EffectHitConfig
 				{
 					GroundEffect = new EffectConfig("F_sys_target_monster", 0.7f),
@@ -100,7 +97,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 1000;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}
 
@@ -122,7 +119,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), Position.Zero);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
@@ -153,17 +150,17 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			};
 
 			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 			await skill.Wait(TimeSpan.FromMilliseconds(700));
 			position = caster.Position;
 			hits = new List<SkillHitInfo>();
 			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 			await skill.Wait(TimeSpan.FromMilliseconds(600));
 			position = caster.Position;
 			hits = new List<SkillHitInfo>();
 			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}
 
@@ -185,7 +182,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), Position.Zero);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
@@ -216,7 +213,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var delays = new[] { 700, 800 };
 			for (var i = 0; i < 3; i++)
 			{
-				var position = originPos.GetRelative(farPos, distance: 50);
+				var position = originPos.GetRelative(farPos, distance: 30);
 				_ = EffectAndHit(skill, caster, position, config);
 
 				if (i < delays.Length)

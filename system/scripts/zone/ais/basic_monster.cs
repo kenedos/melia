@@ -1,33 +1,137 @@
 ﻿using System.Collections;
-using System.Linq;
-using Melia.Shared.Game.Const;
-using Melia.Shared.World;
+using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.AI;
 using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.Characters;
-using Melia.Zone.World.Actors.Monsters;
 
-/// <summary>
-/// Basic AI for most monsters.
-/// </summary>
 [Ai("BasicMonster")]
 public class BasicMonsterAiScript : AiScript
 {
+	private const int MaxChaseDistance = 300;
+	private const int MaxMasterDistance = 200;
+
+	ICombatEntity target;
+
 	protected override void Setup()
 	{
-		this.MaxChaseDistance = 350;
-		this.MaxRoamDistance = 1000;
-
 		During("Idle", CheckEnemies);
-		During("Idle", CheckFear);
 		During("Attack", CheckTarget);
 		During("Attack", CheckMaster);
-		During("Attack", CheckFear);
 	}
 
 	protected override void Root()
 	{
-		StartRoutine("ReturnHome", ReturnHome());
+		StartRoutine("Idle", Idle());
+	}
+
+	protected IEnumerable Idle()
+	{
+		ResetMoveSpeed();
+
+		var master = GetMaster();
+		if (master != null)
+		{
+			yield return Follow(master);
+			yield break;
+		}
+
+		if (IsFarFromHome())
+		{
+			yield return ReturnHome();
+			yield break;
+		}
+
+		yield return Wait(4000, 8000);
+
+		SwitchRandom();
+		if (Case(80))
+		{
+			yield return MoveRandom();
+		}
+		else
+		{
+			yield return Animation("IDLE");
+		}
+	}
+
+	protected IEnumerable Attack()
+	{
+		SetRunning(true);
+
+		while (!target.IsDead)
+		{
+			if (!TryGetRandomSkill(out var skill))
+			{
+				yield return Wait(2000);
+				continue;
+			}
+
+			yield return MoveToAttack(target, skill.GetAttackRange());
+			yield return UseSkill(skill, target);
+			yield return Wait(skill.Properties.Delay);
+		}
+
+		yield break;
+	}
+
+	protected IEnumerable StopAndIdle()
+	{
+		yield return StopMove();
+		StartRoutine("Idle", Idle());
+	}
+
+	protected IEnumerable StopAndAttack()
+	{
+		ExecuteOnce(Emoticon("I_emo_exclamation"));
+		ExecuteOnce(TurnTowards(target));
+
+		yield return StopMove();
+		StartRoutine("Attack", Attack());
+	}
+
+	private void CheckEnemies()
+	{
+		var mostHated = GetMostHated();
+		if (mostHated != null)
+		{
+			target = mostHated;
+			StartRoutine("StopAndAttack", StopAndAttack());
+		}
+	}
+
+	private void CheckTarget()
+	{
+		// Switch targets if the current one is no longer the most hated one
+		var mostHated = GetMostHated();
+		if (mostHated != null && target != mostHated)
+		{
+			target = mostHated;
+			StartRoutine("StopAndAttack", StopAndAttack());
+			return;
+		}
+
+		// Transition to idle if the target has vanished or is out of range
+		if (EntityGone(target) || !InRangeOf(target, MaxChaseDistance) || !IsHating(target))
+		{
+			target = null;
+			StartRoutine("StopAndIdle", StopAndIdle());
+		}
+	}
+
+	private void CheckMaster()
+	{
+		if (target == null)
+			return;
+
+		if (!TryGetMaster(out var master))
+			return;
+
+		// Reset aggro if the master left
+		if (EntityGone(master) || !InRangeOf(master, MaxMasterDistance))
+		{
+			target = null;
+			RemoveAllHate();
+			StartRoutine("StopAndIdle", StopAndIdle());
+		}
 	}
 }

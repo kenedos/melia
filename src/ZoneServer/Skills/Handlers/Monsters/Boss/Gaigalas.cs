@@ -5,7 +5,6 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Pads;
 using Melia.Zone.Skills.Combat;
@@ -97,15 +96,45 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var waits = new[] { 1100, 1400, 500 };
-			foreach (var wait in waits)
-			{
-				await skill.Wait(TimeSpan.FromMilliseconds(wait));
-				if (!caster.Position.InRange2D(target.Position, 300))
-					break;
+			await skill.Wait(TimeSpan.FromMilliseconds(1100));
 
-				foreach (var position in GetScatteredPositions(GetLeadPosition(target, 1000, caster), 5, 100, 45))
-					_ = MissileWithFirewall(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f));
+			// Wave 1 - 2
+			for (var i = 0; i < 2; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 1);
+				_ = MissileWithFirewall(skill, caster, position);
+			}
+			for (var i = 0; i < 3; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 2);
+				_ = MissileWithFirewall(skill, caster, position);
+			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1400));
+
+			// Wave 2 - 5
+			for (var i = 0; i < 5; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 1);
+				_ = MissileWithFirewall(skill, caster, position);
+			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(500));
+
+			// Wave 3 - 5
+			for (var i = 0; i < 5; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 1);
+				_ = MissileWithFirewall(skill, caster, position);
+			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(500));
+
+			// Wave 4 - 5
+			for (var i = 0; i < 5; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 1);
+				_ = MissileWithFirewall(skill, caster, position);
 			}
 		}
 
@@ -182,13 +211,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 
+			var rnd = new Random();
 			var padCount = 12;
 			var baseDirection = originPos.GetDirection(farPos);
 
 			for (var i = 0; i < padCount; i++)
 			{
-				var distance = 50 + GameRandom.Get().NextDouble() * 170;
-				var widthOffset = (GameRandom.Get().NextDouble() - 0.5) * 60;
+				var distance = 50 + rnd.NextDouble() * 170;
+				var widthOffset = (rnd.NextDouble() - 0.5) * 60;
 				var padPos = originPos.GetRelative(baseDirection, (float)distance);
 				padPos = padPos.GetRelative(new Direction((float)(baseDirection.DegreeAngle + 90)), (float)widthOffset);
 				SkillCreatePad(caster, skill, padPos, 0f, PadName.Mon_firewall);
@@ -231,13 +261,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 3100;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 130, 10, 0, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 130, 10, 0, 1, 5, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 90, angle: 30f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 500;
+			hitDelay = 3600;
 			aniTime = 500;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 130, 10, 0, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 130, 10, 0, 1, 5, hits);
 		}
 	}
 }

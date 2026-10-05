@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using Melia.Shared.Util;
 using Yggdrasil.Geometry;
 using Yggdrasil.Util;
 
@@ -208,7 +207,7 @@ namespace Melia.Shared.World
 		/// <returns></returns>
 		public readonly Position GetRandomInRange2D(int distance)
 		{
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 			return this.GetRandom(rnd.Next(1, distance + 1), rnd);
 		}
 
@@ -221,7 +220,7 @@ namespace Melia.Shared.World
 		/// <returns></returns>
 		public readonly Position GetRandomInRange2D(int distanceMin, int distanceMax)
 		{
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 			return this.GetRandom(rnd.Next(distanceMin, distanceMax + 1), rnd);
 		}
 
@@ -280,7 +279,7 @@ namespace Melia.Shared.World
 				return this;
 
 			if (rand != 0)
-				distance += GameRandom.Get().Next(rand);
+				distance += RandomProvider.Get().Next(rand);
 
 			var deltaX = other.X - this.X;
 			var deltaY = other.Y - this.Y;
@@ -288,11 +287,10 @@ namespace Melia.Shared.World
 
 			if (angle != 0)
 			{
-				var length2D = MathF.Sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
-				var direction = this.GetDirection(other).AddDegreeAngle(angle);
+				var direction = new Direction(angle);
 
-				deltaX = direction.Cos * length2D;
-				deltaZ = direction.Sin * length2D;
+				deltaX *= direction.Cos;
+				deltaZ *= direction.Sin;
 			}
 
 			var deltaXYZ = MathF.Sqrt((deltaX * deltaX) + (deltaY * deltaY) + (deltaZ * deltaZ));

@@ -43,7 +43,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			var hits = new List<SkillHitInfo>();
-			var position = originPos.GetRelative(farPos, distance: 49f, angle: -1f);
+			var position = originPos.GetRelative(farPos, distance: 30, angle: 0f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 3f),
@@ -60,8 +60,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 30000f, 1, 40, -1, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 30000f, 1, 100, -1, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}
 
@@ -216,7 +216,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			caster.TurnTowards(leadPos);
 			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), Position.Zero);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
@@ -233,7 +233,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			for (var i = 0; i < angles.Length; i++)
 			{
-				var position = originPos.GetRelative(farPos, distance: 80, angle: angles[i], height: i == 0 ? 2 : 0);
+				var posOrigin = i == 0 ? originPos : farPos;
+				var position = originPos.GetRelative(posOrigin, distance: 20, angle: angles[i], height: i == 0 ? 2 : 0);
 				var hits = new List<SkillHitInfo>();
 				_ = MissileThrow(skill, caster, position, new MissileConfig
 				{

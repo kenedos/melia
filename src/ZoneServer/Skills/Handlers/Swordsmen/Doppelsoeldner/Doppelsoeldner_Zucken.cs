@@ -22,6 +22,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 	[SkillHandler(SkillId.Doppelsoeldner_Zucken)]
 	public class Doppelsoeldner_Zucken : IGroundSkillHandler
 	{
+		private const float HealingRate = 0.075f;
+
 		/// <summary>
 		/// Handles skill, damaging targets.
 		/// </summary>
@@ -71,6 +73,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(400);
 			var aniTime1 = TimeSpan.FromMilliseconds(60);
+			var aniTime2 = TimeSpan.FromMilliseconds(60);
 			var delayBetweenHits = TimeSpan.FromMilliseconds(150);
 			var skillHitDelay = TimeSpan.Zero;
 
@@ -87,9 +90,6 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 				{
 					var modifier = SkillModifier.MultiHit(2);
 
-					if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-						modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
-
 					var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 					target.TakeDamage(skillHitResult.Damage, caster);
 
@@ -97,7 +97,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 					skillHit.HitEffect = HitEffect.Impact;
 					hits.Add(skillHit);
 
-					hitSomething = true;
+					if (skillHitResult.Damage > 0f)
+						hitSomething = true;
 				}
 
 				Send.ZC_SKILL_HIT_INFO(caster, hits);
@@ -108,8 +109,14 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 
 			if (hitSomething)
 			{
+				var maximumHp = Math.Max(0f, caster.Properties.GetFloat(PropertyName.MHP));
+				var healingAmount = maximumHp * HealingRate;
+
+				if (healingAmount > 0f)
+					caster.Heal(healingAmount, 0f);
+
 				var duration = TimeSpan.FromSeconds(3);
-				caster.StartBuff(BuffId.Redel_Buff, skill.Level, 0, duration, caster, SkillId.Doppelsoeldner_Redel);
+				caster.StartBuff(BuffId.Redel_Buff, skill.Level, 0, duration, caster);
 			}
 		}
 	}

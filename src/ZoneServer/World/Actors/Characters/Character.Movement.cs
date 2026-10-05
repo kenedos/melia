@@ -12,7 +12,7 @@ using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
-using Melia.Zone.Scripting;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -187,23 +187,6 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Variables.Perm.SetFloat("Melia.CityReturnLocation.X", location.X);
 			this.Variables.Perm.SetFloat("Melia.CityReturnLocation.Y", location.Y);
 			this.Variables.Perm.SetFloat("Melia.CityReturnLocation.Z", location.Z);
-		}
-
-		/// <summary>
-		/// Returns whether the character has entered a city at least once.
-		/// </summary>
-		public bool HasVisitedCity()
-			=> this.Variables.Perm.GetBool("Melia.HasVisitedCity", false);
-
-		/// <summary>
-		/// Records that the character has entered a city.
-		/// </summary>
-		public void MarkVisitedCity()
-		{
-			if (this.Variables.Perm.GetBool("Melia.HasVisitedCity", false))
-				return;
-
-			this.Variables.Perm.SetBool("Melia.HasVisitedCity", true);
 		}
 		#endregion
 
@@ -414,7 +397,6 @@ namespace Melia.Zone.World.Actors.Characters
 					this.CloseEyes();
 					foreach (var companion in this.Companions.GetList())
 						companion.Map?.RemoveMonster(companion);
-					this.Tracks.Cleanup();
 					this.Map?.RemoveCharacter(this);
 
 					ItemHookRegistry.Instance.UnregisterCharacter(this);
@@ -447,22 +429,6 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public override bool CanSee(IActor actor)
 		{
-			if (actor == null)
-				return false;
-
-			// A layer is a hard boundary; the client never draws another one,
-			// so this character cannot be hit by or hit what is standing on
-			// it. Checked ahead of the Always shortcut, which the cast of a
-			// cutscene relies on and which is set on every track actor.
-			if (actor.Layer != this.Layer)
-				return false;
-
-			// Checked ahead of the Always shortcut, since an NPC that is
-			// only there for part of a quest chain must stay away from
-			// everyone else regardless of its visibility flag.
-			if (actor is Npc conditionalNpc && conditionalNpc.VisibleTo != null && !conditionalNpc.VisibleTo(this))
-				return false;
-
 			if (actor.Visibility == ActorVisibility.Always)
 				return true;
 
@@ -476,50 +442,6 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
-		/// Returns true if the monster was sent to the character's client
-		/// and can be referenced by packets.
-		/// </summary>
-		/// <param name="monster"></param>
-		/// <returns></returns>
-		public bool IsMonsterVisible(IMonster monster)
-		{
-			if (monster == null)
-				return false;
-
-			lock (_lookAroundLock)
-				return _visibleMonsters.Contains(monster);
-		}
-
-		/// <summary>
-		/// Returns true if the actor was sent to the character's client and
-		/// can be referenced by handle in subsequent packets.
-		/// </summary>
-		/// <param name="actor"></param>
-		/// <returns></returns>
-		public bool IsActorVisible(IActor actor)
-		{
-			if (actor == null)
-				return false;
-
-			if (actor == this)
-				return true;
-
-			lock (_lookAroundLock)
-			{
-				if (actor is IMonster monster)
-					return _visibleMonsters.Contains(monster);
-
-				if (actor is Character character)
-					return _visibleCharacters.Contains(character);
-
-				if (actor is Pad pad)
-					return _visiblePads.Contains(pad);
-			}
-
-			return true;
-		}
-
-		/// <summary>
 		/// Updates visible entities around character.
 		/// </summary>
 		public void LookAround()
@@ -527,33 +449,19 @@ namespace Melia.Zone.World.Actors.Characters
 			if (!this.EyesOpen)
 				return;
 
-			// Visibility predicates run script code that may take other locks, such as the quest lock.
-			if (!Monitor.TryEnter(_lookAroundScanLock))
-				return;
-
-			this.LookAroundScanned();
-			Monitor.Exit(_lookAroundScanLock);
-		}
-
-		/// <summary>
-		/// Updates visible entities around character, with the scan lock held.
-		/// </summary>
-		private void LookAroundScanned()
-		{
 			int sentCount;
-
-			// Fill reusable scratch sets with currently visible entities
-			_currentVisMonsters.Clear();
-			this.Map.GetVisibleMonsters(this, _currentVisMonsters);
-
-			_currentVisChars.Clear();
-			this.Map.GetVisibleCharacters(this, _currentVisChars);
-
-			_currentVisPads.Clear();
-			this.Map.GetVisiblePads(this, _currentVisPads);
 
 			lock (_lookAroundLock)
 			{
+				// Fill reusable scratch sets with currently visible entities
+				_currentVisMonsters.Clear();
+				this.Map.GetVisibleMonsters(this, _currentVisMonsters);
+
+				_currentVisChars.Clear();
+				this.Map.GetVisibleCharacters(this, _currentVisChars);
+
+				_currentVisPads.Clear();
+				this.Map.GetVisiblePads(this, _currentVisPads);
 				// Compute appeared characters
 				_tempAppearChars.Clear();
 				foreach (var c in _currentVisChars)
@@ -628,22 +536,6 @@ namespace Melia.Zone.World.Actors.Characters
 			}
 		}
 
-		/// <summary>
-		/// Sends a monster's appearance to this character at once, without
-		/// the per-tick limit LookAround applies.
-		/// </summary>
-		/// <param name="monster"></param>
-		public void ShowMonster(IMonster monster)
-		{
-			lock (_lookAroundLock)
-			{
-				if (!_visibleMonsters.Add(monster))
-					return;
-			}
-
-			this.HandleAppearingSingleMonster(monster);
-		}
-
 		private void HandleAppearingCharacters(List<Character> appearCharacters)
 		{
 			for (var i = 0; i < appearCharacters.Count; i++)
@@ -697,21 +589,22 @@ namespace Melia.Zone.World.Actors.Characters
 				}
 
 				character.ShowEffects(this.Connection);
+
+				// Remove Serial Bullet ao relogar/reaparecer para evitar bug de animação/estado
+				character.RemoveBuff(BuffId.DoubleBullet_Toggle_Buff);
+
 				Send.ZC_BUFF_LIST(this.Connection, character);
-				Send.ZC_NORMAL.UpdateSkillEffect(this.Connection, character, 0, character.Position, character.Direction, character.Position);
+
+				// Reaplica o ataque principal correto após buffs/efeitos serem enviados ao client.
+				// Corrige relog com Serial Bullet ativo voltando para Pistol_Attack.
+				SchwarzerReiterAttackHelper.UpdateMainAttack(character);
 			}
 		}
 
 		private void HandleDisappearingCharacters(List<Character> disappearCharacters)
 		{
 			for (var i = 0; i < disappearCharacters.Count; i++)
-			{
-				var character = disappearCharacters[i];
-
-				ShopBuilder.ForgetShopView(this, character.Handle);
-
-				Send.ZC_LEAVE(this.Connection, character);
-			}
+				Send.ZC_LEAVE(this.Connection, disappearCharacters[i]);
 		}
 
 		private void HandleAppearingMonsters(List<IMonster> appearMonsters)
@@ -763,8 +656,8 @@ namespace Melia.Zone.World.Actors.Characters
 			if (monster.Properties.TryGetFloat(PropertyName.Scale, out var scale) && scale != 1)
 				monster.ChangeScale(scale, 0);
 
-			if (monster is Mob shieldedMob && shieldedMob.MaxShield > 0)
-				Send.ZC_UPDATE_SHIELD(this.Connection, monster, shieldedMob.Shield);
+			if (monster is Mob mobBoss && mobBoss.Rank == MonsterRank.Boss)
+				Send.ZC_UPDATE_SHIELD(this.Connection, monster, mobBoss.Shield);
 
 			monster.ShowEffects(this.Connection);
 
@@ -809,7 +702,6 @@ namespace Melia.Zone.World.Actors.Characters
 					Send.ZC_OWNER(this, monster);
 
 				Send.ZC_FACTION(this.Connection, monster, entity.Faction);
-				Send.ZC_NORMAL.UpdateSkillEffect(this.Connection, entity, 0, entity.Position, entity.Direction, entity.Position);
 
 				if (entity.HasBuffs())
 					Send.ZC_BUFF_LIST(this.Connection, entity);
@@ -823,12 +715,8 @@ namespace Melia.Zone.World.Actors.Characters
 				}
 			}
 
-			if (monster is MonsterInName minMon)
-			{
-				var npcState = this.GetMapNPCState(minMon);
-				if (npcState != NpcState.IgnoreState)
-					Send.ZC_SET_NPC_STATE(this.Connection, minMon, (short)npcState);
-			}
+			if (monster is MonsterInName minMon && this.GetMapNPCState(minMon) != NpcState.IgnoreState)
+				Send.ZC_SET_NPC_STATE(minMon);
 		}
 
 		private void HandleDisappearingMonsters(List<IMonster> disappearMonsters)
@@ -876,7 +764,7 @@ namespace Melia.Zone.World.Actors.Characters
 			// Perform unthrottled initial visibility scan. Unlike
 			// LookAround(), this sends all monsters at once since
 			// the player expects to see everything on map entry.
-			lock (_lookAroundScanLock)
+			lock (_lookAroundLock)
 			{
 				// Get currently visible entities
 				_currentVisChars.Clear();
@@ -888,43 +776,40 @@ namespace Melia.Zone.World.Actors.Characters
 				_currentVisPads.Clear();
 				this.Map.GetVisiblePads(this, _currentVisPads);
 
-				lock (_lookAroundLock)
-				{
-					// Compute newly appearing characters
-					_tempAppearChars.Clear();
-					foreach (var c in _currentVisChars)
-						if (!_visibleCharacters.Contains(c))
-							_tempAppearChars.Add(c);
+				// Compute newly appearing characters
+				_tempAppearChars.Clear();
+				foreach (var c in _currentVisChars)
+					if (!_visibleCharacters.Contains(c))
+						_tempAppearChars.Add(c);
 
-					// Compute newly appearing monsters
-					_tempAppearMonsters.Clear();
-					foreach (var m in _currentVisMonsters)
-						if (!_visibleMonsters.Contains(m))
-							_tempAppearMonsters.Add(m);
+				// Compute newly appearing monsters
+				_tempAppearMonsters.Clear();
+				foreach (var m in _currentVisMonsters)
+					if (!_visibleMonsters.Contains(m))
+						_tempAppearMonsters.Add(m);
 
-					// Compute newly appearing pads
-					_tempAppearPads.Clear();
-					foreach (var p in _currentVisPads)
-						if (!_visiblePads.Contains(p))
-							_tempAppearPads.Add(p);
+				// Compute newly appearing pads
+				_tempAppearPads.Clear();
+				foreach (var p in _currentVisPads)
+					if (!_visiblePads.Contains(p))
+						_tempAppearPads.Add(p);
 
-					this.HandleAppearingCharacters(_tempAppearChars);
-					this.HandleAppearingMonsters(_tempAppearMonsters);
-					this.HandleAppearingPads(_tempAppearPads);
+				this.HandleAppearingCharacters(_tempAppearChars);
+				this.HandleAppearingMonsters(_tempAppearMonsters);
+				this.HandleAppearingPads(_tempAppearPads);
 
-					// Update visible sets
-					_visibleCharacters.Clear();
-					foreach (var c in _currentVisChars)
-						_visibleCharacters.Add(c);
+				// Update visible sets
+				_visibleCharacters.Clear();
+				foreach (var c in _currentVisChars)
+					_visibleCharacters.Add(c);
 
-					_visibleMonsters.Clear();
-					foreach (var m in _currentVisMonsters)
-						_visibleMonsters.Add(m);
+				_visibleMonsters.Clear();
+				foreach (var m in _currentVisMonsters)
+					_visibleMonsters.Add(m);
 
-					_visiblePads.Clear();
-					foreach (var p in _currentVisPads)
-						_visiblePads.Add(p);
-				}
+				_visiblePads.Clear();
+				foreach (var p in _currentVisPads)
+					_visiblePads.Add(p);
 			}
 		}
 

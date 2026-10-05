@@ -38,7 +38,8 @@ namespace Melia.Zone.Network.Helpers
 			packet.PutInt(monster.MaxHp);
 			if (Versions.Protocol > 500)
 			{
-				packet.PutLong(monster.Shield);
+				packet.PutInt(monster.Shield);
+				packet.PutInt(monster.MaxShield);
 			}
 			else if (Versions.Client >= KnownVersions.OpenBeta)
 			{
@@ -118,7 +119,7 @@ namespace Melia.Zone.Network.Helpers
 			{
 				packet.PutLpString(monster.Name);
 				packet.PutLpString(monster.UniqueName);
-				packet.PutLpString(monster.GetClientDialogName());
+				packet.PutLpString(monster.DialogName);
 				packet.PutLpString(monster.EnterName);
 				packet.PutLpString(monster.LeaveName);
 			}
@@ -126,25 +127,10 @@ namespace Melia.Zone.Network.Helpers
 			{
 				packet.PutString(monster.Name, 256);
 				packet.PutString(monster.UniqueName, 256);
-				packet.PutString(monster.GetClientDialogName(), 256);
+				packet.PutString(monster.DialogName, 256);
 				packet.PutString(monster.EnterName, 256);
 				packet.PutString(monster.LeaveName, 256);
 			}
-		}
-
-		/// <summary>
-		/// Returns the dialog name the client knows the monster by. A
-		/// scripted dialog goes by the monster's unique name, which the
-		/// client matches its quest NPCs and markers against.
-		/// </summary>
-		/// <param name="monster"></param>
-		/// <returns></returns>
-		public static string GetClientDialogName(this IMonsterAppearance monster)
-		{
-			if (monster.DialogName == "DYNAMIC_DIALOG" && !string.IsNullOrEmpty(monster.UniqueName))
-				return monster.UniqueName;
-
-			return monster.DialogName;
 		}
 
 		/// <summary>
@@ -165,7 +151,7 @@ namespace Melia.Zone.Network.Helpers
 			// Strings
 			size += Encoding.UTF8.GetByteCount(monster.Name ?? "");
 			size += Encoding.UTF8.GetByteCount(monster.UniqueName ?? "");
-			size += Encoding.UTF8.GetByteCount(monster.GetClientDialogName() ?? "");
+			size += Encoding.UTF8.GetByteCount(monster.DialogName ?? "");
 			size += Encoding.UTF8.GetByteCount(monster.EnterName ?? "");
 			size += Encoding.UTF8.GetByteCount(monster.LeaveName ?? "");
 

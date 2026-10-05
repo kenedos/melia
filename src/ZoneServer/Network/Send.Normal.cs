@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Numerics;
 using System.Reflection.Emit;
 using System.Security.Cryptography;
-using System.Text;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Game.Const.Web;
@@ -17,7 +15,6 @@ using Melia.Shared.Util;
 using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.Network.Helpers;
-using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors;
@@ -122,51 +119,6 @@ namespace Melia.Zone.Network
 				packet.AddStringId(animationName);
 
 				npc.Map.Broadcast(packet, npc);
-			}
-
-			/// <summary>
-			/// Attaches effect to actor on clients in range.
-			/// </summary>
-			/// <param name="actor"></param>
-			/// <param name="effect"></param>
-			public static void AttachEffect(IActor actor, AttachableEffect effect)
-			{
-				using var packet = Packet.Rent(Op.ZC_NORMAL);
-				packet.PutInt(NormalOp.Zone.AttachEffect);
-
-				packet.PutInt(actor.Handle);
-				packet.AddStringId(effect.PacketString);
-				packet.PutFloat(effect.Scale);
-				packet.PutInt((int)effect.Location);
-				packet.PutFloat(effect.Offset.X);
-				packet.PutFloat(effect.Offset.Y);
-				packet.PutFloat(effect.Offset.Z);
-				packet.PutFloat(0);
-
-				actor.Map.Broadcast(packet, actor);
-			}
-
-			/// <summary>
-			/// Attaches effect to actor on client.
-			/// </summary>
-			/// <param name="conn"></param>
-			/// <param name="actor"></param>
-			/// <param name="effect"></param>
-			public static void AttachEffect(IZoneConnection conn, IActor actor, AttachableEffect effect)
-			{
-				using var packet = Packet.Rent(Op.ZC_NORMAL);
-				packet.PutInt(NormalOp.Zone.AttachEffect);
-
-				packet.PutInt(actor.Handle);
-				packet.AddStringId(effect.PacketString);
-				packet.PutFloat(effect.Scale);
-				packet.PutInt((int)effect.Location);
-				packet.PutFloat(effect.Offset.X);
-				packet.PutFloat(effect.Offset.Y);
-				packet.PutFloat(effect.Offset.Z);
-				packet.PutFloat(0);
-
-				conn.Send(packet);
 			}
 
 			/// <summary>
@@ -1215,37 +1167,7 @@ namespace Melia.Zone.Network
 				packet.PutDirection(direction);
 				packet.PutPosition(farPos);
 
-				entity.Map.BroadcastToViewers(packet, entity);
-			}
-
-			/// <summary>
-			/// Seeds the skill effect state for entity on a single client,
-			/// so effects built before the next update aren't rooted at the
-			/// map's origin.
-			/// </summary>
-			/// <param name="conn"></param>
-			/// <param name="entity"></param>
-			/// <param name="targetHandle"></param>
-			/// <param name="originPos"></param>
-			/// <param name="direction"></param>
-			/// <param name="farPos"></param>
-			public static void UpdateSkillEffect(IZoneConnection conn, ICombatEntity entity, int targetHandle, Position originPos, Direction direction, Position farPos)
-			{
-				using var packet = Packet.Rent(Op.ZC_NORMAL);
-				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.UpdateSkillEffect);
-
-				packet.PutInt(entity.Handle);
-				if (Versions.Protocol > 500)
-					packet.PutInt(0);
-				else
-					packet.PutByte(0);
-				packet.PutInt(0);
-				packet.PutInt(targetHandle);
-				packet.PutPosition(originPos);
-				packet.PutDirection(direction);
-				packet.PutPosition(farPos);
-
-				conn.Send(packet);
+				entity.Map.Broadcast(packet, entity);
 			}
 
 			/// <summary>
@@ -1281,7 +1203,7 @@ namespace Melia.Zone.Network
 				packet.PutDirection(direction);
 				packet.PutPosition(farPos);
 
-				entity.Map.BroadcastToViewers(packet, entity);
+				entity.Map.Broadcast(packet, entity);
 			}
 
 			/// <summary>
@@ -2288,39 +2210,18 @@ namespace Melia.Zone.Network
 			/// <param name="character"></param>
 			/// <param name="trackName"></param>
 			/// <param name="actors"></param>
-			/// <param name="actorLines">The timeline line of each actor, or null if the cast starts at line 2 without gaps.</param>
-			public static void StartCutscene(Character character, string trackName, IActor[] actors, int[] actorLines = null)
+			public static void StartCutscene(Character character, string trackName, params IActor[] actors)
 			{
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.CutsceneTrack);
 
 				packet.PutLpString(trackName);
 				packet.PutLong(1);
-
-				// The client assigns the list's element N to timeline line N.
-				if (actorLines != null && actorLines.Length == actors.Length)
-				{
-					var lineCount = 0;
-					foreach (var line in actorLines)
-						lineCount = Math.Max(lineCount, line + 1);
-
-					var handles = new int[lineCount];
-					for (var i = 0; i < actors.Length; i++)
-						handles[actorLines[i]] = actors[i].Handle;
-
-					packet.PutInt(handles.Length);
-					foreach (var handle in handles)
-						packet.PutInt(handle);
-				}
-				else
-				{
-					packet.PutInt(actors.Length + 2);
-					packet.PutInt(0);
-					packet.PutInt(0);
-					for (var i = 0; i < actors.Length; i++)
-						packet.PutInt(actors[i].Handle);
-				}
-
+				packet.PutInt(actors.Length + 2);
+				packet.PutInt(0);
+				packet.PutInt(0);
+				for (var i = 0; i < actors.Length; i++)
+					packet.PutInt(actors[i].Handle);
 				packet.PutInt(1);
 				packet.PutInt(character.Handle);
 
@@ -2797,54 +2698,6 @@ namespace Melia.Zone.Network
 					packet.PutShort(properties.GetByteCount());
 					packet.AddProperties(properties);
 				}
-
-				character.Connection.Send(packet);
-			}
-
-			/// <summary>
-			/// Shows an item balloon above the given actor, for the given
-			/// character only.
-			/// </summary>
-			/// <param name="character"></param>
-			/// <param name="actor"></param>
-			/// <param name="item"></param>
-			/// <param name="type"></param>
-			/// <param name="style"></param>
-			/// <param name="systemMessage"></param>
-			/// <param name="duration"></param>
-			public static void ShowItemBalloon(Character character, IActor actor, Item item, string type = "reward_itembox", string style = "{@st43}", string systemMessage = "AppraisalSuccess", float duration = 3)
-			{
-				using var packet = Packet.Rent(Op.ZC_NORMAL);
-				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.ShowItemBalloon);
-
-				packet.PutByte(1);
-				packet.PutInt(actor.Handle);
-				packet.PutByte(0);
-				packet.AddStringId(style);
-				packet.AddMessageId(systemMessage);
-				packet.PutShort(1);
-				packet.PutByte(0);
-				packet.PutFloat(duration);
-				packet.PutFloat(0);
-				packet.PutLpString(type);
-
-				// An empty balloon still writes the full body, so the client
-				// reads the display fields instead of running off the end
-				if (item == null)
-				{
-					packet.PutInt(0);
-					packet.PutInt(0);
-					packet.PutShort(0);
-
-					character.Connection.Send(packet);
-					return;
-				}
-
-				var properties = item.Properties.GetAll();
-				packet.PutInt(item.Amount);
-				packet.PutInt(item.Id);
-				packet.PutShort(properties.GetByteCount());
-				packet.AddProperties(properties);
 
 				character.Connection.Send(packet);
 			}
@@ -3841,68 +3694,6 @@ namespace Melia.Zone.Network
 
 
 			/// <summary>
-			/// Sends a character's jobs and their circles to the receiver, as
-			/// a single "name|teamName|activeJobId|jobId:circle:level" entry,
-			/// for the windows that inspect one character.
-			/// </summary>
-			/// <param name="receiver"></param>
-			/// <param name="character"></param>
-			public static void CompareJobCircles(Character receiver, Character character)
-			{
-				if (!ZoneServer.Instance.Conf.World.ClassCircleSystem)
-					return;
-
-				var jobCircles = character.Jobs.GetCircleString();
-				if (jobCircles.Length == 0)
-					return;
-
-				var sb = new StringBuilder();
-				sb.Append(character.Name).Append('|').Append(character.TeamName).Append('|').Append((int)character.JobId).Append('|').Append(jobCircles);
-
-				receiver.AddonMessage("LAIMA_COMPARE_JOB_CIRCLES", sb.ToString());
-			}
-
-			/// <summary>
-			/// Sends every group member's jobs and their circles to the
-			/// group's clients, as "name|teamName|activeJobId|jobId:circle:level"
-			/// entries separated by semicolons.
-			/// </summary>
-			/// <remarks>
-			/// Both names are sent because the party UI displays the team name
-			/// for some members and the character name for others.
-			/// </remarks>
-			/// <param name="group"></param>
-			public static void PartyJobCircles(IGroup group)
-			{
-				if (!ZoneServer.Instance.Conf.World.ClassCircleSystem)
-					return;
-
-				var members = group.GetMembers();
-
-				var sb = new StringBuilder();
-				foreach (var member in members)
-				{
-					if (string.IsNullOrEmpty(member.JobCircles))
-						continue;
-
-					if (sb.Length > 0)
-						sb.Append(';');
-
-					sb.Append(member.Name).Append('|').Append(member.TeamName).Append('|').Append((int)member.ActiveJobId).Append('|').Append(member.JobCircles);
-				}
-
-				if (sb.Length == 0)
-					return;
-
-				var message = sb.ToString();
-				foreach (var member in members)
-				{
-					var character = ZoneServer.Instance.World.GetCharacter(c => c.ObjectId == member.ObjectId);
-					character?.AddonMessage("LAIMA_PARTY_JOB_CIRCLES", message);
-				}
-			}
-
-			/// <summary>
 			/// Update the group's leader.
 			/// </summary>
 			/// <param name="group"></param>
@@ -4230,41 +4021,14 @@ namespace Melia.Zone.Network
 			/// <param name="packetString"></param>
 			/// <param name="shopType"></param>
 			/// <param name="i1"></param>
-			/// <summary>
-			/// Sends the trade log of the given shop, which its owner sees
-			/// in their shop window.
-			/// </summary>
-			/// <remarks>
-			/// Sent empty when a shop opens, and again with the whole log
-			/// after every sale.
-			///
-			/// The client prints a sale's buyer name in place of its price
-			/// and amount wherever the name isn't empty, which is what
-			/// the game sends, so those two are display-dead while a name
-			/// is attached.
-			/// </remarks>
-			/// <param name="conn"></param>
-			/// <param name="shop"></param>
-			public static void AutoSellerHistory(IZoneConnection conn, ShopData shop)
+			public static void Shop_Unknown11C(IZoneConnection conn, string packetString, PersonalShopType shopType, int i1 = 0)
 			{
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
-				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.AutoSellerHistory);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.Shop_Unknown11C);
 
-				packet.PutInt(shop.EffectId);
-				packet.PutInt((int)shop.Type);
-				packet.PutInt(shop.History.Count);
-
-				foreach (var sale in shop.History)
-				{
-					packet.PutInt(sale.ClassId);
-					packet.PutInt(sale.Price);
-					packet.PutInt(sale.Amount);
-
-					// The client shows this in place of the price and amount
-					// wherever it isn't empty, which is what the game uses it
-					// for - naming who bought.
-					packet.PutLpString(sale.BuyerName);
-				}
+				packet.AddStringId(packetString);
+				packet.PutInt((int)shopType);
+				packet.PutInt(i1);
 
 				conn.Send(packet);
 			}
@@ -4560,7 +4324,7 @@ namespace Melia.Zone.Network
 						// id 1 becomes "Ch 2", etc. Because of this we
 						// can't just send anything here, it needs to be
 						// a sequential number starting from 0 to match
-						// the game's behavior.
+						// official behavior.
 
 						zpacket.PutShort(channelId);
 						zpacket.PutShort(zoneServerInfo.CurrentPlayers);
@@ -4797,7 +4561,7 @@ namespace Melia.Zone.Network
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.StatusEffect);
 
 				packet.PutInt(actor.Handle);
-				packet.PutInt((int)duration);
+				packet.PutFloat(duration);
 				packet.PutLpString(effectName);
 				packet.PutLpString(effectType);
 
@@ -5040,10 +4804,6 @@ namespace Melia.Zone.Network
 
 				var jobs = character.Jobs.GetList();
 
-				// The client keys its job list by job id and has no readable
-				// per-job circle field, so circles are pushed alongside it.
-				SendJobCircles(character, jobs);
-
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.UpdateSkillUI);
 
@@ -5054,7 +4814,7 @@ namespace Melia.Zone.Network
 					packet.PutShort((short)job.Id);
 					packet.PutShort((short)job.Level);
 					packet.PutInt(0);
-					packet.PutLong(job.DisplayExp);
+					packet.PutLong(job.TotalExp);
 					packet.PutByte((byte)job.SkillPoints);
 					packet.PutShort(0);
 					packet.PutEmptyBin(5);
@@ -5064,190 +4824,6 @@ namespace Melia.Zone.Network
 
 				character.Connection.Send(packet);
 			}
-
-			/// <summary>
-			/// Sends the character's per-job circles on their own, for the
-			/// points where the client rebuilds its skill tree before the
-			/// full skill UI update reaches it.
-			/// </summary>
-			/// <param name="character"></param>
-			public static void JobCircles(Character character)
-				=> SendJobCircles(character, character.Jobs.GetList());
-
-			/// <summary>
-			/// Sends the character's per-job circles and levels to the
-			/// client as "jobId:circle:level" entries, with the active job's
-			/// id as the numeric argument. The client has no field of its
-			/// own for circles, and its notion of the active job goes stale
-			/// until the next login.
-			/// </summary>
-			/// <param name="character"></param>
-			/// <param name="jobs"></param>
-			private static void SendJobCircles(Character character, Job[] jobs)
-			{
-				if (!ZoneServer.Instance.Conf.World.ClassCircleSystem)
-					return;
-
-				var sb = new StringBuilder();
-				foreach (var job in jobs)
-				{
-					if (sb.Length > 0)
-						sb.Append(' ');
-
-					sb.Append((int)job.Id).Append(':').Append(Math.Max(1, (int)job.Circle)).Append(':').Append(job.Level);
-				}
-
-				character.AddonMessage("LAIMA_JOB_CIRCLES", sb.ToString(), (int)character.JobId);
-			}
-
-			/// <summary>
-			/// Sends the caption ratios and buff duration of every skill that
-			/// declares them, so skill descriptions read the server's numbers
-			/// instead of a formula written into the client per skill.
-			/// </summary>
-			/// <remarks>
-			/// The client has no column for these. SklFactor and SklFactorByLevel
-			/// are plain Number properties, so one generic script computes the
-			/// displayed factor for every skill in the game from what the server
-			/// already sends; the caption ratios are Calculated properties, whose
-			/// value the client works out for itself and whose server-sent value
-			/// it ignores. Pushing the raw fields is what puts them on the same
-			/// footing - the client keeps one generic script per slot and the
-			/// numbers arrive from the data.
-			///
-			/// Sent in chunks, because a whole roster of buffs does not fit in
-			/// one addon message and the client appends rather than replaces.
-			/// </remarks>
-			/// <param name="character"></param>
-			public static void CaptionRatios(Character character)
-			{
-				var sb = new StringBuilder();
-
-				foreach (var data in ZoneServer.Instance.Data.SkillDb.Entries.Values)
-				{
-					if (!HasCaptionData(data))
-						continue;
-
-					if (sb.Length > 0)
-						sb.Append(' ');
-
-					sb.Append((int)data.Id).Append(':')
-						.Append(Format(data.CaptionRatio1)).Append(':').Append(Format(data.CaptionRatio1ByLevel)).Append(':').Append(Format(data.CaptionRatio1Max)).Append(':')
-						.Append(Format(data.CaptionRatio2)).Append(':').Append(Format(data.CaptionRatio2ByLevel)).Append(':').Append(Format(data.CaptionRatio2Max)).Append(':')
-						.Append(Format(data.CaptionRatio3)).Append(':').Append(Format(data.CaptionRatio3ByLevel)).Append(':').Append(Format(data.CaptionRatio3Max)).Append(':')
-						.Append(Format(data.CaptionTime)).Append(':').Append(Format(data.CaptionTimeByLevel));
-
-					if (sb.Length < CaptionChunkLength)
-						continue;
-
-					character.AddonMessage("LAIMA_CAPTION_RATIOS", sb.ToString());
-					sb.Clear();
-				}
-
-				if (sb.Length > 0)
-					character.AddonMessage("LAIMA_CAPTION_RATIOS", sb.ToString());
-			}
-
-			/// <summary>
-			/// Sends the resolved values of every caption ratio/time slot
-			/// that a skill overrides with a script, for the levels the
-			/// client can ever preview.
-			/// </summary>
-			/// <remarks>
-			/// A slot with no override is skill data only, and its value is
-			/// the same for every character - that's what CaptionRatios
-			/// sends. A slot with an override can depend on the caster (a
-			/// live stat, an ability), so it has to be resolved per
-			/// character instead of shipped as a formula for the client to
-			/// run. The values are computed once here rather than reread
-			/// live client-side, so they go stale exactly like every other
-			/// character stat the client displays, and need the same kind
-			/// of resend on relevant change (see character level-up/reset).
-			/// </remarks>
-			/// <param name="character"></param>
-			public static void CaptionOverrides(Character character)
-			{
-				var sb = new StringBuilder();
-
-				foreach (var data in ZoneServer.Instance.Data.SkillDb.Entries.Values)
-				{
-					for (var slot = 1; slot <= 4; ++slot)
-					{
-						if (!ScriptableFunctions.Skill.TryGet(CaptionOverrideFuncName(slot) + "_" + data.ClassName, out var overrideFunc))
-							continue;
-
-						if (sb.Length > 0)
-							sb.Append(' ');
-
-						sb.Append((int)data.Id).Append(':').Append(slot);
-
-						for (var level = 1; level <= CaptionOverrideMaxLevel; ++level)
-						{
-							var skill = new Skill(character, data.Id, level);
-							sb.Append(':').Append(Format(overrideFunc(skill)));
-						}
-
-						if (sb.Length < CaptionChunkLength)
-							continue;
-
-						character.AddonMessage("LAIMA_CAPTION_OVERRIDE", sb.ToString());
-						sb.Clear();
-					}
-				}
-
-				if (sb.Length > 0)
-					character.AddonMessage("LAIMA_CAPTION_OVERRIDE", sb.ToString());
-			}
-
-			/// <summary>
-			/// Highest skill level a caption override is resolved for, since
-			/// the client can preview a skill up to its job's highest
-			/// possible circle cap.
-			/// </summary>
-			private const int CaptionOverrideMaxLevel = 15;
-
-			/// <summary>
-			/// Returns the scriptable function name a caption override for
-			/// the given slot is looked up under, matching the convention
-			/// SkillProperties.CalculateProperty and BuffHandler.GetCaptionRatio
-			/// use.
-			/// </summary>
-			/// <param name="slot"></param>
-			private static string CaptionOverrideFuncName(int slot)
-				=> slot switch
-				{
-					1 => "SCR_Get_CaptionRatio",
-					2 => "SCR_Get_CaptionRatio2",
-					3 => "SCR_Get_CaptionRatio3",
-					4 => "SCR_Get_CaptionTime",
-					_ => throw new ArgumentOutOfRangeException(nameof(slot), $"No caption slot {slot}."),
-				};
-
-			/// <summary>
-			/// Characters a caption ratio message is filled to before it is
-			/// sent and a new one started.
-			/// </summary>
-			private const int CaptionChunkLength = 1024;
-
-			/// <summary>
-			/// Returns whether the skill declares any caption ratio or duration
-			/// at all, which is what puts it in scope for the client push.
-			/// </summary>
-			/// <param name="data"></param>
-			private static bool HasCaptionData(SkillData data)
-				=> data.CaptionRatio1 != 0 || data.CaptionRatio1ByLevel != 0
-					|| data.CaptionRatio2 != 0 || data.CaptionRatio2ByLevel != 0
-					|| data.CaptionRatio3 != 0 || data.CaptionRatio3ByLevel != 0
-					|| data.CaptionTime != 0 || data.CaptionTimeByLevel != 0;
-
-			/// <summary>
-			/// Formats a caption value for the client, invariantly, so a
-			/// machine with a comma decimal separator does not split the
-			/// message's own fields.
-			/// </summary>
-			/// <param name="value"></param>
-			private static string Format(float value)
-				=> value.ToString("0.####", CultureInfo.InvariantCulture);
 
 			/// <summary>
 			/// Show Instance Dungeon Match Making UI
@@ -5354,31 +4930,78 @@ namespace Melia.Zone.Network
 			/// <param name="conn"></param>
 			public static void AdventureBookRank(IZoneConnection conn)
 			{
+				var ranking = ZoneServer.Instance.Database.GetAdventureRanking();
+				var accountId = conn.Account.Id;
+
+				var currentIndex = ranking.FindIndex(x => x.AccountId == accountId);
+				var currentRank = currentIndex >= 0 ? currentIndex + 1 : 0;
+				var currentPointsLong = currentIndex >= 0 ? ranking[currentIndex].Points : 0L;
+				var currentPoints = (int)Math.Min(currentPointsLong, int.MaxValue);
+
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.AdventureBookRank);
 
-				packet.PutInt(1); // Current Rank
-				packet.PutInt(1000); // ?
-				packet.PutInt(100000); // Current Points
-				packet.PutInt(3); // 3?
-				for (var i = 0; i < 3; i++)
+				packet.PutInt(currentRank);
+				packet.PutInt(ranking.Count);
+				packet.PutInt(currentPoints);
+
+				var topCount = Math.Min(3, ranking.Count);
+				packet.PutInt(topCount);
+
+				for (var i = 0; i < topCount; i++)
 				{
-					packet.PutLong(conn.SelectedCharacter.AccountObjectId);
-					packet.PutLpString(conn.SelectedCharacter.TeamName);
-					packet.PutInt(100000 - i);
+					var entry = ranking[i];
+					var points = (int)Math.Min(entry.Points, int.MaxValue);
+					var accountObjectId = ObjectIdRanges.Accounts + entry.AccountId;
+
+					packet.PutLong(accountObjectId);
+					packet.PutLpString(entry.TeamName);
+					packet.PutInt(points);
 				}
-				// Nearest 5 ranks
-				for (var i = 1; i < 6; i++)
+
+				var nearest = new List<int>();
+
+				if (currentIndex >= 0)
 				{
-					packet.PutInt(i);
-					packet.PutLong(conn.SelectedCharacter.AccountObjectId);
-					packet.PutInt(100000 - i);
+					var start = Math.Max(0, currentIndex - 2);
+					var end = Math.Min(ranking.Count - 1, start + 4);
+
+					start = Math.Max(0, end - 4);
+
+					for (var i = start; i <= end; i++)
+						nearest.Add(i);
 				}
-				packet.PutInt(100000); // Current Points
-				packet.PutInt(1);
-				packet.PutLong(conn.SelectedCharacter.AccountObjectId);
-				packet.PutInt(1); // Current Rank
-				packet.PutInt(100000); // Current Points
+
+				while (nearest.Count < 5)
+					nearest.Add(-1);
+
+				for (var i = 0; i < 5; i++)
+				{
+					var index = nearest[i];
+
+					if (index >= 0)
+					{
+						var entry = ranking[index];
+						var points = (int)Math.Min(entry.Points, int.MaxValue);
+						var accountObjectId = ObjectIdRanges.Accounts + entry.AccountId;
+
+						packet.PutInt(index + 1);
+						packet.PutLong(accountObjectId);
+						packet.PutInt(points);
+					}
+					else
+					{
+						packet.PutInt(0);
+						packet.PutLong(0);
+						packet.PutInt(0);
+					}
+				}
+
+				packet.PutInt(currentPoints);
+				packet.PutInt(currentRank > 0 ? 1 : 0);
+				packet.PutLong(currentRank > 0 ? conn.SelectedCharacter.AccountObjectId : 0);
+				packet.PutInt(currentRank);
+				packet.PutInt(currentPoints);
 
 				conn.Send(packet);
 			}

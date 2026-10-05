@@ -234,7 +234,7 @@ namespace Melia.Zone.World.Gacha
 					throw new InvalidOperationException("No entries found.");
 
 				var totalProbability = this.GetWeightedTotalProbability(counters);
-				var randomValue = GameRandom.Get().Next(0, totalProbability);
+				var randomValue = RandomProvider.Get().Next(0, totalProbability);
 
 				foreach (var entry in _entries)
 				{
@@ -310,7 +310,7 @@ namespace Melia.Zone.World.Gacha
 					var superRares = _entries.Where(e => e.Rarity == GachaRarity.SuperRare);
 					if (superRares.Any())
 					{
-						var pityEntry = superRares.PickRandom();
+						var pityEntry = superRares.Random();
 						var lastCommonIndex = entries.FindLastIndex(e => e.Rarity == GachaRarity.Common);
 						if (lastCommonIndex != -1)
 						{
@@ -325,7 +325,7 @@ namespace Melia.Zone.World.Gacha
 					var rares = _entries.Where(e => e.Rarity == GachaRarity.Rare);
 					if (rares.Any())
 					{
-						var pityEntry = rares.PickRandom();
+						var pityEntry = rares.Random();
 						var lastCommonIndex = entries.FindLastIndex(e => e.Rarity == GachaRarity.Common);
 						if (lastCommonIndex != -1)
 						{

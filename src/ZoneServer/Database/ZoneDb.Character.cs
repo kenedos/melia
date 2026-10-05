@@ -16,8 +16,6 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
-using Melia.Zone.World.Items;
-using Melia.Zone.World.Storages;
 // using Melia.Zone.World.Houses; // Removed: Houses namespace deleted
 using Melia.Zone.World.Quests;
 using MySqlConnector;
@@ -59,6 +57,7 @@ namespace Melia.Zone.Database
 
 			this.LoadAchievements(character);
 			this.LoadAchievementPoints(character);
+			character.Achievements.RecalculateTitleStatReward();
 			this.LoadAdventureBook(character);
 			this.LoadAdventureBookMonsterDrop(character);
 			this.LoadAdventureBookItems(character);
@@ -66,36 +65,6 @@ namespace Melia.Zone.Database
 
 			character.PersonalStorage.InitSize();
 			this.LoadStorage(character.PersonalStorage, "storage_personal", "characterId", character.DbId);
-
-			character.OblationBox.SetStorageSize(OblationStorage.MaxSize);
-			this.LoadStorage(character.OblationBox, "storage_oblation", "characterId", character.DbId);
-			this.LoadOblationPricesPaid(character);
-		}
-
-		/// <summary>
-		/// Reads back what the character paid for each item in their
-		/// offering box.
-		/// </summary>
-		/// <param name="character"></param>
-		private void LoadOblationPricesPaid(Character character)
-		{
-			var itemsByDbId = new Dictionary<long, Item>();
-			foreach (var item in character.OblationBox.GetItems().Values)
-				itemsByDbId[item.DbId] = item;
-
-			using (var conn = this.GetConnection())
-			using (var cmd = new MySqlCommand("SELECT `itemId`, `pricePaid` FROM `storage_oblation` WHERE `characterId` = @characterId", conn))
-			{
-				cmd.Parameters.AddWithValue("@characterId", character.DbId);
-				using (var reader = cmd.ExecuteReader())
-				{
-					while (reader.Read())
-					{
-						if (itemsByDbId.TryGetValue(reader.GetInt64("itemId"), out var item))
-							character.OblationBox.SetPricePaid(item.ObjectId, reader.GetInt32("pricePaid"));
-					}
-				}
-			}
 		}
 
 		private void LoadAchievements(Character character)
@@ -109,8 +78,15 @@ namespace Melia.Zone.Database
 					while (reader.Read())
 					{
 						var achievementId = reader.GetInt32("achievementId");
+						var unlockDate = reader.GetInt64("unlockDate");
+
+						if (unlockDate == 0)
+							unlockDate = DateTime.UtcNow.ToFileTimeUtc();
+
 						if (!character.Achievements.HasAchievement(achievementId))
 							character.Achievements.AddAchievement(achievementId, true);
+
+						character.Achievements.SetAchievementUnlockDate(achievementId, unlockDate);
 					}
 				}
 			}
@@ -210,13 +186,49 @@ namespace Melia.Zone.Database
 			}
 		}
 
+		public JobId[] GetAccountJobs(long accountId)
+		{
+			var jobs = new List<JobId>();
+
+			using (var conn = this.GetConnection())
+			using (var cmd = new MySqlCommand(@"
+				SELECT DISTINCT j.`jobId`
+				FROM `jobs` AS j
+				INNER JOIN `characters` AS c
+					ON c.`characterId` = j.`characterId`
+				WHERE c.`accountId` = @accountId
+				ORDER BY j.`jobId` ASC", conn))
+			{
+				cmd.Parameters.AddWithValue("@accountId", accountId);
+
+				using (var reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						var rawJobId = reader.GetInt16("jobId");
+
+						if (!Enum.IsDefined(typeof(JobId), rawJobId))
+						{
+							Log.Warning("GetAccountJobs: Unknown JobId {0} for account {1}.", rawJobId, accountId);
+							continue;
+						}
+
+						jobs.Add((JobId)rawJobId);
+					}
+				}
+			}
+
+			return jobs.ToArray();
+		}
+
 		private void LoadJobs(Character character)
 		{
-			// Jobs carry their own rank, but characters saved before that
-			// column existed have it backfilled from the order they were
-			// added in, so they're still queried by selection date.
+			// Note that the order the jobs are added in is important,
+			// because it determines the jobs' ranks, which are assigned
+			// based on their order. That's why they are queried by their
+			// selection date, which effectively determines their rank.
 			using (var conn = this.GetConnection())
-			using (var mc = new MySqlCommand("SELECT * FROM `jobs` WHERE `characterId` = @characterId ORDER BY `selectionDate` ASC", conn))
+			using (var mc = new MySqlCommand("SELECT * FROM `jobs` WHERE `characterId` = @characterId ORDER BY `selectionDate` ASC, `jobId` ASC", conn))
 			{
 				mc.Parameters.AddWithValue("@characterId", character.DbId);
 				using (var reader = mc.ExecuteReader())
@@ -246,13 +258,6 @@ namespace Melia.Zone.Database
 						var job = new Job(character, jobId, totalExp, circle, skillPoints);
 						job.SelectionDate = selectionDate;
 						job.AdvancementDate = advDate;
-
-						// A stored rank is kept as is, since it records when
-						// the job's current circle was actually taken. 0 means
-						// the character predates the column, and AddSilent
-						// derives one from the selection order instead.
-						job.Rank = reader.GetInt32("jobRank");
-
 						character.Jobs.AddSilent(job);
 					}
 				}
@@ -475,19 +480,38 @@ namespace Melia.Zone.Database
 		private void LoadAdventureBook(Character character)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new MySqlCommand("SELECT * FROM `adventure_book` WHERE `accountId` = @accountId", conn))
 			{
-				cmd.Parameters.AddWithValue("@accountId", character.AccountDbId);
-				using (var reader = cmd.ExecuteReader())
+				using (var cmd = new MySqlCommand("SELECT `id`, `accountId`, `type`, `classId`, `count` FROM `adventure_book` WHERE `accountId` = @accountId ORDER BY `id`", conn))
 				{
-					while (reader.Read())
+					cmd.Parameters.AddWithValue("@accountId", character.AccountDbId);
+
+					using (var reader = cmd.ExecuteReader())
 					{
-						var adventureBookType = (AdventureBookType)reader.GetByte("type");
-						var classId = reader.GetInt32("classId");
-						var count = reader.GetInt32("count");
-						if (adventureBookType == AdventureBookType.MonsterKilled)
+						while (reader.Read())
 						{
-							character.AdventureBook.AddMonsterKill(classId, count, true);
+							var rawType = reader.GetByte("type");
+							var adventureBookType = (AdventureBookType)rawType;
+							var classId = reader.GetInt32("classId");
+							var count = reader.GetInt32("count");
+
+							switch (adventureBookType)
+							{
+								case AdventureBookType.MonsterKilled:
+									character.AdventureBook.AddMonsterKill(classId, count, true);
+									break;
+
+								case AdventureBookType.Job:
+									character.AdventureBook.AddJob(classId, count, true);
+									break;
+
+								case AdventureBookType.Dungeon:
+									character.AdventureBook.AddDungeon(classId, count, true);
+									break;
+
+								case AdventureBookType.PersonalShop:
+									character.AdventureBook.AddPersonalShop(classId, count, true);
+									break;
+							}
 						}
 					}
 				}
@@ -584,23 +608,6 @@ namespace Melia.Zone.Database
 				cmd.Set("shown", isShown ? 1 : 0);
 
 				cmd.Execute();
-			}
-		}
-
-		/// <summary>
-		/// Removes all shown tutorials from the account.
-		/// </summary>
-		/// <param name="accountId"></param>
-		public void ResetHelp(long accountId)
-		{
-			if (accountId == 0)
-				return;
-
-			using (var conn = this.GetConnection())
-			using (var cmd = new MySqlCommand("DELETE FROM `help` WHERE `accountId` = @accountId", conn))
-			{
-				cmd.Parameters.AddWithValue("@accountId", accountId);
-				cmd.ExecuteNonQuery();
 			}
 		}
 

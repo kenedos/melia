@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -116,9 +116,19 @@ namespace Melia.Zone
 		public AchievementService Achievements { get; } = new AchievementService();
 
 		/// <summary>
+		/// Manager for account-wide hunting tasks.
+		/// </summary>
+		public HuntingTaskService HuntingTasks { get; } = new HuntingTaskService();
+
+		/// <summary>
 		/// Manager for periodic dungeon reset tasks.
 		/// </summary>
 		public DungeonResetService DungeonReset { get; } = new DungeonResetService();
+
+		/// <summary>
+		/// Manager for periodic world boss tasks.
+		/// </summary>
+		public WorldBossManager WorldBosses { get; } = new WorldBossManager();
 
 		/// <summary>
 		/// Returns the dialog function handlers.
@@ -191,45 +201,6 @@ namespace Melia.Zone
 
 			ConsoleUtil.RunningTitle();
 			new ZoneConsoleCommands().Wait();
-		}
-
-		/// <summary>
-		/// Loads data, scripts and handlers without binding sockets or
-		/// connecting to the coordinator. Used by the balance harness to
-		/// evaluate skills without a client.
-		/// </summary>
-		/// <param name="groupId"></param>
-		/// <param name="serverId"></param>
-		public void RunHeadless(int groupId = 1001, int serverId = 1)
-		{
-			Log.Init($"ZoneServer_headless_{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fff}");
-
-			this.NavigateToRoot();
-
-			this.LoadConf();
-			this.LoadPackages();
-			this.LoadVersionInfo();
-			if (this.Data.OpDb != null)
-				this.PacketHandler.LoadMethods();
-			this.LoadLocalization(this.Conf);
-			this.LoadData(this.Type);
-
-			// Map.AddCharacter calls UpdateServerInfo, which reads ServerInfo.
-			this.LoadServerList(this.Data.ServerDb, this.Type, groupId, serverId);
-
-			// InitWorld reaches the database through GlobalVariables and
-			// Houses, so a connection is required. Init directly rather than
-			// via InitDatabase, which exits the process on failure.
-			var conf = this.Conf.Database;
-			this.Database.Init(conf.Host, conf.Port, conf.User, conf.Pass, conf.Db);
-
-			this.InitSkills();
-			this.InitWorld();
-			this.LoadDialogFunctions();
-			this.LoadTriggerFunctions();
-			this.LoadScripts("zone");
-			this.LoadIesMods();
-			this.PrepareWorld();
 		}
 
 		/// <summary>
@@ -469,9 +440,15 @@ namespace Melia.Zone
 
 			Log.Info("Initializing dungeon reset service...");
 			this.DungeonReset.Initialize();
+			Log.Info("Initializing World Boss manager...");
+			this.WorldBosses.Initialize();
 
 			Log.Info("Initializing achievement service...");
 			this.Achievements.Initialize();
+
+			Log.Info("Initializing hunting task service...");
+			this.HuntingTasks.Initialize();
+
 			Log.Info("  done loading {0} maps.", this.World.Count);
 		}
 
@@ -543,8 +520,6 @@ namespace Melia.Zone
 			this.IesMods.Add("SharedConst", 105, "Value", this.Conf.World.MaxAdvanceJobLevel);
 			this.IesMods.Add("SharedConst", 100050, "Value", this.Conf.World.JobMaxRank); // JOB_CHANGE_MAX_RANK
 
-			this.IesMods.Add("SharedConst", 90001, "Value", this.Conf.World.ClassCircleSystem ? 1 : 0); // CLASS_CIRCLE_SYSTEM_ENABLED
-
 			// Magical Amulets are invisible by default, this makes them visible.
 			if (Feature.IsEnabled("MagicalAmulet"))
 			{
@@ -565,6 +540,38 @@ namespace Melia.Zone
 
 			//foreach (var item in this.Data.ItemDb.Entries.Values)
 			//	this.IesMods.Add("Item", item.Id, "UserTrade", "YES");
+
+			this.LoadCollectionIesMods();
+		}
+
+		/// <summary>
+		/// Synchronizes the collection reward descriptions in the client IES table
+		/// with the rewards configured in the server collection database.
+		/// </summary>
+		private void LoadCollectionIesMods()
+		{
+			var modifiedCollections = 0;
+
+			foreach (var collection in this.Data.CollectionDb.Entries.Values.OrderBy(collection => collection.Id))
+			{
+				var properties = collection.RewardProperties
+					.Concat(collection.RewardAccountProperties)
+					.SelectMany(property => new[]
+					{
+				property.Key,
+				property.Value.ToString()
+					});
+
+				var propertyList = string.Join("/", properties);
+
+				if (string.IsNullOrWhiteSpace(propertyList))
+					continue;
+
+				this.IesMods.Add("Collection", collection.Id, "PropList", propertyList);
+				modifiedCollections++;
+			}
+
+			Log.Info("Loaded {0} collection IES property modifications.", modifiedCollections);
 		}
 
 		/// <summary>
@@ -684,7 +691,17 @@ namespace Melia.Zone
 		{
 			try
 			{
-				_deadConnectionSweepService = new DeadConnectionSweepService(TimeSpan.FromSeconds(15));
+				var timeoutSeconds = this.Conf.World.DeadConnectionTimeoutSeconds;
+				if (timeoutSeconds <= 0)
+				{
+					Log.Info("DeadConnectionSweepService: Disabled via dead_connection_timeout_seconds.");
+					return;
+				}
+
+				var sweepInterval = TimeSpan.FromSeconds(this.Conf.World.DeadConnectionSweepIntervalSeconds);
+				var timeout = TimeSpan.FromSeconds(timeoutSeconds);
+
+				_deadConnectionSweepService = new DeadConnectionSweepService(sweepInterval, timeout);
 			}
 			catch (Exception ex)
 			{

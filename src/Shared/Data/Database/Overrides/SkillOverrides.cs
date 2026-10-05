@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
@@ -36,8 +36,6 @@ namespace Melia.Shared.Data.Database
 
 			if (entry.ContainsKey("basicSp"))
 				data.BasicSp = entry.ReadFloat("basicSp");
-			if (entry.ContainsKey("lvUpSpendSp"))
-				data.LvUpSpendSp = entry.ReadFloat("lvUpSpendSp");
 			if (entry.ContainsKey("basicCast"))
 				data.BasicCast = entry.ReadFloat("basicCast");
 			if (entry.ContainsKey("shootTime"))
@@ -47,7 +45,7 @@ namespace Melia.Shared.Data.Database
 			if (entry.ContainsKey("holdTime"))
 				data.HoldTime = entry.ReadList<int>("holdTime").Select(a => TimeSpan.FromMilliseconds(a)).ToList();
 			if (entry.ContainsKey("splashType"))
-				data.SplashType = entry.ReadEnum<SplashType>("splashType");
+				data.SplashType = (SplashType)entry.ReadInt("splashType");
 			if (entry.ContainsKey("splashRange"))
 				data.SplashRange = entry.ReadFloat("splashRange");
 			if (entry.ContainsKey("splashHeight"))
@@ -66,28 +64,6 @@ namespace Melia.Shared.Data.Database
 				data.AtkAdd = entry.ReadFloat("atkAdd");
 			if (entry.ContainsKey("atkAddByLevel"))
 				data.AtkAddByLevel = entry.ReadFloat("atkAddByLevel");
-			if (entry.ContainsKey("captionRatio1"))
-				data.CaptionRatio1 = entry.ReadFloat("captionRatio1");
-			if (entry.ContainsKey("captionRatio1ByLevel"))
-				data.CaptionRatio1ByLevel = entry.ReadFloat("captionRatio1ByLevel");
-			if (entry.ContainsKey("captionRatio1Max"))
-				data.CaptionRatio1Max = entry.ReadFloat("captionRatio1Max");
-			if (entry.ContainsKey("captionRatio2"))
-				data.CaptionRatio2 = entry.ReadFloat("captionRatio2");
-			if (entry.ContainsKey("captionRatio2ByLevel"))
-				data.CaptionRatio2ByLevel = entry.ReadFloat("captionRatio2ByLevel");
-			if (entry.ContainsKey("captionRatio2Max"))
-				data.CaptionRatio2Max = entry.ReadFloat("captionRatio2Max");
-			if (entry.ContainsKey("captionRatio3"))
-				data.CaptionRatio3 = entry.ReadFloat("captionRatio3");
-			if (entry.ContainsKey("captionRatio3ByLevel"))
-				data.CaptionRatio3ByLevel = entry.ReadFloat("captionRatio3ByLevel");
-			if (entry.ContainsKey("captionRatio3Max"))
-				data.CaptionRatio3Max = entry.ReadFloat("captionRatio3Max");
-			if (entry.ContainsKey("captionTime"))
-				data.CaptionTime = entry.ReadFloat("captionTime");
-			if (entry.ContainsKey("captionTimeByLevel"))
-				data.CaptionTimeByLevel = entry.ReadFloat("captionTimeByLevel");
 			if (entry.ContainsKey("cooldownTime"))
 				data.CooldownTime = entry.ReadTimeSpan("cooldownTime");
 			if (entry.ContainsKey("overheatCount"))

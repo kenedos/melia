@@ -9,6 +9,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
+using static Melia.Zone.Skills.Handlers.Mon.Mon_Saloon_Skill_1;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 
@@ -17,6 +18,24 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Saloon_Skill_1)]
 	public class Mon_Saloon_Skill_1 : ITargetSkillHandler
 	{
+		internal static class SalamionAbilityHelper
+		{
+			public static void Apply(ICombatEntity caster, Skill skill, List<SkillHitInfo> hits)
+			{
+				if (hits.Count == 0 || !caster.TryGetOwner(out var owner))
+					return;
+
+				if (caster.IsOwnerAbilityActive(AbilityId.Sorcerer5))
+				{
+					var ownerIntelligence = owner.Properties.GetFloat(PropertyName.INT);
+					SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, ownerIntelligence, 10000f, 1, 100, -1, hits);
+				}
+
+				if (caster.IsOwnerAbilityActive(AbilityId.Sorcerer6))
+					SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 10000f, 1, 50, -1, hits);
+			}
+		}
+
 		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
@@ -46,22 +65,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			// TODO: No Implementation S_R_COND_OR_START
-
-			if (caster.IsOwnerAbilityActive(AbilityId.Sorcerer5))
-			{
-				var casterINT = caster.Properties.GetFloat(PropertyName.INT);
-				if (caster.TryGetOwner(out var owner))
-					casterINT = owner.Properties.GetFloat(PropertyName.INT);
-				SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, casterINT, 10000f, 1, 2 * owner.GetAbilityLevel(AbilityId.Sorcerer5), -1, hits);
-			}
-			if (caster.IsOwnerAbilityActive(AbilityId.Sorcerer6))
-			{
-				if (caster.TryGetOwner(out var owner))
-					SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 10000f, 1, 2 * owner.GetAbilityLevel(AbilityId.Sorcerer6), -1, hits);
-			}
-			// TODO: No Implementation S_R_COND_OR_END
-
+			SalamionAbilityHelper.Apply(caster, skill, hits);
 		}
 	}
 
@@ -97,22 +101,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			// TODO: No Implementation S_R_COND_OR_START
-
-			if (caster.IsOwnerAbilityActive(AbilityId.Sorcerer5))
-			{
-				var casterINT = caster.Properties.GetFloat(PropertyName.INT);
-				if (caster.TryGetOwner(out var owner))
-					casterINT = owner.Properties.GetFloat(PropertyName.INT);
-				SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, casterINT, 10000f, 1, 2 * owner.GetAbilityLevel(AbilityId.Sorcerer5), -1, hits);
-			}
-			if (caster.IsOwnerAbilityActive(AbilityId.Sorcerer6))
-			{
-				if (caster.TryGetOwner(out var owner))
-					SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 10000f, 1, 2 * owner.GetAbilityLevel(AbilityId.Sorcerer6), -1, hits);
-			}
-			// TODO: No Implementation S_R_COND_OR_END
-
+			SalamionAbilityHelper.Apply(caster, skill, hits);
 		}
 	}
 
@@ -148,22 +137,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			// TODO: No Implementation S_R_COND_OR_START
-
-			if (caster.IsOwnerAbilityActive(AbilityId.Sorcerer5))
-			{
-				var casterINT = caster.Properties.GetFloat(PropertyName.INT);
-				if (caster.TryGetOwner(out var owner))
-					casterINT = owner.Properties.GetFloat(PropertyName.INT);
-				SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, casterINT, 10000f, 1, 2 * owner.GetAbilityLevel(AbilityId.Sorcerer5), -1, hits);
-			}
-			if (caster.IsOwnerAbilityActive(AbilityId.Sorcerer6))
-			{
-				if (caster.TryGetOwner(out var owner))
-					SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 10000f, 1, 2 * owner.GetAbilityLevel(AbilityId.Sorcerer6), -1, hits);
-			}
-			// TODO: No Implementation S_R_COND_OR_END
-
+			SalamionAbilityHelper.Apply(caster, skill, hits);
 		}
 	}
 

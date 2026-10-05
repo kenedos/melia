@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Melia.Shared.World;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
@@ -20,27 +19,6 @@ namespace Melia.Zone.World.Quests.Objectives
 		public HashSet<int> MonsterIds { get; }
 
 		/// <summary>
-		/// Returns whether only kills made on the character's own layer
-		/// count towards this objective.
-		/// </summary>
-		public bool LayerOnly { get; init; }
-
-		/// <summary>
-		/// Returns the center of the area kills must happen in, if any.
-		/// </summary>
-		public Position? AreaCenter { get; init; }
-
-		/// <summary>
-		/// Returns the radius around AreaCenter that kills must happen in.
-		/// </summary>
-		public float AreaRadius { get; init; }
-
-		/// <summary>
-		/// Returns an extra condition a monster must meet to count, if any.
-		/// </summary>
-		public Func<IMonster, bool> Filter { get; init; }
-
-		/// <summary>
 		/// Creates an objective to kill a certain amount of one of the
 		/// given types of monsters.
 		/// </summary>
@@ -53,29 +31,6 @@ namespace Melia.Zone.World.Quests.Objectives
 
 			this.TargetCount = amount;
 			this.MonsterIds = [.. monsterIds];
-		}
-
-		/// <summary>
-		/// Creates an objective to kill a certain amount of one of the
-		/// given types of monsters, identified by class name.
-		/// </summary>
-		/// <param name="amount"></param>
-		/// <param name="monsterClassNames"></param>
-		public KillObjective(int amount, params string[] monsterClassNames)
-		{
-			if (monsterClassNames == null || monsterClassNames.Length == 0)
-				throw new ArgumentException("Must specify at least one monster class name.");
-
-			this.TargetCount = amount;
-			this.MonsterIds = new HashSet<int>(monsterClassNames.Length);
-
-			foreach (var className in monsterClassNames)
-			{
-				if (!ZoneServer.Instance.Data.MonsterDb.TryFind(className, out var data))
-					throw new ArgumentException($"KillObjective: Unknown monster '{className}'.");
-
-				this.MonsterIds.Add(data.Id);
-			}
 		}
 
 		/// <summary>
@@ -138,18 +93,6 @@ namespace Melia.Zone.World.Quests.Objectives
 		{
 			var result = new List<Character> { killer };
 
-			// A party track shares its kills with everyone on its layer,
-			// regardless of the party's own sharing settings.
-			var group = killer.Tracks?.ActiveTrack?.Group;
-			if (group != null)
-			{
-				foreach (var member in group.Members)
-				{
-					if (member != killer && member.Map == killer.Map && !result.Contains(member))
-						result.Add(member);
-				}
-			}
-
 			// Check if party quest sharing is enabled
 			if (!ZoneServer.Instance.Conf.World.PartyQuestSharingEnabled)
 				return result;
@@ -173,7 +116,7 @@ namespace Melia.Zone.World.Quests.Objectives
 
 			foreach (var member in partyMembers)
 			{
-				if (member != killer && !result.Contains(member))
+				if (member != killer)
 					result.Add(member);
 			}
 
@@ -190,15 +133,6 @@ namespace Melia.Zone.World.Quests.Objectives
 			character.Quests.UpdateObjectives<KillObjective>((quest, objective, progress) =>
 			{
 				if (progress.Done)
-					return;
-
-				if (objective.LayerOnly && (character.Layer == 0 || monster.Layer != character.Layer))
-					return;
-
-				if (objective.AreaCenter.HasValue && !monster.Position.InRange2D(objective.AreaCenter.Value, objective.AreaRadius))
-					return;
-
-				if (objective.Filter != null && !objective.Filter(monster))
 					return;
 
 				if (objective.IsTarget(monster))

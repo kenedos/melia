@@ -103,6 +103,31 @@ namespace Melia.Zone.World.Actors.Components
 			removed?.OnRemove(this.Actor);
 		}
 
+		public void RemoveColorEffectAndRestore(string effectName)
+		{
+			if (string.IsNullOrEmpty(effectName))
+				return;
+
+			Effect removed;
+			ColorEffect[] remaining;
+
+			lock (_effects)
+			{
+				if (!_effects.TryGetValue(effectName, out removed) || removed is not ColorEffect)
+					return;
+
+				_effects.Remove(effectName);
+				remaining = _effects.Values.OfType<ColorEffect>().ToArray();
+			}
+
+			removed.OnRemove(this.Actor);
+
+			this.BroadcastEffectAddition(ColorEffect.FromRgba(1f, 1f, 1f, 1f));
+
+			foreach (var effect in remaining)
+				this.BroadcastEffectAddition(effect);
+		}
+
 		/// <summary>
 		/// Updates the component, triggering events.
 		/// </summary>

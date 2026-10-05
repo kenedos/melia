@@ -231,6 +231,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				return;
 			}
 
+			Log.Info("[DungeonEntry] IncreaseEntryCount: Character='{0}', DungeonId={1}, ClassName='{2}', PlayPerReset={3}, PlayPerResetType={4}, ResetType={5}, WeeklyEnterableCount={6}, Value={7}.",
+				this.Character.Name,
+				dungeonId,
+				instancedDungeonData.ClassName,
+				instancedDungeonData.PlayPerReset,
+				instancedDungeonData.PlayPerResetType,
+				instancedDungeonData.ResetType,
+				instancedDungeonData.WeeklyEnterableCount,
+				value);
+
 			var accountProperties = this.Character.Connection.Account.Properties;
 
 			// Challenge Mode Entry Count
@@ -278,8 +288,37 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				if (instancedDungeonData.ResetType == InstanceDungeonResetType.PC)
 				{
 					var propertyName = "InDunCountType_" + instancedDungeonData.PlayPerResetType;
+
+					Log.Info("[DungeonEntry] PC counter: Character='{0}', DungeonId={1}, Property='{2}', Exists={3}.",
+						this.Character.Name,
+						dungeonId,
+						propertyName,
+						PropertyTable.Exists("PCEtc", propertyName));
+
 					if (PropertyTable.Exists("PCEtc", propertyName))
+					{
+						var before = 0f;
+
+						if (this.Character.Etc.Properties.Has(propertyName))
+							this.Character.Etc.Properties.TryGetFloat(propertyName, out before);
+
+						Log.Info("[DungeonEntry] BEFORE ModifyEtcProperty: Character='{0}', Property='{1}', Value={2}.",
+							this.Character.Name,
+							propertyName,
+							before);
+
 						this.Character.ModifyEtcProperty(propertyName, value);
+
+						var after = 0f;
+
+						if (this.Character.Etc.Properties.Has(propertyName))
+							this.Character.Etc.Properties.TryGetFloat(propertyName, out after);
+
+						Log.Info("[DungeonEntry] AFTER ModifyEtcProperty: Character='{0}', Property='{1}', Value={2}.",
+							this.Character.Name,
+							propertyName,
+							after);
+					}
 				}
 				else
 				{

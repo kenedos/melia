@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,6 @@ using System.Reflection;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
 using Melia.Zone.Scripting;
-using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
@@ -21,7 +20,6 @@ namespace Melia.Zone.Skills.Handlers
 	{
 		private readonly ConcurrentDictionary<SkillId, ISkillHandler> _handlers = new();
 		private readonly Dictionary<SkillId, int> _priorities = new();
-		private static readonly string[] CombatCalcPhases = GetCombatCalcPhases();
 
 		/// <summary>
 		/// Initializes the skill handlers, loading all it can find in
@@ -89,6 +87,7 @@ namespace Melia.Zone.Skills.Handlers
 		{
 			_handlers[skillId] = handler;
 
+			this.LoadCombatEvents(skillId, handler);
 			ScriptableFunctions.Load(handler);
 		}
 
@@ -166,24 +165,17 @@ namespace Melia.Zone.Skills.Handlers
 		/// <param name="skillId"></param>
 		private void RemoveCombatEvents(SkillId skillId)
 		{
-			foreach (var phase in CombatCalcPhases)
-				ScriptableFunctions.Combat.Remove("SCR_Combat_" + phase + "_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_Attack_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_Defense_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_Attack_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_Defense_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeBonuses_Attack_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeBonuses_Defense_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Attack_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Defense_" + skillId);
 
 			ScriptableFunctions.SkillBuffHook.Remove("SCR_Buff_OnStart_" + skillId);
 			ScriptableFunctions.SkillBuffHook.Remove("SCR_Buff_OnEnd_" + skillId);
-		}
-
-		/// <summary>
-		/// Returns every phase name a combat calc modifier can be declared
-		/// for, which is what the names registered for one are built from.
-		/// </summary>
-		private static string[] GetCombatCalcPhases()
-		{
-			return typeof(CombatCalcPhase)
-				.GetFields(BindingFlags.Public | BindingFlags.Static)
-				.Where(a => a.IsLiteral && a.FieldType == typeof(string))
-				.Select(a => (string)a.GetRawConstantValue())
-				.ToArray();
 		}
 
 		/// <summary>

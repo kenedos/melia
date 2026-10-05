@@ -8,6 +8,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Monsters;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Base
@@ -35,32 +36,31 @@ namespace Melia.Zone.Skills.Handlers.Base
 		/// <param name="caster"></param>
 		protected virtual async Task Attack(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
+			if (target == null || target.IsDead)
+				return;
+
 			if (!caster.TrySpendSp(skill))
 				return;
 
 			skill.IncreaseOverheat();
 
+			var isSummon = caster is Summon;
 			var splashArea = this.GetSplashArea(skill, caster, target);
 			var aniTime = this.GetAniTime(skill);
 			var hitDelay = this.GetHitDelay(skill);
 			var skillHitDelay = skill.Properties.HitDelay;
+			var skillSpeedRate = skill.Properties.GetFloat(PropertyName.SklSpdRate);
 
-			// Adjust delays based on skill speed rate. The way the speed rate
-			// actually works is currently somewhat guessed and is mostly based
-			// on research done on dagger attacks by players. For more info,
-			// see MeleeGroundSkillHandler.
-			aniTime /= skill.Properties.GetFloat(PropertyName.SklSpdRate);
-			hitDelay /= skill.Properties.GetFloat(PropertyName.SklSpdRate);
+			aniTime /= skillSpeedRate;
+			hitDelay /= skillSpeedRate;
+
+			if (isSummon)
+				caster.TurnTowards(target);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, target.Position, null);
 
-			// Some skills are running on a timer, such as Onion_Attack1.
-			// These skills get initiated, but the hit info is only sent
-			// after a certain amount of time passed. This allows the
-			// target to move out of harms way before the skill hits,
-			// such as with the poison cloud in the Kepa attack skill.
-
-			Debug.ShowShape(caster.Map, splashArea, edgePoints: false, duration: aniTime);
+			if (!isSummon)
+				Debug.ShowShape(caster.Map, splashArea, edgePoints: false, duration: aniTime);
 
 			await skill.Wait(hitDelay);
 
@@ -70,18 +70,43 @@ namespace Melia.Zone.Skills.Handlers.Base
 				return;
 			}
 
+			if (isSummon)
+			{
+				if (target.IsDead || target.Map != caster.Map)
+				{
+					Send.ZC_SKILL_DISABLE(caster);
+					return;
+				}
+
+				caster.TurnTowards(target);
+
+				splashArea = this.GetSplashArea(skill, caster, target);
+			}
+
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
-			foreach (var t in targets.LimitBySDR(caster, skill))
+			foreach (var currentTarget in targets.LimitBySDR(caster, skill))
 			{
-				var skillHitResult = SCR_SkillHit(caster, t, skill);
-				t.TakeDamage(skillHitResult.Damage, caster);
+				if (currentTarget.IsDead)
+					continue;
 
-				var skillHit = new SkillHitInfo(caster, t, skill, skillHitResult, hitDelay, skillHitDelay);
+				var skillHitResult = SCR_SkillHit(caster, currentTarget, skill);
+
+				currentTarget.TakeDamage(skillHitResult.Damage, caster);
+
+				var skillHit = new SkillHitInfo(
+					caster,
+					currentTarget,
+					skill,
+					skillHitResult,
+					hitDelay,
+					skillHitDelay
+				);
+
 				hits.Add(skillHit);
 
-				this.OnHit(caster, t, skill, skillHitResult);
+				this.OnHit(caster, currentTarget, skill, skillHitResult);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);

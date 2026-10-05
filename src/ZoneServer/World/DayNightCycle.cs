@@ -179,6 +179,9 @@ namespace Melia.Zone.World
 		{
 			foreach (var character in ZoneServer.Instance.World.GetCharacters())
 			{
+				if (character?.Connection?.Account == null)
+					continue;
+
 				if (character.Connection.Account.Variables.Perm.GetBool("Melia.DisableBellSound", false))
 					continue;
 

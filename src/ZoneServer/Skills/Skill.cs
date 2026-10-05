@@ -7,7 +7,6 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Buffs;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
@@ -25,23 +24,6 @@ namespace Melia.Zone.Skills
 	public class Skill : IPropertyObject, IUpdateable
 	{
 		private static long ObjectIds = ObjectIdRanges.Skills;
-
-		private static readonly TimeSpan MeleeLeadTime = TimeSpan.FromMilliseconds(250);
-
-		/// <summary>
-		/// The name of the cooldown group shared by all skills cast from
-		/// a skill scroll.
-		/// </summary>
-		public const string ScrollCooldownGroupName = "Scroll_SkillItem";
-
-		/// <summary>
-		/// The prefix of the cooldown groups a scroll's spent charges are
-		/// shown with, one per charge below the max.
-		/// </summary>
-		public const string ScrollChargeCooldownPrefix = "Scroll_SkillItem_Charge";
-
-		private int _overheatCounter;
-		private TimeSpan _overheatTimeRemaining;
 
 		private readonly object _ctsLock = new();
 		private CancellationTokenSource _cts;
@@ -156,30 +138,7 @@ namespace Melia.Zone.Skills
 		/// Returns the skill's overheat count. If this value reaches the
 		/// skill's maximum overheat, the skill goes on a cooldown.
 		/// </summary>
-		/// <remarks>
-		/// An item skill is a new instance on every use, so its counter
-		/// is kept on the owner's cooldown group instead.
-		/// </remarks>
-		public int OverheatCounter
-		{
-			get
-			{
-				if (this.IsItemSkill && this.Owner.Components.TryGet<CooldownComponent>(out var cooldowns))
-					return cooldowns.GetOverheatCounter(this.CooldownGroup);
-
-				return _overheatCounter;
-			}
-			private set
-			{
-				if (this.IsItemSkill && this.Owner.Components.TryGet<CooldownComponent>(out var cooldowns))
-				{
-					cooldowns.SetOverheatCounter(this.CooldownGroup, value);
-					return;
-				}
-
-				_overheatCounter = value;
-			}
-		}
+		public int OverheatCounter { get; private set; }
 
 		/// <summary>
 		/// Returns the skill's current maximum overheat count, which can
@@ -220,26 +179,7 @@ namespace Melia.Zone.Skills
 		/// <summary>
 		/// Returns the time until the skill's overheat counter is reset.
 		/// </summary>
-		public TimeSpan OverheatTimeRemaining
-		{
-			get
-			{
-				if (this.IsItemSkill && this.Owner.Components.TryGet<CooldownComponent>(out var cooldowns))
-					return cooldowns.GetOverheatTimeRemaining(this.CooldownGroup);
-
-				return _overheatTimeRemaining;
-			}
-			private set
-			{
-				if (this.IsItemSkill && this.Owner.Components.TryGet<CooldownComponent>(out var cooldowns))
-				{
-					cooldowns.SetOverheatTimeRemaining(this.CooldownGroup, value);
-					return;
-				}
-
-				_overheatTimeRemaining = value;
-			}
-		}
+		public TimeSpan OverheatTimeRemaining { get; private set; }
 
 		/// <summary>
 		/// Returns the when the skill is off cooldown.
@@ -256,12 +196,6 @@ namespace Melia.Zone.Skills
 		/// database.
 		/// </summary>
 		public CooldownData CooldownData { get; }
-
-		/// <summary>
-		/// Returns the cooldown group the skill's cooldown is tracked under,
-		/// which is a scroll-specific group for item skills that have one.
-		/// </summary>
-		public CooldownId CooldownGroup => this.CooldownData.Id;
 
 		/// <summary>
 		/// Returns reference to the skill's overheat data from the file
@@ -345,7 +279,7 @@ namespace Melia.Zone.Skills
 		/// <summary>
 		/// Returns true if the skill is currently on cooldown.
 		/// </summary>
-		public bool IsOnCooldown => this.Owner.IsOnCooldown(this.CooldownGroup);
+		public bool IsOnCooldown => this.Owner.IsOnCooldown(this.Data.CooldownGroup);
 
 		/// <summary>
 		/// Returns true if the skill has interruptible cast time.
@@ -470,38 +404,10 @@ namespace Melia.Zone.Skills
 			this.IsItemSkill = isItemSkill;
 
 			this.Data = ZoneServer.Instance.Data.SkillDb.Find(skillId) ?? throw new ArgumentException($"Unknown skill '{skillId}'.");
-			this.CooldownData = ResolveCooldownData(this.Data, isItemSkill) ?? throw new ArgumentException($"Unknown skill '{skillId}' cooldown group '{this.Data.CooldownGroup}'.");
+			this.CooldownData = ZoneServer.Instance.Data.CooldownDb.Find(this.Data.CooldownGroup) ?? throw new ArgumentException($"Unknown skill '{skillId}' cooldown group '{this.Data.CooldownGroup}'.");
 			this.OverheatData = ZoneServer.Instance.Data.CooldownDb.Find(this.Data.OverheatGroup) ?? throw new ArgumentException($"Unknown skill '{skillId}' overheat group '{this.Data.OverheatGroup}'.");
 
 			this.Properties = new SkillProperties(this);
-		}
-
-		/// <summary>
-		/// Returns the cooldown data the skill tracks its cooldown with.
-		/// Skills cast from an item all share one scroll cooldown group,
-		/// so they neither share a cooldown with the learned skill nor
-		/// with each other's.
-		/// </summary>
-		/// <remarks>
-		/// The group is looked up by name rather than through CooldownId,
-		/// so a group added to the cooldown database works without also
-		/// being declared as a constant.
-		/// </remarks>
-		/// <param name="skillData"></param>
-		/// <param name="isItemSkill"></param>
-		/// <returns></returns>
-		private static CooldownData ResolveCooldownData(SkillData skillData, bool isItemSkill)
-		{
-			var cooldownDb = ZoneServer.Instance.Data.CooldownDb;
-
-			if (isItemSkill)
-			{
-				var scrollData = cooldownDb.Find(ScrollCooldownGroupName);
-				if (scrollData != null)
-					return scrollData;
-			}
-
-			return cooldownDb.Find(skillData.CooldownGroup);
 		}
 
 		/// <summary>
@@ -565,7 +471,7 @@ namespace Melia.Zone.Skills
 			// default cooldown time. This simpler system allows us to customize
 			// skills overheats without having to constantly change cooldown.ies
 			//this.OverheatTimeRemaining = this.OverheatData.OverheatResetTime;
-			this.OverheatTimeRemaining = this.IsItemSkill ? this.Properties.CoolDown : this.Data.CooldownTime;
+			this.OverheatTimeRemaining = this.Data.CooldownTime;
 
 			var overheated = false;
 			if (this.OverheatCounter >= overheatMaxCount)
@@ -574,52 +480,17 @@ namespace Melia.Zone.Skills
 				this.OverheatTimeRemaining = TimeSpan.Zero;
 				overheated = true;
 
-				var cooldown = this.Owner.StartCooldown(this.CooldownGroup, this.Properties.CoolDown);
+				var cooldown = this.Owner.StartCooldown(this.Data.CooldownGroup, this.Properties.CoolDown);
 				cooldown.OnCooldownChanged += this.OnCooldownChanged;
 			}
 
-			this.UpdateScrollCharges();
-
 			// Update the overheat after the max was checked so we reset it
 			// to 0 if we went into cooldown
-			// No cooldowns for monsters, and an item skill's overheat group
-			// belongs to the learned skill, whose icon must not show it
-			if (this.Owner is Character character && !this.IsItemSkill)
+			// No cooldowns for monsters
+			if (this.Owner is Character character)
 				Send.ZC_OVERHEAT_CHANGED(character, this);
 
 			return overheated;
-		}
-
-		/// <summary>
-		/// Updates the cooldown groups a scroll's spent charges are drawn
-		/// with, one group per charge, running for as long as the charges
-		/// take to reset.
-		/// </summary>
-		/// <remarks>
-		/// The client has no way to read the overheat of a skill the
-		/// character never learned, but it reads any cooldown group by
-		/// name, which is what the scroll's icon draws its charges from.
-		/// </remarks>
-		private void UpdateScrollCharges()
-		{
-			if (!this.IsItemSkill || !this.Owner.Components.TryGet<CooldownComponent>(out var cooldowns))
-				return;
-
-			var counter = this.OverheatCounter;
-			var resetTime = this.OverheatTimeRemaining;
-			var cooldownDb = ZoneServer.Instance.Data.CooldownDb;
-
-			for (var i = 1; i < this.OverheatMaxCount; ++i)
-			{
-				var chargeData = cooldownDb.Find(ScrollChargeCooldownPrefix + i);
-				if (chargeData == null)
-					continue;
-
-				if (i <= counter)
-					cooldowns.Start(chargeData.Id, resetTime);
-				else
-					cooldowns.Remove(chargeData.Id);
-			}
 		}
 
 		/// <summary>
@@ -635,15 +506,29 @@ namespace Melia.Zone.Skills
 			if (!this.Owner.Components.TryGet<CooldownComponent>(out var cooldownComponent))
 				return;
 
-			cooldownComponent.Start(this.CooldownGroup, cooldownTime);
+			cooldownComponent.Start(this.Data.CooldownGroup, cooldownTime);
 
 			this.OverheatCounter = 0;
 			this.OverheatTimeRemaining = TimeSpan.Zero;
 
-			this.UpdateScrollCharges();
+			Send.ZC_OVERHEAT_CHANGED(character, this);
+		}
 
-			if (!this.IsItemSkill)
-				Send.ZC_OVERHEAT_CHANGED(character, this);
+		/// <summary>
+		/// Removes the cooldown and clears overheat without applying extra cooldown time.
+		/// </summary>
+		public void ResetCooldown()
+		{
+			if (this.Owner is not Character character)
+				return;
+
+			if (!this.Owner.Components.TryGet<CooldownComponent>(out var cooldownComponent))
+				return;
+
+			this.OverheatCounter = 0;
+			this.OverheatTimeRemaining = TimeSpan.Zero;
+			cooldownComponent.Remove(this.Data.CooldownGroup);
+			Send.ZC_OVERHEAT_CHANGED(character, this);
 		}
 
 		/// <summary>
@@ -655,7 +540,7 @@ namespace Melia.Zone.Skills
 		/// <param name="reduction"></param>
 		public void ReduceCooldown(TimeSpan reduction)
 		{
-			this.Owner.Components.Get<CooldownComponent>().ReduceCooldown(this.CooldownGroup, reduction);
+			this.Owner.Components.Get<CooldownComponent>().ReduceCooldown(this.Data.CooldownGroup, reduction);
 		}
 
 		/// <summary>
@@ -704,6 +589,18 @@ namespace Melia.Zone.Skills
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public int GetPVPValue(float value)
+		{
+			if (this.Owner.Map.IsPVP && value > 2)
+				value = MathF.Sqrt(value - 2) + MathF.Min(2, value);
+			return (int)value;
+		}
+
+		/// <summary>
 		/// Calculates positions and direction for use in splash areas.
 		/// </summary>
 		/// <param name="caster"></param>
@@ -731,7 +628,11 @@ namespace Melia.Zone.Skills
 			// not move past their AoEs when attacking.
 			var originTranslation = caster.Position;
 			if (caster is Character player && player.Movement.IsMoving)
-				originTranslation = player.Movement.GetProjectedPosition(MeleeLeadTime);
+			{
+				var speed = (int)player.Properties.GetFloat(PropertyName.MSPD);
+				var translationPerSpeed = speed / 4;
+				originTranslation = caster.Position.GetRelative(caster.Direction, translationPerSpeed);
+			}
 
 			if (originTranslation != caster.Position)
 				result.OriginPos = originTranslation;
@@ -813,29 +714,6 @@ namespace Melia.Zone.Skills
 			}
 
 			Interlocked.Exchange(ref _runnerCount, 0);
-
-			this.NotifyBuffsOnSkillUse();
-
-			// An Equipment Maintenance bonus lasts a number of attacks, and
-			// this is the one point every skill use passes through.
-			if (this.Data.AttackType != SkillAttackType.None)
-				Helpers.SquireSkillHelper.ConsumeMaintenance(this.Owner, false);
-		}
-
-		/// <summary>
-		/// Notifies the owner's active buffs that implement
-		/// IBuffOnSkillUseHandler that this skill is being used.
-		/// </summary>
-		private void NotifyBuffsOnSkillUse()
-		{
-			if (this.Owner == null || !this.Owner.Components.TryGet<BuffComponent>(out var buffs))
-				return;
-
-			foreach (var buff in buffs.GetList())
-			{
-				if (buff.Handler is IBuffOnSkillUseHandler skillUseHandler)
-					skillUseHandler.OnSkillUse(buff, this.Owner, this);
-			}
 		}
 
 		/// <summary>
@@ -893,18 +771,13 @@ namespace Melia.Zone.Skills
 
 			Interlocked.Increment(ref _runnerCount);
 
-			// Synchronously, so the runner count drops on the thread that
-			// finished the task rather than whenever the pool gets to it.
-			// IsRunning is what tells a caller the skill is done, and a
-			// pool-scheduled decrement makes that answer depend on how busy
-			// the machine is.
 			task.WaitAsync(_cts.Token).ContinueWith(t =>
 			{
 				Interlocked.Decrement(ref _runnerCount);
 
 				if (t.Exception != null)
 					Log.Error("An exception occured while running '{0}' for '{1}': {2}", this.Id, this.Owner?.Name ?? "(disposed)", t.Exception);
-			}, TaskContinuationOptions.ExecuteSynchronously);
+			});
 		}
 
 		/// <summary>
@@ -970,7 +843,7 @@ namespace Melia.Zone.Skills
 				return;
 
 			var token = (cancellable && _cts != null) ? _cts.Token : CancellationToken.None;
-			await GameClock.Delay(time, token);
+			await Task.Delay(time, token);
 		}
 
 		/// <summary>

@@ -45,6 +45,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			}
 		}
 
+		private void ValidateStartUpWeapon()
+		{
+			if (!this.Character.IsBuffActive(BuffId.StartUp_Buff))
+				return;
+
+			var weapon = this.GetEquip(EquipSlot.RightHand);
+			if (weapon != null && weapon is not DummyEquipItem
+				&& weapon.Data.EquipType1 == EquipType.Sword)
+				return;
+
+			this.Character.RemoveBuff(BuffId.StartUp_Buff);
+		}
+
 		/// <summary>
 		/// Raised when the character equipped an item.
 		/// </summary>
@@ -108,43 +121,12 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// dummy items.
 		/// </summary>
 		/// <returns></returns>
-		public IReadOnlyList<int> GetActualEquipIds()
-		{
-			// TODO: Cache.
-
-			var result = new List<int>();
-
-			lock (_syncLock)
-			{
-				foreach (var (slot, equip) in _equip)
-				{
-					var isNonDummyEquip = (int)slot <= InventoryDefaults.EquipSlotCount && equip is not DummyEquipItem;
-					if (isNonDummyEquip)
-						result.Add(equip.Id);
-				}
-			}
-
-			return result;
-		}
-
-		/// <summary>
-		/// Adds the ids of the equipped items, excluding dummy items, to
-		/// the given collection.
-		/// </summary>
-		/// <param name="result"></param>
-		public void GetActualEquipIds(ICollection<int> result)
+		public int[] GetActualEquipIds()
 		{
 			// TODO: Cache.
 
 			lock (_syncLock)
-			{
-				foreach (var (slot, equip) in _equip)
-				{
-					var isNonDummyEquip = (int)slot <= InventoryDefaults.EquipSlotCount && equip is not DummyEquipItem;
-					if (isNonDummyEquip)
-						result.Add(equip.Id);
-				}
-			}
+				return _equip.Where(a => (int)a.Key <= InventoryDefaults.EquipSlotCount && a.Value is not DummyEquipItem).Select(a => a.Value.Id).ToArray();
 		}
 
 		/// <summary>
@@ -432,53 +414,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
-		/// Returns the object ids of stacks of the given item that together
-		/// hold the requested amount and that can all stack with each other.
-		/// </summary>
-		/// <remarks>
-		/// Items of one class are usually interchangeable, but not always -
-		/// skill scrolls of one class carry different skills. Callers that
-		/// hand out items picked by class id use this to keep a selection
-		/// from mixing.
-		/// </remarks>
-		/// <param name="itemId"></param>
-		/// <param name="amount"></param>
-		/// <param name="objectIds"></param>
-		/// <returns></returns>
-		public bool TryGetMatchingStacks(int itemId, int amount, out List<long> objectIds)
-		{
-			objectIds = new List<long>();
-
-			var candidates = this.GetItems(a => a.Id == itemId).Values.ToList();
-
-			foreach (var anchorItem in candidates)
-			{
-				var stacks = new List<long>();
-				var total = 0;
-
-				foreach (var item in candidates)
-				{
-					if (!item.CanStackWith(anchorItem))
-						continue;
-
-					stacks.Add(item.ObjectId);
-					total += item.Amount;
-
-					if (total >= amount)
-						break;
-				}
-
-				if (total < amount)
-					continue;
-
-				objectIds = stacks;
-				return true;
-			}
-
-			return false;
-		}
-
-		/// <summary>
 		/// Returns item by world id, or null if it doesn't exist.
 		/// </summary>
 		/// <param name="worldId"></param>
@@ -647,67 +582,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				Send.ZC_EQUIP_GEM_INFO(this.Character);
 			}
 
-			if (addType == InventoryAddType.PickUp && inventoryType == InventoryType.Inventory)
-				this.Character.Tutorials.CheckItemPickup(item);
-
 			ZoneServer.Instance.ServerEvents.PlayerAddedItem.Raise(new PlayerItemEventArgs(this.Character, item.Id, amountToAdd));
 
 			return true;
-		}
-
-		/// <summary>
-		/// Adds item to inventory, updating weight and raising events as
-		/// normal, but without sending the client packets for this
-		/// individual add. Use with <see cref="NotifyItemsAdded"/> to
-		/// sync the client once after batching several quiet adds.
-		/// </summary>
-		/// <param name="item"></param>
-		/// <param name="addType"></param>
-		public bool AddQuiet(Item item, InventoryAddType addType = InventoryAddType.PickUp,
-			InventoryType inventoryType = InventoryType.Inventory, string reason = null)
-		{
-			if (_items.Count > 2000 && inventoryType == InventoryType.PersonalStorage)
-				return false;
-
-			var amountToAdd = item.Amount;
-
-			var left = this.FillStacks(item, addType, true, inventoryType, 0f, reason);
-			if (left > 0)
-			{
-				item.Amount = left;
-				this.AddStack(item, addType, true, inventoryType);
-			}
-
-			if (inventoryType == InventoryType.Inventory)
-				this.UpdateWeight();
-
-			ZoneServer.Instance.ServerEvents.PlayerAddedItem.Raise(new PlayerItemEventArgs(this.Character, item.Id, amountToAdd));
-
-			return true;
-		}
-
-		/// <summary>
-		/// Syncs the client with the current state of the given item id
-		/// and shows a pickup notification for the given amount. Used to
-		/// send a single notification for a batch of <see cref="AddQuiet"/>
-		/// calls for the same item.
-		/// </summary>
-		/// <param name="itemId"></param>
-		/// <param name="amount"></param>
-		/// <param name="addType"></param>
-		public void NotifyItemsAdded(int itemId, int amount, InventoryAddType addType = InventoryAddType.PickUp)
-		{
-			var match = this.GetItems(a => a.Id == itemId).LastOrDefault();
-			if (match.Value == null)
-				return;
-
-			Send.ZC_ITEM_ADD(this.Character, match.Value, match.Key, amount, addType, InventoryType.Inventory);
-
-			if (Versions.Client > KnownVersions.ClosedBeta1)
-			{
-				Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character, match.Value.Data.Category);
-				Send.ZC_EQUIP_GEM_INFO(this.Character);
-			}
 		}
 
 		/// <summary>
@@ -750,9 +627,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (!item.IsStackable)
 				return item.Amount;
 
+			var itemId = item.Id;
 			var amount = item.Amount;
 			var cat = item.Data.Category;
-			var stacks = this.GetStacks(cat, item, inventoryType);
+			var stacks = this.GetStacks(cat, itemId, inventoryType);
 
 			// Fill stacks
 			foreach (var index in stacks)
@@ -852,9 +730,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// aren't full yet.
 		/// </summary>
 		/// <param name="cat"></param>
-		/// <param name="source"></param>
+		/// <param name="itemId"></param>
 		/// <returns></returns>
-		private List<int> GetStacks(InventoryCategory cat, Item source, InventoryType inventoryType = InventoryType.Inventory)
+		private List<int> GetStacks(InventoryCategory cat, int itemId, InventoryType inventoryType = InventoryType.Inventory)
 		{
 			var result = new List<int>();
 
@@ -863,7 +741,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				switch (inventoryType)
 				{
 					case InventoryType.PersonalStorage:
-						var index = _warehouse.FindIndex(item => item.CanStackWith(source) && item.Amount < item.Data.MaxStack);
+						var index = _warehouse.FindIndex(item => item.Id == itemId && item.Amount < item.Data.MaxStack);
 						result.Add(index);
 						break;
 					default:
@@ -872,7 +750,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 						for (var i = 0; i < categoryItems.Count; ++i)
 						{
 							var item = categoryItems[i];
-							if (item.CanStackWith(source) && item.Amount < item.Data.MaxStack)
+							if (item.Id == itemId && item.Amount < item.Data.MaxStack)
 								result.Add(i);
 						}
 						break;
@@ -1075,26 +953,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
-		/// Reruns the gem scripts for every gem socketed into an equipped item,
-		/// so the skill levels they grant match the character's current state.
-		/// </summary>
-		public void RefreshGemSkills()
-		{
-			if (!ScriptableFunctions.Equip.TryGet("SCR_GEM_EQUIP", out var scriptFunc))
-				return;
-
-			foreach (var equip in this.GetEquip())
-			{
-				var item = equip.Value;
-				if (item == null || !item.HasSockets)
-					continue;
-
-				foreach (var gem in item.GetUsedGemSockets())
-					scriptFunc(this.Character, gem, equip.Key);
-			}
-		}
-
-		/// <summary>
 		/// Processes the script for a single card when equipped.
 		/// </summary>
 		/// <param name="card">The card item to process.</param>
@@ -1227,20 +1085,20 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			}
 
 			if (unequipLH)
-				this.Unequip(EquipSlot.LeftHand);
+				this.Unequip(EquipSlot.LeftHand, false);
 
 			if (unequipRH)
-				this.Unequip(EquipSlot.RightHand);
+				this.Unequip(EquipSlot.RightHand, false);
 
 			if (redirectToRH)
 			{
-				this.Unequip(EquipSlot.RightHand);
+				this.Unequip(EquipSlot.RightHand, false);
 				slot = EquipSlot.RightHand;
 			}
 
 			// Unequip existing item in the target slot
 			if (this.GetItem(slot) is not DummyEquipItem)
-				this.Unequip(slot);
+				this.Unequip(slot, false);
 
 			// Equip new item
 			lock (_syncLock)
@@ -1250,9 +1108,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				_itemsWorldIndex.Remove(item.ObjectId);
 			}
 
+			this.ValidateStartUpWeapon();
+
 			// Update character
 			this.HandleAppearanceChanges(slot);
-			ShopBuilder.RefreshServiceShopEquipment(this.Character);
 
 			// Update client
 			Send.ZC_ITEM_REMOVE(this.Character, item.ObjectId, 1, InventoryItemRemoveMsg.Equipped, InventoryType.Inventory);
@@ -1313,6 +1172,11 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		public InventoryResult Unequip(EquipSlot slot)
 		{
+			return this.Unequip(slot, true);
+		}
+
+		private InventoryResult Unequip(EquipSlot slot, bool validateStartUp)
+		{
 			if (!Enum.IsDefined(typeof(EquipSlot), slot))
 				return InventoryResult.InvalidSlot;
 
@@ -1323,9 +1187,11 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			lock (_syncLock)
 				_equip[slot] = new DummyEquipItem(slot);
 
+			if (validateStartUp)
+				this.ValidateStartUpWeapon();
+
 			// Update character
 			this.HandleAppearanceChanges(slot);
-			ShopBuilder.RefreshServiceShopEquipment(this.Character);
 
 			// Update client
 			Send.ZC_ITEM_EQUIP_LIST(this.Character);
@@ -1706,15 +1572,15 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			}
 
 			// Sending ZC_ITEM_INVENTORY_INDEX_LIST stopped working at some
-			// point after the iCBT2, the game sends a full list now.
+			// point after the iCBT2, officials send a full list now.
 			//Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character);
 
 			// Sending ZC_ITEM_INVENTORY_LIST stopped working at some point.
 			// Third time's the charm, I bet ZC_ITEM_INVENTORY_DIVISION_LIST
 			// is way better than the previous options!
-			//Send.ZC_ITEM_INVENTORY_LIST(this.Character);
 
 			Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character);
+			Send.ZC_ITEM_INVENTORY_DIVISION_LIST(this.Character);
 			Send.ZC_EQUIP_GEM_INFO(this.Character);
 		}
 

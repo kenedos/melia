@@ -5,7 +5,6 @@ using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.Buffs.Handlers.Common
 {
@@ -50,7 +49,7 @@ namespace Melia.Zone.Buffs.Handlers.Common
 			// DashRun doesn't have an update time by default, but we want to
 			// make some checks on its update, so we're going to change this.
 			buff.UpdateTime = TimeSpan.FromMilliseconds(100);
-			buff.NextUpdateTime = GameClock.LocalNow.Add(buff.UpdateTime);
+			buff.NextUpdateTime = DateTime.Now.Add(buff.UpdateTime);
 		}
 
 		/// <summary>

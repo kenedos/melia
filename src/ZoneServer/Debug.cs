@@ -5,7 +5,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
 using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.Network;
@@ -26,11 +25,6 @@ namespace Melia.Zone
 	public static class Debug
 	{
 		private static int _rangePreviewCounter = 0;
-
-		/// <summary>
-		/// Returns whether mob skill announcements are sent.
-		/// </summary>
-		public static bool MobSkillAnnounceEnabled { get; set; }
 
 		/// <summary>
 		/// Temporarily visualizes the shape on the map using friendly
@@ -144,9 +138,6 @@ namespace Melia.Zone
 		/// <param name="skill"></param>
 		public static void MobSkillAnnounce(ICombatEntity caster, Skill skill)
 		{
-			if (!MobSkillAnnounceEnabled)
-				return;
-
 			Send.ZC_CHAT(caster, "Watch out! I'm using {0}!", skill.Data.ClassName);
 		}
 
@@ -188,9 +179,9 @@ namespace Melia.Zone
 
 			foreach (var polygon in polygons)
 			{
-				var r = GameRandom.Get().Next(0x77, 0xDD);
-				var g = GameRandom.Get().Next(0x77, 0xDD);
-				var b = GameRandom.Get().Next(0x77, 0xDD);
+				var r = new Random().Next(0x77, 0xDD);
+				var g = new Random().Next(0x77, 0xDD);
+				var b = new Random().Next(0x77, 0xDD);
 				var color = new Rgba32((byte)r, (byte)g, (byte)b);
 
 				if (!drawCellsColored)

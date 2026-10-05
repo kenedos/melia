@@ -35,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -70,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -120,7 +120,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -169,39 +169,38 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var randomDelays = new[] { 250, 50, 150, 150, 150, 150 };
 
 			var position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 120, height: 1);
-			_ = EffectAndHit(skill, caster, position, randomHitConfig);
+			await EffectAndHit(skill, caster, position, randomHitConfig);
 
 			foreach (var delay in randomDelays)
 			{
 				await skill.Wait(TimeSpan.FromMilliseconds(delay));
 				position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 120, height: 1);
-				_ = EffectAndHit(skill, caster, position, randomHitConfig);
+				await EffectAndHit(skill, caster, position, randomHitConfig);
 			}
 
 			position = originPos.GetRelative(farPos, distance: 40, angle: 180f, height: 1);
-			_ = EffectAndHit(skill, caster, position, relativeHitConfig);
+			await EffectAndHit(skill, caster, position, relativeHitConfig);
 			position = originPos.GetRelative(farPos, distance: 35, angle: -90f, height: 1);
-			_ = EffectAndHit(skill, caster, position, relativeHitConfig);
+			await EffectAndHit(skill, caster, position, relativeHitConfig);
 			position = originPos.GetRelative(farPos, distance: 35, angle: -45f, height: 1);
-			_ = EffectAndHit(skill, caster, position, relativeHitConfig);
+			await EffectAndHit(skill, caster, position, relativeHitConfig);
 			position = originPos.GetRelative(farPos, distance: 30, height: 1);
-			_ = EffectAndHit(skill, caster, position, relativeHitConfig);
+			await EffectAndHit(skill, caster, position, relativeHitConfig);
 			position = originPos.GetRelative(farPos, distance: 40, angle: 90f, height: 1);
-			_ = EffectAndHit(skill, caster, position, relativeHitConfig);
+			await EffectAndHit(skill, caster, position, relativeHitConfig);
 			position = originPos.GetRelative(farPos, distance: 35, angle: 35f, height: 1);
-			_ = EffectAndHit(skill, caster, position, relativeHitConfig);
+			await EffectAndHit(skill, caster, position, relativeHitConfig);
 			position = originPos.GetRelative(farPos, distance: 40, angle: 135f, height: 1);
-			_ = EffectAndHit(skill, caster, position, relativeHitConfig);
+			await EffectAndHit(skill, caster, position, relativeHitConfig);
 			position = originPos.GetRelative(farPos, distance: 40, angle: -135f, height: 1);
-			_ = EffectAndHit(skill, caster, position, relativeHitConfig);
+			await EffectAndHit(skill, caster, position, relativeHitConfig);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 120, height: 1);
-			_ = EffectAndHit(skill, caster, position, randomHitConfig);
+			await EffectAndHit(skill, caster, position, randomHitConfig);
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 120, height: 1);
-			_ = EffectAndHit(skill, caster, position, randomHitConfig);
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			await EffectAndHit(skill, caster, position, randomHitConfig);
 		}
 	}
 
@@ -224,7 +223,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -240,7 +239,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 30, angle: 45f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 2300;
+			hitDelay = 5500;
 			aniTime = 2300;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
@@ -264,7 +263,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 

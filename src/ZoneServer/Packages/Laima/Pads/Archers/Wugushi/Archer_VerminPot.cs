@@ -1,0 +1,147 @@
+using System;
+using System.Linq;
+using Melia.Shared.Packages;
+using Melia.Shared.Game.Const;
+using Melia.Zone.Network;
+using Melia.Zone.Pads.Handlers;
+using Melia.Zone.Skills;
+using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Actors.Pads;
+using static Melia.Zone.Pads.Helpers.PadHelper;
+using static Melia.Zone.Skills.SkillUseFunctions;
+
+namespace Melia.Zone.Pads.HandlersOverride.Archers.Wugushi
+{
+	[Package("laima")]
+	[PadHandler(PadName.Archer_VerminPot)]
+	public class Archer_VerminPotOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, IUpdatePadHandler
+	{
+		private const int MaxTargets = 3;
+
+		public void Created(object sender, PadTriggerArgs args)
+		{
+			var pad = args.Trigger;
+			var creator = args.Creator;
+
+			Send.ZC_NORMAL.PadUpdate(pad, true);
+			pad.SetRange(40f);
+			pad.SetUpdateInterval(750);
+			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(15000);
+
+			var monster = PadCreateMonster(pad, "hidden_monster4", pad.Position, 0f, 0, 15f, "HitProof#YES", "None", 1, true, "None", "None", false, "SCR_ARRIVE_THROWGUPOT");
+			if (monster is Mob mob)
+			{
+				mob.SetHittable(false);
+				mob.MonsterType = RelationType.Friendly;
+				mob.Faction = FactionType.Law;
+				mob.StartBuff(BuffId.Invincible);
+			}
+		}
+
+		public void Destroyed(object sender, PadTriggerArgs args)
+		{
+			var pad = args.Trigger;
+			var creator = args.Creator;
+
+			Send.ZC_NORMAL.PadUpdate(pad, false);
+		}
+
+		public void Entered(object sender, PadTriggerActorArgs args)
+		{
+			var pad = args.Trigger;
+			var creator = args.Creator;
+			var initiator = args.Initiator;
+			var skill = pad.Skill;
+
+			if (!creator.IsEnemy(initiator))
+				return;
+
+			if (initiator.IsBuffActive(BuffId.Archer_VerminPot_Debuff))
+				return;
+
+			var damage = (int)SCR_SkillHit(creator, initiator, skill).Damage;
+			if (damage <= 0)
+				return;
+
+			AddPadBuff(creator, initiator, pad, BuffId.Archer_VerminPot_Debuff, skill.Level, damage, 15000, 1, 100);
+		}
+
+		public void Updated(object sender, PadTriggerArgs args)
+		{
+			var pad = args.Trigger;
+			var creator = args.Creator;
+			var skill = pad.Skill;
+
+
+			var targets = pad.Trigger.GetAttackableEntities(creator)
+				.OrderBy(t => t.IsBuffActive(BuffId.Archer_VerminPot_Debuff) ? 1 : 0)
+				.Take(MaxTargets);
+
+			foreach (var target in targets)
+			{
+				if (target.IsBuffActive(BuffId.Archer_VerminPot_Debuff))
+					continue;
+
+				var damage = (int)SCR_SkillHit(creator, target, skill).Damage;
+				if (damage <= 0)
+					continue;
+
+				AddPadBuff(creator, target, pad, BuffId.Archer_VerminPot_Debuff, skill.Level, damage, 15000, 1, 100);
+			}
+
+			this.TryUseBossCardSkill(pad, creator);
+		}
+
+		private void TryUseBossCardSkill(Pad pad, ICombatEntity creator)
+		{
+			var bossCardId = (int)creator.GetTempVar(PropertyName.Wugushi_bosscard);
+			if (bossCardId <= 0)
+				return;
+
+			var now = DateTime.Now;
+			if (pad.Variables.Has("Melia.BossCard.NextFire"))
+			{
+				var nextFire = pad.Variables.Get<DateTime>("Melia.BossCard.NextFire");
+				if (now < nextFire)
+					return;
+			}
+
+			var firstTarget = pad.Trigger.GetAttackableEntities(creator).FirstOrDefault();
+			if (firstTarget == null)
+				return;
+
+			if (!ZoneServer.Instance.Data.ItemDb.TryFind(bossCardId, out var cardData))
+				return;
+
+			var monsterClassId = (int)cardData.Script.NumArg1;
+			if (monsterClassId <= 0)
+				return;
+
+			if (!ZoneServer.Instance.Data.MonsterDb.TryFind(monsterClassId, out var monsterData))
+				return;
+
+			if (monsterData.Skills.Count == 0)
+				return;
+
+			var skillId = monsterData.Skills[0].SkillId;
+
+			if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<ITargetSkillHandler>(skillId, out var handler))
+				return;
+
+			var padMonster = pad.Monster;
+			if (padMonster == null)
+				return;
+
+			var shootTime = ZoneServer.Instance.Data.SkillDb.TryFind(skillId, out var skillData)
+				? skillData.ShootTime
+				: TimeSpan.FromMilliseconds(1000);
+
+			pad.Variables.Set("Melia.BossCard.NextFire", now + shootTime);
+
+			var bossSkill = new Skill(padMonster, skillId);
+			handler.Handle(bossSkill, padMonster, firstTarget);
+		}
+	}
+}

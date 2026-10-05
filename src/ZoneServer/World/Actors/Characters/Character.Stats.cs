@@ -5,7 +5,6 @@ using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Logging;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.Characters
 {
@@ -14,13 +13,16 @@ namespace Melia.Zone.World.Actors.Characters
 	// ===================================================================
 	public partial class Character
 	{
-		private const int DungeonTutorialLevel = 25;
-
 		#region Stats Properties
 		/// <summary>
 		/// Gets or sets the character's current job id.
 		/// </summary>
 		public JobId JobId { get; set; }
+
+		/// <summary>
+		/// Gets or sets the character's visual job id, the character's class icon.
+		/// </summary>
+		public JobId VisualJobId { get; set; }
 
 		/// <summary>
 		/// Returns the class of the character's current job.
@@ -246,21 +248,89 @@ namespace Melia.Zone.World.Actors.Characters
 			if (this.IsDead)
 				return;
 
-			var bonusExpRate = this.Properties.GetFloat(PropertyName.BonusExp_BM) / 100f;
-			var bonusJobExpRate = this.Properties.GetFloat(PropertyName.BonusJobExp_BM) / 100f;
+			// Miracle Seed (+50% EXP)
+			if (this.IsBuffActive(BuffId.Event_CharExpRate))
+			{
+				exp = (long)(exp * 1.5f);
+				jobExp = (long)(jobExp * 1.5f);
+			}
 
-			if (bonusExpRate != 0)
-				exp = (long)(exp * (1 + bonusExpRate));
-			if (bonusJobExpRate != 0)
-				jobExp = (long)(jobExp * (1 + bonusJobExpRate));
+			// Goddess Sculpture (+25% EXP)
+			if (this.IsBuffActive(BuffId.Event_GoddessStatueExp))
+			{
+				exp = (long)(exp * 1.25f);
+				jobExp = (long)(jobExp * 1.25f);
+			}
+
+			// EXP Tomes
+			if (this.IsBuffActive(BuffId.Premium_boostToken03))
+			{
+				exp = (long)(exp * 4f);
+				jobExp = (long)(jobExp * 4f);
+			}
+			else if (this.IsBuffActive(BuffId.Premium_boostToken02))
+			{
+				exp = (long)(exp * 2.5f);
+				jobExp = (long)(jobExp * 2.5f);
+			}
+			else if (this.IsBuffActive(BuffId.Premium_boostToken))
+			{
+				exp = (long)(exp * 1.3f);
+				jobExp = (long)(jobExp * 1.3f);
+			}
+
+			// Preserve EXP before applying the Team Level bonus.
+			// Team EXP is based on 1% of this value and must not include its own bonus.
+			var teamExpBase = exp;
+
+			// Team Level EXP bonus
+			var teamLevel = 1;
+			if (this.Connection?.Account != null)
+			{
+				teamLevel = TeamLevelHelper.GetLevel(this.Connection.Account.TeamExp);
+				var teamBonusRate = TeamLevelHelper.GetExpBonusRate(teamLevel);
+
+				if (teamBonusRate > 0)
+				{
+					exp += (long)Math.Floor(exp * teamBonusRate);
+					jobExp += (long)Math.Floor(jobExp * teamBonusRate);
+				}
+			}
 
 			// Base EXP
 			this.Exp += exp;
 			this.TotalExp += exp;
 
+			// Team EXP - 1% of EXP before the Team Level bonus
+			if (teamExpBase > 0 && this.Connection?.Account != null)
+			{
+				var account = this.Connection.Account;
+				var oldTeamExp = account.TeamExp;
+				var calculatedGain = TeamLevelHelper.CalculateTeamExpGain(teamExpBase);
+				var teamExpGain = Math.Min(calculatedGain, int.MaxValue - (long)oldTeamExp);
+
+				if (teamExpGain > 0)
+				{
+					account.TeamExp += (int)teamExpGain;
+
+					var newTeamLevel = TeamLevelHelper.GetLevel(account.TeamExp);
+
+					if (newTeamLevel != teamLevel)
+					{
+						TeamLevelHelper.Synchronize(this);
+
+						Send.ZC_ADDON_MSG(this, "ACCOUNT_UPDATE", 0, null);
+					}
+				}
+			}
+
 			if (monster != null)
+			{
 				Send.ZC_EXP_UP_BY_MONSTER(this, exp, jobExp, monster);
 
+				if (exp > 0)
+					this.ServerMessage($"Obtained Exp: {exp:N0} | Job Exp: {jobExp:N0}");
+			}
 			Send.ZC_EXP_UP(this, exp, jobExp); // Not always sent? Might be quest related?
 
 			var level = this.Level;
@@ -296,16 +366,12 @@ namespace Melia.Zone.World.Actors.Characters
 			{
 				// Limit EXP to the total max, otherwise the client will
 				// display level 1 with 0%.
-				var totalMaxExp = job.TotalMaxExp;
-
-				var prevTotalExp = job.TotalExp;
-				var prevDisplayExp = job.DisplayExp;
-				job.TotalExp = Math.Min(totalMaxExp, (job.TotalExp + jobExp));
+				job.TotalExp = Math.Min(job.TotalMaxExp, (job.TotalExp + jobExp));
 
 				var newJobLevel = this.JobLevel;
 				var jobLevelsGained = (newJobLevel - jobLevel);
 
-				Send.ZC_JOB_EXP_UP(this, job.DisplayExp - prevDisplayExp);
+				Send.ZC_JOB_EXP_UP(this, jobExp);
 
 				if (jobLevelsGained > 0)
 					this.FinishJobLevelChange(jobLevelsGained);
@@ -328,6 +394,8 @@ namespace Melia.Zone.World.Actors.Characters
 		{
 			if (amount < 1)
 				throw new ArgumentException("Amount can't be lower than 1.");
+
+			this.ShowHelp("TUTO_STATPOINT");
 
 			var statsPerLevel = ZoneServer.Instance.Conf.World.StatsPerLevel;
 			var extraStatsLevels = ZoneServer.Instance.Conf.World.ExtraStatsLevels;
@@ -353,15 +421,9 @@ namespace Melia.Zone.World.Actors.Characters
 			}
 
 			var newLevel = this.Properties.Modify(PropertyName.Lv, amount);
-
-			this.ShowHelp("TUTO_STATPOINT");
-
-			if (newLevel >= DungeonTutorialLevel)
-				this.ShowHelp("TUTO_INSTANT_DUNGEON");
-
 			if (newLevel >= ZoneServer.Instance.Conf.World.MaxLevel && !this.Variables.Perm.Has("Melia.MaxLevel.AchievedTime"))
 			{
-				this.Variables.Perm.Set("Melia.MaxLevel.AchievedTime", GameClock.Now.Ticks.ToString());
+				this.Variables.Perm.Set("Melia.MaxLevel.AchievedTime", DateTime.UtcNow.Ticks.ToString());
 				Log.Info("Max Level Reached: {0} {1} {2} ", this.DbId, this.Name, this.TeamName);
 				Send.ZC_TEXT(NoticeTextType.Gold, $"Congratulations to {this.Name} for reaching max level.");
 			}
@@ -373,7 +435,6 @@ namespace Melia.Zone.World.Actors.Characters
 			Send.ZC_MAX_EXP_CHANGED(this, 0);
 			Send.ZC_PC_LEVELUP(this);
 			Send.ZC_OBJECT_PROPERTY(this);
-			Send.ZC_NORMAL.CaptionOverrides(this);
 
 			this.AddonMessage("NOTICE_Dm_levelup_base", "!@#$Auto_KaeLigTeo_LeBeli_SangSeungHayeossSeupNiDa#@!", 3);
 			this.PlayEffect("F_pc_level_up", 3);
@@ -419,7 +480,6 @@ namespace Melia.Zone.World.Actors.Characters
 			Send.ZC_MAX_EXP_CHANGED(this, 0);
 			Send.ZC_PC_LEVELUP(this);
 			Send.ZC_OBJECT_PROPERTY(this);
-			Send.ZC_NORMAL.CaptionOverrides(this);
 
 			this.AddonMessage("NOTICE_Dm_levelup_base", "!@#$Auto_KaeLigTeo_LeBeli_SangSeungHayeossSeupNiDa#@!", 3);
 			this.PlayEffect("F_pc_level_up", 3);
@@ -454,7 +514,6 @@ namespace Melia.Zone.World.Actors.Characters
 
 			this.Properties.InvalidateAll();
 			Send.ZC_OBJECT_PROPERTY(this);
-			Send.ZC_NORMAL.CaptionOverrides(this);
 			this.AddonMessage(Shared.Game.Const.AddonMessage.RESET_STAT_UP);
 		}
 		#endregion

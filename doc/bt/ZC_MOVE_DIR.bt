@@ -20,7 +20,7 @@ position pos;
 direction dir;
 byte b1; // 1
 float speed; // 33f or 30f
-float clientTime;
+float f1;
 byte bin[24];
 int i1; // 6
 int i2; // 0

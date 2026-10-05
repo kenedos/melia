@@ -6,7 +6,6 @@ using System.Threading;
 using Melia.Shared.Data.Database;
 using Melia.Shared.ObjectProperties;
 using Melia.Zone.Scripting;
-using Yggdrasil.Util;
 
 namespace Melia.Zone.World.Quests
 {
@@ -66,16 +65,6 @@ namespace Melia.Zone.World.Quests
 		/// Returns the quest's data.
 		/// </summary>
 		public QuestData Data { get; }
-
-		/// <summary>
-		/// Returns the variables of this character's instance of the quest.
-		/// </summary>
-		/// <remarks>
-		/// Unlike the shared variables on the quest's data, these belong to
-		/// one character's copy of the quest. They are temporary and are not
-		/// saved across server restarts.
-		/// </remarks>
-		public Variables Vars { get; } = new Variables();
 
 		/// <summary>
 		/// Returns the quest's static data.
@@ -228,30 +217,18 @@ namespace Melia.Zone.World.Quests
 		/// Unlocks objectives based on which objectives have been completed
 		/// if this quest uses sequential unlocking.
 		/// </summary>
-		/// <returns>
-		/// The progresses that went from locked to unlocked during this call.
-		/// </returns>
-		public List<QuestProgress> UpdateUnlock()
+		public void UpdateUnlock()
 		{
-			var unlocked = new List<QuestProgress>();
-
 			if (this.Data.UnlockType != QuestUnlockType.Sequential)
-				return unlocked;
+				return;
 
 			for (var i = 0; i < _progresses.Count - 1; ++i)
 			{
-				if (!_progresses[i].Done)
+				if (_progresses[i].Done)
+					_progresses[i + 1].Unlocked = true;
+				else
 					break;
-
-				var next = _progresses[i + 1];
-				if (next.Unlocked)
-					continue;
-
-				next.Unlocked = true;
-				unlocked.Add(next);
 			}
-
-			return unlocked;
 		}
 
 		/// <summary>
@@ -288,36 +265,39 @@ namespace Melia.Zone.World.Quests
 		}
 
 		/// <summary>
-		/// Runs the given function once on every modifier with the given
-		/// type, if any of the quest's objectives are unlocked. If any
-		/// progresses changed, the ChangesOnLastUpdate property will be true.
+		/// Iterates over the quest's modifiers and runs the given function
+		/// on all modifiers with the given type. If any progresses changed,
+		/// the ChangesOnLastUpdate property will be true.
 		/// </summary>
 		/// <typeparam name="TModifier"></typeparam>
 		/// <param name="updater"></param>
 		public void UpdateModifiers<TModifier>(QuestModifiersUpdateFunc<TModifier> updater) where TModifier : QuestModifier
 		{
-			this.ChangesOnLastUpdate = false;
+			var quest = this;
+			var anythingChanged = false;
 
-			if (!_progresses.Any(a => a.Unlocked))
-				return;
-
-			var before = _progresses.Select(a => (a.Count, a.Done, a.Unlocked)).ToArray();
-
-			for (var i = 0; i < this.Data.Modifiers.Count; i++)
+			foreach (var progress in quest.Progresses)
 			{
-				if (this.Data.Modifiers[i] is TModifier tModifier)
-					updater(this, tModifier);
-			}
+				if (!progress.Unlocked)
+					continue;
 
-			for (var i = 0; i < _progresses.Count; i++)
-			{
-				var progress = _progresses[i];
-				if (before[i] != (progress.Count, progress.Done, progress.Unlocked))
+				var count = progress.Count;
+				var done = progress.Done;
+				var unlocked = progress.Unlocked;
+
+				for (var i = 0; i < quest.Data.Modifiers.Count; i++)
 				{
-					this.ChangesOnLastUpdate = true;
-					break;
+					var modifier = quest.Data.Modifiers[i];
+					if (modifier is not TModifier tModifier)
+						continue;
+					updater(this, tModifier, progress);
 				}
+
+				if (progress.Count != count || progress.Done != done || progress.Unlocked != unlocked)
+					anythingChanged = true;
 			}
+
+			this.ChangesOnLastUpdate = anythingChanged;
 		}
 
 		/// <summary>
@@ -345,7 +325,8 @@ namespace Melia.Zone.World.Quests
 	/// <typeparam name="TModifier"></typeparam>
 	/// <param name="quest"></param>
 	/// <param name="modifier"></param>
-	public delegate void QuestModifiersUpdateFunc<in TModifier>(Quest quest, TModifier modifier) where TModifier : QuestModifier;
+	/// <param name="progress"></param>
+	public delegate void QuestModifiersUpdateFunc<in TModifier>(Quest quest, TModifier modifier, QuestProgress progress) where TModifier : QuestModifier;
 
 	/// <summary>
 	/// Specifies a quest's current status.

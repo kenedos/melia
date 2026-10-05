@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,14 +34,6 @@ namespace Melia.Shared.Configuration.Files
 		public int DropDisappearSeconds { get; protected set; }
 		public bool Littering { get; protected set; }
 		public bool TargetedLittering { get; protected set; }
-		public bool TrashLootEnabled { get; protected set; }
-		public int TrashLootLevelGap { get; protected set; }
-		public int TrashLootMaxGrade { get; protected set; }
-		public int TrashLootPickUpDelay { get; protected set; }
-		public int TrashLootGraceSeconds { get; protected set; }
-		public int TrashLootGraceMaxSeconds { get; protected set; }
-		public int TrashLootGraceDecaySeconds { get; protected set; }
-		public bool MapDeathPenalty { get; protected set; }
 
 		// exp.conf
 		public float ExpRate { get; protected set; }
@@ -70,11 +62,8 @@ namespace Melia.Shared.Configuration.Files
 
 		// items.conf
 		public float ItemCooldownRate { get; protected set; }
-		public bool StackDuplicateSkillGems { get; protected set; }
-		public bool SkillGemsGrantNewSkills { get; protected set; }
 
 		// jobs.conf
-		public bool ClassCircleSystem { get; protected set; }
 		public int JobMaxRank { get; protected set; }
 		public bool NoAdvancement { get; protected set; }
 		public bool NoRankReset { get; protected set; }
@@ -94,25 +83,6 @@ namespace Melia.Shared.Configuration.Files
 		// monsters.conf
 		public TimeSpan DefaultMinRespawn { get; protected set; }
 		public TimeSpan DefaultMaxRespawn { get; protected set; }
-		public float AmbushChance { get; protected set; }
-		public int AmbushMinMonsters { get; protected set; }
-		public int AmbushMaxMonsters { get; protected set; }
-		public int AmbushDistance { get; protected set; }
-		public int AmbushCooldownSeconds { get; protected set; }
-		public float MonsterHelpCallChance { get; protected set; }
-		public float MonsterPanicFleeChance { get; protected set; }
-		public float MonsterEliteAscensionChance { get; protected set; }
-		public bool PatrolEnabled { get; protected set; }
-		public float PatrolChance { get; protected set; }
-		public int PatrolGroupSize { get; protected set; }
-		public float PatrolGroupRadius { get; protected set; }
-		public bool PatrolWalk { get; protected set; }
-		public int PatrolNodeSampleStep { get; protected set; }
-		public float PatrolNodeMinClearance { get; protected set; }
-		public float PatrolNodeSpacing { get; protected set; }
-		public float PatrolEdgeMaxLength { get; protected set; }
-		public float PatrolRouteRadius { get; protected set; }
-		public int PatrolRouteMaxNodes { get; protected set; }
 
 		// quests.conf
 		public bool DisplayQuestObjectives { get; protected set; }
@@ -150,9 +120,7 @@ namespace Melia.Shared.Configuration.Files
 		// rare_monsters.conf
 		public float BlueJackpotSpawnChance { get; protected set; }
 		public float BlueJackpotExpRate { get; protected set; }
-		public int BlueJackpotMinLevel { get; protected set; }
 		public float RedJackpotSpawnChance { get; protected set; }
-		public int RedJackpotMinLevel { get; protected set; }
 		public int RedJackpotWaveMin { get; protected set; }
 		public int RedJackpotWaveMax { get; protected set; }
 		public int RedJackpotWaveMonsterCount { get; protected set; }
@@ -161,17 +129,12 @@ namespace Melia.Shared.Configuration.Files
 		public float SilverJackpotSpawnChance { get; protected set; }
 		public int SilverJackpotRolls { get; protected set; }
 		public float SilverJackpotGuaranteedItemThreshold { get; protected set; }
-		public int SilverJackpotMinLevel { get; protected set; }
 		public float GoldJackpotSpawnChance { get; protected set; }
 		public int GoldJackpotRolls { get; protected set; }
 		public float GoldJackpotGuaranteedItemThreshold { get; protected set; }
-		public int GoldJackpotMinLevel { get; protected set; }
 		public float EliteSpawnChance { get; protected set; }
 		public float EliteHPSPRate { get; protected set; }
 		public float EliteStatRate { get; protected set; }
-		public float EliteAtkRate { get; protected set; }
-		public float EliteDefRate { get; protected set; }
-		public float EliteSecondaryStatRate { get; protected set; }
 		public float EliteExpRate { get; protected set; }
 		public int EliteRolls { get; protected set; }
 		public float EliteGuaranteedItemThreshold { get; protected set; }
@@ -186,9 +149,6 @@ namespace Melia.Shared.Configuration.Files
 		public bool MythicAlwaysAggressive { get; protected set; }
 		public float MythicHPSPRate { get; protected set; }
 		public float MythicStatRate { get; protected set; }
-		public float MythicAtkRate { get; protected set; }
-		public float MythicDefRate { get; protected set; }
-		public float MythicSecondaryStatRate { get; protected set; }
 		public float MythicExpRate { get; protected set; }
 		public int MythicRolls { get; protected set; }
 		public float MythicGuaranteedItemThreshold { get; protected set; }
@@ -264,8 +224,9 @@ namespace Melia.Shared.Configuration.Files
 		public int LogCleanupRetentionDays { get; protected set; }
 		public int LogCleanupIntervalHours { get; protected set; }
 
-		// misc.conf - Client scripts
-		public HashSet<string> DisabledClientScripts { get; protected set; }
+		// Dead connection sweep settings
+		public int DeadConnectionTimeoutSeconds { get; protected set; }
+		public int DeadConnectionSweepIntervalSeconds { get; protected set; }
 
 		// party.conf - Quest Sharing
 		public bool PartyQuestSharingEnabled { get; protected set; }
@@ -304,28 +265,6 @@ namespace Melia.Shared.Configuration.Files
 			this.MonstersReturnHome = this.GetBool("monsters_return_home", true);
 			this.MonsterStagger = this.GetBool("monster_stagger", false);
 
-			this.AmbushChance = this.GetFloat("ambush_chance", 10);
-			this.AmbushMinMonsters = this.GetInt("ambush_min_monsters", 2);
-			this.AmbushMaxMonsters = this.GetInt("ambush_max_monsters", 4);
-			this.AmbushDistance = this.GetInt("ambush_distance", 30);
-			this.AmbushCooldownSeconds = this.GetInt("ambush_cooldown_seconds", 60);
-
-			this.MonsterHelpCallChance = this.GetFloat("monster_help_call_chance", 0.3f);
-			this.MonsterPanicFleeChance = this.GetFloat("monster_panic_flee_chance", 0.3f);
-			this.MonsterEliteAscensionChance = this.GetFloat("monster_elite_ascension_chance", 0.0005f);
-
-			this.PatrolEnabled = this.GetBool("patrol_enabled", true);
-			this.PatrolChance = this.GetFloat("patrol_chance", 35);
-			this.PatrolGroupSize = this.GetInt("patrol_group_size", 3);
-			this.PatrolGroupRadius = this.GetFloat("patrol_group_radius", 250);
-			this.PatrolWalk = this.GetBool("patrol_walk", true);
-			this.PatrolNodeSampleStep = this.GetInt("patrol_node_sample_step", 25);
-			this.PatrolNodeMinClearance = this.GetFloat("patrol_node_min_clearance", 40);
-			this.PatrolNodeSpacing = this.GetFloat("patrol_node_spacing", 200);
-			this.PatrolEdgeMaxLength = this.GetFloat("patrol_edge_max_length", 600);
-			this.PatrolRouteRadius = this.GetFloat("patrol_route_radius", 1200);
-			this.PatrolRouteMaxNodes = this.GetInt("patrol_route_max_nodes", 6);
-
 			this.SilverDropAmount = this.GetFloat("silver_drop_amount", 100);
 			this.SilverDropRate = this.GetFloat("silver_drop_rate", 100);
 			this.EquipmentDropRate = this.GetFloat("equipment_drop_rate", 100);
@@ -341,14 +280,6 @@ namespace Melia.Shared.Configuration.Files
 			this.DropDisappearSeconds = this.GetInt("drop_disappear_time", 100);
 			this.Littering = this.GetBool("littering", false);
 			this.TargetedLittering = this.GetBool("targeted_littering", false);
-			this.TrashLootEnabled = this.GetBool("trash_loot_enabled", true);
-			this.TrashLootLevelGap = this.GetInt("trash_loot_level_gap", 20);
-			this.TrashLootMaxGrade = this.GetInt("trash_loot_max_grade", 2);
-			this.TrashLootPickUpDelay = this.GetInt("trash_loot_pick_up_delay", 10);
-			this.TrashLootGraceSeconds = this.GetInt("trash_loot_grace_time", 60);
-			this.TrashLootGraceMaxSeconds = this.GetInt("trash_loot_grace_max_time", 3840);
-			this.TrashLootGraceDecaySeconds = this.GetInt("trash_loot_grace_decay_time", 86400);
-			this.MapDeathPenalty = this.GetBool("map_death_penalty", false);
 
 			this.StorageFee = this.GetInt("storage_fee", 20);
 			this.StorageExtCost = this.GetInt("storage_ext_cost", 20);
@@ -384,10 +315,7 @@ namespace Melia.Shared.Configuration.Files
 			this.EnableDayNightCycle = this.GetBool("enable_day_night_cycle", true);
 
 			this.ItemCooldownRate = this.GetFloat("item_cooldown_rate", 1);
-			this.StackDuplicateSkillGems = this.GetBool("stack_duplicate_skill_gems", false);
-			this.SkillGemsGrantNewSkills = this.GetBool("skill_gems_grant_new_skills", false);
 
-			this.ClassCircleSystem = this.GetBool("class_circle_system", false);
 			this.JobMaxRank = this.GetInt("job_max_rank", 4);
 			this.NoAdvancement = this.GetBool("no_advancement", false);
 			this.NoRankReset = this.GetBool("no_rank_reset", true);
@@ -424,9 +352,7 @@ namespace Melia.Shared.Configuration.Files
 
 			this.BlueJackpotSpawnChance = this.GetFloat("blue_jackpot_spawn_chance", 0.05f);
 			this.BlueJackpotExpRate = this.GetFloat("blue_jackpot_exp_rate", 10000);
-			this.BlueJackpotMinLevel = this.GetInt("blue_jackpot_min_level", 0);
 			this.RedJackpotSpawnChance = this.GetFloat("red_jackpot_spawn_chance", 0.05f);
-			this.RedJackpotMinLevel = this.GetInt("red_jackpot_min_level", 0);
 			this.RedJackpotWaveMin = this.GetInt("red_wave_min", 4);
 			this.RedJackpotWaveMax = this.GetInt("red_wave_max", 10);
 			this.RedJackpotWaveMonsterCount = this.GetInt("red_wave_monster_count", 15);
@@ -435,17 +361,12 @@ namespace Melia.Shared.Configuration.Files
 			this.SilverJackpotSpawnChance = this.GetFloat("silver_jackpot_spawn_chance", 0.05f);
 			this.SilverJackpotRolls = this.GetInt("silver_jackpot_rolls", 100);
 			this.SilverJackpotGuaranteedItemThreshold = this.GetFloat("silver_guaranteed_item_threshold", 0.5f);
-			this.SilverJackpotMinLevel = this.GetInt("silver_jackpot_min_level", 0);
 			this.GoldJackpotSpawnChance = this.GetFloat("gold_jackpot_spawn_chance", 0.01f);
 			this.GoldJackpotRolls = this.GetInt("gold_jackpot_rolls", 1000);
 			this.GoldJackpotGuaranteedItemThreshold = this.GetFloat("gold_guaranteed_item_threshold", 0.5f);
-			this.GoldJackpotMinLevel = this.GetInt("gold_jackpot_min_level", 0);
 			this.EliteSpawnChance = this.GetFloat("elite_spawn_chance", 2);
 			this.EliteHPSPRate = this.GetFloat("elite_hpsp_rate", 150);
 			this.EliteStatRate = this.GetFloat("elite_stat_rate", 150);
-			this.EliteAtkRate = this.GetFloat("elite_atk_rate", this.EliteStatRate);
-			this.EliteDefRate = this.GetFloat("elite_def_rate", this.EliteStatRate);
-			this.EliteSecondaryStatRate = this.GetFloat("elite_secondary_stat_rate", 100);
 			this.EliteExpRate = this.GetFloat("elite_exp_rate", 2);
 			this.EliteRolls = this.GetInt("elite_rolls", 2);
 			this.EliteGuaranteedItemThreshold = this.GetFloat("elite_guaranteed_item_threshold", 0.5f);
@@ -459,9 +380,6 @@ namespace Melia.Shared.Configuration.Files
 			this.MythicAlwaysAggressive = this.GetBool("mythic_always_aggressive", true);
 			this.MythicHPSPRate = this.GetFloat("mythic_hpsp_rate", 600);
 			this.MythicStatRate = this.GetFloat("mythic_stat_rate", 400);
-			this.MythicAtkRate = this.GetFloat("mythic_atk_rate", this.MythicStatRate);
-			this.MythicDefRate = this.GetFloat("mythic_def_rate", this.MythicStatRate);
-			this.MythicSecondaryStatRate = this.GetFloat("mythic_secondary_stat_rate", 100);
 			this.MythicExpRate = this.GetFloat("mythic_exp_rate", 3000);
 			this.MythicRolls = this.GetInt("mythic_rolls", 15);
 			this.MythicGuaranteedItemThreshold = this.GetFloat("mythic_guaranteed_item_threshold", 5);
@@ -486,7 +404,8 @@ namespace Melia.Shared.Configuration.Files
 			this.LogCleanupRetentionDays = this.GetInt("log_cleanup_retention_days", 7);
 			this.LogCleanupIntervalHours = this.GetInt("log_cleanup_interval_hours", 6);
 
-			this.DisabledClientScripts = this.GetString("disabled_client_scripts", "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToHashSet();
+			this.DeadConnectionTimeoutSeconds = this.GetInt("dead_connection_timeout_seconds", 120);
+			this.DeadConnectionSweepIntervalSeconds = this.GetInt("dead_connection_sweep_interval_seconds", 30);
 
 			this.GlobalDropSuperMobItemThreshold = this.GetBool("global_drop_super_mob_item_threshold", false);
 			this.GlobalDropSuperMobItemReroll = this.GetBool("global_drop_super_mob_item_reroll", false);

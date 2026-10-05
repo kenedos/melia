@@ -39,7 +39,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(800));
-			var position = originPos.GetRelative(farPos, distance: 53f);
+			var position = originPos.GetRelative(farPos, distance: 20f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 2.5f),
@@ -83,9 +83,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			var targetPos = originPos.GetRelative(farPos);
+			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 130f, 50));
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 			var position = originPos.GetRelative(farPos, distance: 60);
-			_ = EffectAndHit(skill, caster, position, new EffectHitConfig
+			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 0.5f),
 				PositionDelay = 1000,
@@ -102,9 +104,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			});
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
-			if (!caster.Position.InRange2D(target.Position, 250))
-				return;
-
+			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
+			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hits = new List<SkillHitInfo>();
 			var config = new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("F_smoke129_spreadout##0.8", 0.5f),
@@ -122,17 +124,23 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			var blasts = new List<Task>();
-			foreach (var blastPos in GetScatteredPositions(GetLeadPosition(target, 1000, caster), 3, 90, 70))
-				blasts.Add(this.Blast(caster, skill, blastPos, config));
-			await Task.WhenAll(blasts);
-		}
-
-		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
-		{
-			var hits = new List<SkillHitInfo>();
 			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 15);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
+			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			hits = new List<SkillHitInfo>();
+			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
+			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			hits = new List<SkillHitInfo>();
+			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
+			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			hits = new List<SkillHitInfo>();
+			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}
 
@@ -162,7 +170,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			var hits = new List<SkillHitInfo>();
-			var position = originPos.GetRelative(farPos, distance: 60f, angle: -2f);
+			var position = originPos.GetRelative(farPos, distance: 10, angle: -2f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 3f),
@@ -179,8 +187,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 0f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
-			SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, 3000f, 1, 15, -1, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, 3000f, 1, 40, -1, hits);
 		}
 	}
 
@@ -237,12 +245,16 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			var targetPos = originPos.GetRelative(farPos, distance: 12.135043f, angle: -50f);
+			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 150f, 20));
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			var hits = new List<SkillHitInfo>();
 			var config = new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("F_smoke129_spreadout##0.8", 0.5f),
 				PositionDelay = 1000,
 				Effect = new EffectConfig("F_burstup008_smoke", 1f),
-				Range = 25f,
+				Range = 35f,
 				KnockdownPower = 0f,
 				Delay = 0f,
 				HitCount = 1,
@@ -254,24 +266,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			var waits = new[] { 1000, 2000, 2500 };
-			foreach (var wait in waits)
+			for (var i = 0; i < 9; i++)
 			{
-				await skill.Wait(TimeSpan.FromMilliseconds(wait));
-				if (!caster.Position.InRange2D(target.Position, 250))
-					return;
-
-				foreach (var position in GetScatteredPositions(GetLeadPosition(target, 1000, caster), 4, 100, 55))
-					_ = this.Blast(caster, skill, position, config);
+				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
+				position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+				await EffectAndHit(skill, caster, position, config, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_debrave, 1, 0f, 6000f, 1, 10, -1, hits);
+				SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+				hits.Clear();
 			}
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
-		}
-
-		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
-		{
-			var hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_debrave, 1, 0f, 6000f, 1, 10, -1, hits);
 		}
 	}
 }

@@ -12,7 +12,6 @@ using Melia.Zone.World.Actors;
 using Yggdrasil.Extensions;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
-using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using System.Linq;
 using Melia.Zone.Skills.Helpers;
 
@@ -110,7 +109,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1800));
 			var position = originPos.GetRelative(farPos, distance: 50f);
-			_ = EffectAndHit(skill, caster, position, new EffectHitConfig
+			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = EffectConfig.None,
 				PositionDelay = 0,
@@ -143,12 +142,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			var baseDir = originPos.GetDirection(farPos);
-			var startingPosition = originPos.GetRelative(baseDir, 40f);
-			var lines = new List<Task>();
-			foreach (var angle in new[] { -15f, 15f, -45f, 45f })
-				lines.Add(EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(baseDir.AddDegreeAngle(angle), 250f), config));
-			await Task.WhenAll(lines);
+			for (var i = 0; i < 4; i++)
+			{
+				var startingPosition = originPos.GetRelative(farPos, distance: 40f);
+				var endingPosition = originPos.GetRelative(farPos, distance: 250f);
+				await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
+			}
 		}
 	}
 
@@ -218,7 +217,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -226,8 +224,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			_ = MonsterSkillFollowMovePath(caster, skill, (1600, 1f, 104f), (2100, 122f, 0f));
-
 			await skill.Wait(TimeSpan.FromMilliseconds(1600));
 			var startingPosition = originPos.GetRelative(farPos);
 			var endingPosition = originPos.GetRelative(farPos, distance: 150f);

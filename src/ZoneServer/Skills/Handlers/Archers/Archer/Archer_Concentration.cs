@@ -37,7 +37,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 			target = caster;
 
 			var duration = TimeSpan.FromMinutes(30);
-			target.StartBuff(BuffId.Concentration_Buff, skill.Level, 0, duration, caster, skill.Id);
+			target.StartBuff(BuffId.Concentration_Buff, skill.Level, 0, duration, caster);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 		}

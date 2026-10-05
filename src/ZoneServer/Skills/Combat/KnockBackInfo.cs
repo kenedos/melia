@@ -1,7 +1,6 @@
 ﻿using System;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
@@ -151,7 +150,7 @@ namespace Melia.Zone.Skills.Combat
 				KnockDirection.TowardsTarget => caster.Position,
 				KnockDirection.TowardsCaster => target.Position.GetRelative(caster.Position.GetDirection(target.Position), 200f),
 				KnockDirection.CasterForward => target.Position.GetRelative(caster.Direction.Backwards, 100f),
-				KnockDirection.Random => target.Position.GetRelative(new Direction(GameRandom.Get().NextDouble() * 360), 100f),
+				KnockDirection.Random => target.Position.GetRelative(new Direction(RandomProvider.Get().NextDouble() * 360), 100f),
 				_ => caster.Position,
 			};
 		}

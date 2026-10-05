@@ -9,7 +9,6 @@ using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Composition;
 using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.Components
 {
@@ -66,6 +65,8 @@ namespace Melia.Zone.World.Actors.Components
 			this.RegisterState(new(StateType.Raised, [LockType.Movement, LockType.Attack, LockType.GetKnockedBack]));
 			this.RegisterState(new(StateType.Captured, [LockType.Movement, LockType.Attack, LockType.GetTargeted]));
 			this.RegisterState(new(StateType.Fear, [LockType.Attack]));
+			this.RegisterState(new(StateType.SageRupture, []));
+			this.RegisterState(new(StateType.SageBlackHole, [LockType.Movement, LockType.Attack]));
 		}
 
 		/// <summary>
@@ -155,7 +156,7 @@ namespace Melia.Zone.World.Actors.Components
 
 			if (duration != TimeSpan.MaxValue)
 			{
-				var endTime = GameClock.LocalNow.Add(duration);
+				var endTime = DateTime.Now.Add(duration);
 				_lockEnds.Add(new(lockType, endTime));
 			}
 		}
@@ -279,7 +280,7 @@ namespace Melia.Zone.World.Actors.Components
 
 				if (duration != TimeSpan.MaxValue)
 				{
-					var endTime = GameClock.LocalNow.Add(duration);
+					var endTime = DateTime.Now.Add(duration);
 					_stateEnds.Add(new(stateType, endTime));
 				}
 			}
@@ -330,7 +331,7 @@ namespace Melia.Zone.World.Actors.Components
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
-			var now = GameClock.LocalNow;
+			var now = DateTime.Now;
 			var movementLockChanged = false;
 
 			lock (_syncLock)
@@ -399,6 +400,12 @@ namespace Melia.Zone.World.Actors.Components
 		public const string Attack = nameof(Attack);
 
 		/// <summary>
+		/// Prevents other actors from attacking this one.
+		/// </summary>
+		[Obsolete("User GetTargeted and GetDamaged instead.")]
+		public const string GetHit = nameof(GetHit);
+
+		/// <summary>
 		/// Prevents other actors from targeting this one.
 		/// </summary>
 		/// <remarks>
@@ -452,6 +459,8 @@ namespace Melia.Zone.World.Actors.Components
 		public const string Fluting = nameof(Fluting);
 		public const string Frozen = nameof(Frozen);
 		public const string Held = nameof(Held);
+		public const string SageRupture = nameof(SageRupture);
+		public const string SageBlackHole = nameof(SageBlackHole);
 
 		public const string KnockedBack = nameof(KnockedBack);
 

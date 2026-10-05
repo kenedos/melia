@@ -19,4 +19,4 @@ ClientHeaderFixed header;
 byte b1; // 0
 position pos;
 direction dir;
-float clientTime;
+float f1; //312.1994

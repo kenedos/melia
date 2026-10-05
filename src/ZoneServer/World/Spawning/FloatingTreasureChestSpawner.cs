@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Monsters;
@@ -86,7 +85,7 @@ namespace Melia.Zone.World.Spawning
 		{
 			var minMs = _minRespawnDelay.TotalMilliseconds;
 			var maxMs = _maxRespawnDelay.TotalMilliseconds;
-			var randomMs = minMs + (GameRandom.Get().NextDouble() * (maxMs - minMs));
+			var randomMs = minMs + (RandomProvider.Get().NextDouble() * (maxMs - minMs));
 			return TimeSpan.FromMilliseconds(randomMs);
 		}
 

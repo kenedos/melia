@@ -12,25 +12,12 @@ namespace Melia.Shared.Packages
 	/// </summary>
 	public class PackageManager
 	{
-		/// <summary>
-		/// Package name that marks handlers of the system itself, which
-		/// register whenever any package is enabled.
-		/// </summary>
-		public const string SystemName = "system";
-
-		private static readonly string[] ExclusiveTypes = { "core", "skills", "world" };
-
 		private readonly List<PackageInfo> _packages = new();
 
 		/// <summary>
 		/// Returns the list of loaded packages.
 		/// </summary>
 		public IReadOnlyList<PackageInfo> Packages => _packages;
-
-		/// <summary>
-		/// Returns true if two enabled packages share an exclusive type.
-		/// </summary>
-		public bool HasConflicts { get; private set; }
 
 		/// <summary>
 		/// Returns true if the given package name is enabled.
@@ -54,7 +41,7 @@ namespace Melia.Shared.Packages
 			if (attr == null)
 				return true;
 
-			return attr.PackageNames.Any(a => a == SystemName ? _packages.Count > 0 : this.IsEnabled(a));
+			return this.IsEnabled(attr.PackageName);
 		}
 
 		/// <summary>
@@ -84,26 +71,7 @@ namespace Melia.Shared.Packages
 
 				var info = new PackageInfo(packageName, packageDir);
 				_packages.Add(info);
-				Log.Info("  loaded package '{0}' ({1}).", packageName, info.Type);
-			}
-
-			this.CheckConflicts();
-		}
-
-		/// <summary>
-		/// Logs an error for every exclusive package type that more than
-		/// one enabled package belongs to.
-		/// </summary>
-		private void CheckConflicts()
-		{
-			foreach (var type in ExclusiveTypes)
-			{
-				var names = _packages.Where(p => p.Type == type).Select(p => p.Name).ToList();
-				if (names.Count < 2)
-					continue;
-
-				Log.Error("Packages '{0}' are all of type '{1}', and only one package of that type can be enabled.", string.Join("', '", names), type);
-				this.HasConflicts = true;
+				Log.Info("  loaded package '{0}'.", packageName);
 			}
 		}
 	}
@@ -149,12 +117,6 @@ namespace Melia.Shared.Packages
 		public string SqlDirectory => Path.Combine(this.Directory, "sql");
 
 		/// <summary>
-		/// Returns the type declared in the package's package.conf:
-		/// core, skills, world, or addon if none is declared.
-		/// </summary>
-		public string Type { get; private set; } = "addon";
-
-		/// <summary>
 		/// Creates a new package info instance.
 		/// </summary>
 		/// <param name="name"></param>
@@ -163,31 +125,6 @@ namespace Melia.Shared.Packages
 		{
 			this.Name = name;
 			this.Directory = directory;
-			this.ReadType();
-		}
-
-		/// <summary>
-		/// Reads the type option from the package's package.conf.
-		/// </summary>
-		private void ReadType()
-		{
-			var path = Path.Combine(this.Directory, "package.conf");
-			if (!File.Exists(path))
-				return;
-
-			foreach (var line in File.ReadLines(path))
-			{
-				var trimmed = line.Trim();
-				if (trimmed.StartsWith("//"))
-					continue;
-
-				var index = trimmed.IndexOf(':');
-				if (index < 0 || trimmed.Substring(0, index).Trim() != "type")
-					continue;
-
-				this.Type = trimmed.Substring(index + 1).Trim().ToLowerInvariant();
-				return;
-			}
 		}
 
 		/// <summary>

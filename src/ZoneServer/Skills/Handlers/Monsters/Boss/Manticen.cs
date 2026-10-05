@@ -36,7 +36,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -71,7 +71,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -141,7 +141,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -185,23 +185,23 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			var startingPosition = originPos.GetRelative(farPos, distance: 25f, angle: 60f);
-			var endingPosition = originPos.GetRelative(farPos, distance: 110f, angle: 120f);
+			var startingPosition = originPos.GetRelative(farPos, distance: 25f);
+			var endingPosition = originPos.GetRelative(farPos, distance: 110f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
 			startingPosition = originPos.GetRelative(farPos);
-			endingPosition = originPos.GetRelative(farPos, distance: -100f);
+			endingPosition = originPos.GetRelative(farPos);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
-			startingPosition = originPos.GetRelative(farPos, distance: 43f, angle: -30f);
-			endingPosition = originPos.GetRelative(farPos, distance: 130f, angle: -50f);
+			startingPosition = originPos.GetRelative(farPos, distance: 43.299999f);
+			endingPosition = originPos.GetRelative(farPos, distance: 130f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
-			startingPosition = originPos.GetRelative(farPos, distance: 25f, angle: -60f);
-			endingPosition = originPos.GetRelative(farPos, distance: 110f, angle: -120f);
+			startingPosition = originPos.GetRelative(farPos, distance: 25f);
+			endingPosition = originPos.GetRelative(farPos, distance: 110f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
 			startingPosition = originPos.GetRelative(farPos, distance: 50f);
 			endingPosition = originPos.GetRelative(farPos, distance: 150f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
-			startingPosition = originPos.GetRelative(farPos, distance: 43f, angle: 30f);
-			endingPosition = originPos.GetRelative(farPos, distance: 130f, angle: 50f);
+			startingPosition = originPos.GetRelative(farPos, distance: 43.299999f);
+			endingPosition = originPos.GetRelative(farPos, distance: 130f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
 		}
 	}
@@ -225,7 +225,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -242,13 +242,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 200;
+			hitDelay = 2400;
 			aniTime = 200;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 600;
+			hitDelay = 3000;
 			aniTime = 600;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);

@@ -37,7 +37,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 			if (caster.IsAbilityActive(AbilityId.Outlaw19))
 				caster.StartBuff(BuffId.BullyPainBarrier_Buff, skill.Level, 0, TimeSpan.FromSeconds(20), caster);
 			else
-				caster.StartBuff(BuffId.Bully_Buff, skill.Level, 0, TimeSpan.FromSeconds(60), caster, skill.Id);
+				caster.StartBuff(BuffId.Bully_Buff, skill.Level, 0, TimeSpan.FromSeconds(60), caster);
 
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster, null);
 		}

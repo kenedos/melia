@@ -6,7 +6,6 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
@@ -28,8 +27,6 @@ namespace Melia.Zone.World.Items
 	public class Item : IPropertyObject
 	{
 		private readonly List<Item> _gemSockets = new();
-
-		private const int DurabilityPerPoint = 100;
 
 		private static long ObjectIds = ObjectIdRanges.Items;
 
@@ -63,32 +60,6 @@ namespace Melia.Zone.World.Items
 		/// that it can contain more than one item of its type.
 		/// </summary>
 		public bool IsStackable => this.Data.MaxStack > 1;
-
-		/// <summary>
-		/// Returns true if the item carries a skill, which makes otherwise
-		/// identical stacks distinct.
-		/// </summary>
-		public bool IsSkillScroll => this.Data.ClassName.StartsWith("Scroll_SkillItem");
-
-		/// <summary>
-		/// Returns whether the given item may be merged into this one's
-		/// stack.
-		/// </summary>
-		/// <param name="other"></param>
-		/// <returns></returns>
-		public bool CanStackWith(Item other)
-		{
-			if (other == null || other.Id != this.Id)
-				return false;
-
-			if (this.IsSkillScroll)
-			{
-				return this.Properties.GetFloat(PropertyName.SkillType) == other.Properties.GetFloat(PropertyName.SkillType)
-					&& this.Properties.GetFloat(PropertyName.SkillLevel) == other.Properties.GetFloat(PropertyName.SkillLevel);
-			}
-
-			return true;
-		}
 
 		/// <summary>
 		/// Gets or sets item's globally unique db id.
@@ -164,18 +135,6 @@ namespace Melia.Zone.World.Items
 		/// by anyone.
 		/// </summary>
 		public DateTime LootProtectionEnd { get; private set; } = DateTime.MinValue;
-
-		/// <summary>
-		/// Returns whether the item was classified as trash loot for the
-		/// character it dropped for.
-		/// </summary>
-		public bool IsTrashLoot { get; private set; }
-
-		/// <summary>
-		/// Returns the time at which trash loot becomes available to be
-		/// picked up.
-		/// </summary>
-		public DateTime TrashPickUpTime { get; private set; } = DateTime.MinValue;
 
 
 		/// <summary>
@@ -353,8 +312,6 @@ namespace Melia.Zone.World.Items
 			this.RePickUpTime = other.RePickUpTime;
 			this.OwnerHandle = other.OwnerHandle;
 			this.LootProtectionEnd = other.LootProtectionEnd;
-			this.IsTrashLoot = other.IsTrashLoot;
-			this.TrashPickUpTime = other.TrashPickUpTime;
 
 			this.Properties.CopyFrom(other.Properties);
 			this.CopyGemSockets(other);
@@ -636,7 +593,7 @@ namespace Melia.Zone.World.Items
 
 		public ItemMonster Drop(Map map, Position position, long ownerId = 0)
 		{
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 			var direction = new Direction(rnd.Next(0, 360));
 			var dropRadius = ZoneServer.Instance.Conf.World.DropRadius;
 			var distance = rnd.Next(dropRadius / 2, dropRadius + 1);
@@ -824,17 +781,6 @@ namespace Melia.Zone.World.Items
 		}
 
 		/// <summary>
-		/// Marks the item as trash loot, delaying when it can be picked
-		/// up by the character it dropped for.
-		/// </summary>
-		/// <param name="pickUpDelay"></param>
-		public void SetTrashLoot(TimeSpan pickUpDelay)
-		{
-			this.IsTrashLoot = true;
-			this.TrashPickUpTime = DateTime.Now.Add(pickUpDelay);
-		}
-
-		/// <summary>
 		/// Clears protections, so the item can be picked up by anyone.
 		/// </summary>
 		/// <param name="entity"></param>
@@ -863,34 +809,6 @@ namespace Melia.Zone.World.Items
 			Send.ZC_OBJECT_PROPERTY(character.Connection, this);
 			if (isBroken || isFixed)
 				character.InvalidateProperties();
-
-			character.Tutorials.CheckLowDurability(this);
-		}
-
-		/// <summary>
-		/// Wears the item's durability down by the given raw amount and
-		/// updates the client when the displayed value changes or the item
-		/// breaks.
-		/// </summary>
-		/// <param name="character"></param>
-		/// <param name="amount">Raw durability, 100 per displayed point.</param>
-		public void WearDurability(Character character, int amount)
-		{
-			if (amount <= 0 || this.Durability <= 0)
-				return;
-
-			var before = this.Durability;
-			this.Durability = before - amount;
-			var after = this.Durability;
-
-			if (after > 0 && before / DurabilityPerPoint == after / DurabilityPerPoint)
-				return;
-
-			Send.ZC_OBJECT_PROPERTY(character.Connection, this, PropertyName.Dur);
-			if (after == 0)
-				character.InvalidateProperties();
-
-			character.Tutorials.CheckLowDurability(this);
 		}
 
 		public void Appraisal()
@@ -911,23 +829,23 @@ namespace Melia.Zone.World.Items
 			{
 				// red = STR
 				case 643501:
-					this.AddGemRandomOption(1, PropertyName.STR, "STAT", this.GemLevel);
+					this.AddGemRandomOption(1, PropertyName.STR, "STAT", 3 * this.GemLevel);
 					break;
 				// blue = INT
 				case 643502:
-					this.AddGemRandomOption(1, PropertyName.INT, "STAT", this.GemLevel);
+					this.AddGemRandomOption(1, PropertyName.INT, "STAT", 3 * this.GemLevel);
 					break;
 				// green = CON
 				case 643503:
-					this.AddGemRandomOption(1, PropertyName.CON, "STAT", this.GemLevel);
+					this.AddGemRandomOption(1, PropertyName.CON, "STAT", 3 * this.GemLevel);
 					break;
 				// yellow = DEX
 				case 643504:
-					this.AddGemRandomOption(1, PropertyName.DEX, "STAT", this.GemLevel);
+					this.AddGemRandomOption(1, PropertyName.DEX, "STAT", 3 * this.GemLevel);
 					break;
 				// white = SPR
 				case 643817:
-					this.AddGemRandomOption(1, PropertyName.MNA, "STAT", this.GemLevel);
+					this.AddGemRandomOption(1, PropertyName.MNA, "STAT", 3 * this.GemLevel);
 					break;
 			}
 		}
@@ -943,7 +861,7 @@ namespace Melia.Zone.World.Items
 				return;
 
 			this.Properties.SetFloat(PropertyName.NeedRandomOption, 0);
-			var random = GameRandom.Get();
+			var random = RandomProvider.Get();
 			var options = random.Next(minOptions, maxOptions);
 			var utilOptions = new string[] { "CRTHR", "CRTDR", "BLK_BREAK", "BLK", "ADD_HR", "ADD_DR", "RHP", "MSP" };
 			var atkOptions = new string[] { "ADD_CLOTH", "ADD_LEATHER", "ADD_IRON", "ADD_SMALLSIZE", "ADD_MIDDLESIZE",
@@ -989,7 +907,7 @@ namespace Melia.Zone.World.Items
 				this.RemoveRandomOption(i);
 
 			this.Properties.SetFloat(PropertyName.NeedRandomOption, 0);
-			var random = GameRandom.Get();
+			var random = RandomProvider.Get();
 			var itemGrade = (ItemGrade)this.Properties.GetFloat(PropertyName.ItemGrade);
 
 			if (itemGrade <= ItemGrade.Normal)
@@ -1270,7 +1188,7 @@ namespace Melia.Zone.World.Items
 		/// <returns></returns>
 		public float GenerateRandomStatValue(string propertyName, float itemLevel, ItemGrade itemGrade, out float rngModifier)
 		{
-			var random = GameRandom.Get();
+			var random = RandomProvider.Get();
 
 			// Natural oscilation of -20% to +20% to stat value
 			rngModifier = (float)(random.NextDouble() * 0.4 - 0.2);
@@ -1569,7 +1487,7 @@ namespace Melia.Zone.World.Items
 		/// </summary>
 		public void GenerateRandomHatOptions(int minOptions = 1, int maxOptions = 2)
 		{
-			var random = GameRandom.Get();
+			var random = RandomProvider.Get();
 			var options = random.Next(minOptions, maxOptions);
 			var utilOptions = new string[] { "CRTHR", "CRTDR", "BLK_BREAK", "BLK", "ADD_HR", "ADD_DR", "RHP", "SR", "MSPD" };
 			var atkOptions = new string[] { "ADD_CLOTH", "ADD_LEATHER", "ADD_IRON", "ADD_SMALLSIZE", "ADD_MIDDLESIZE",
@@ -1819,7 +1737,19 @@ namespace Melia.Zone.World.Items
 		/// <param name="calcFuncName"></param>
 		private void Create(string propertyName, string calcFuncName)
 		{
-			this.Properties.Create(new CFloatProperty(propertyName, () => this.CalculateProperty(calcFuncName)));
+			switch (propertyName)
+			{
+				case PropertyName.MINATK:
+				case PropertyName.MAXATK:
+				case PropertyName.MATK:
+				case PropertyName.DEF:
+				case PropertyName.MDEF:
+					this.Properties.Create(new RFloatProperty(propertyName, () => this.CalculateProperty(calcFuncName)));
+					break;
+				default:
+					this.Properties.Create(new CFloatProperty(propertyName, () => this.CalculateProperty(calcFuncName)));
+					break;
+			}
 		}
 
 		/// <summary>

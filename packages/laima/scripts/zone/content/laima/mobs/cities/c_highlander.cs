@@ -1,0 +1,44 @@
+//--- Melia Script -----------------------------------------------------------
+// Highlander Master's Training Hall Spawns
+//--- Description -----------------------------------------------------------
+// Sets up monster spawners for 'c_highlander'.
+//---------------------------------------------------------------------------
+
+using System;
+using Melia.Zone.Scripting;
+using Melia.Shared.Game.Const;
+using static Melia.Zone.Scripting.Shortcuts;
+
+public class CHighlanderMobScript : GeneralScript
+{
+	protected override void Load()
+	{
+		// Property Overrides -------------------------------
+
+		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Fire, Properties("MHP", 999999, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
+		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Poison, Properties("MHP", 999999, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
+		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Lightning, Properties("MHP", 999999, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
+		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Earth, Properties("MHP", 999999, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
+
+		// Monster Spawners ---------------------------------
+
+		AddSpawner("c_highlander.Id1", MonsterId.Wood_Carving_Fire, amount: 1, respawn: Seconds(10));
+		AddSpawner("c_highlander.Id2", MonsterId.Wood_Carving_Poison, amount: 1, respawn: Seconds(10));
+		AddSpawner("c_highlander.Id3", MonsterId.Wood_Carving_Lightning, amount: 1, respawn: Seconds(10));
+		AddSpawner("c_highlander.Id4", MonsterId.Wood_Carving_Earth, amount: 1, respawn: Seconds(10));
+
+		// Monster Spawn Points -----------------------------
+
+		// 'Wood_Carving_Fire' GenType 24 Spawn Points
+		AddSpawnPoint("c_highlander.Id1", "c_highlander", Rectangle(-32, -31, 10));
+
+		// 'Wood_Carving_Poison' GenType 25 Spawn Points
+		AddSpawnPoint("c_highlander.Id2", "c_highlander", Rectangle(28, -31, 10));
+
+		// 'Wood_Carving_Lightning' GenType 26 Spawn Points
+		AddSpawnPoint("c_highlander.Id3", "c_highlander", Rectangle(146, 92, 10));
+
+		// 'Wood_Carving_Earth' GenType 27 Spawn Points
+		AddSpawnPoint("c_highlander.Id4", "c_highlander", Rectangle(142, 28, 10));
+	}
+}

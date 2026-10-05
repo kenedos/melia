@@ -24,7 +24,6 @@ using Melia.Shared.Network.Inter.Messages;
 using Melia.Shared.Packages;
 using Melia.Shared.Versioning;
 using Melia.Shared.Versioning.MEnums;
-using Microsoft.Extensions.ObjectPool;
 using Yggdrasil.Data;
 using Yggdrasil.Extensions;
 using Yggdrasil.Logging;
@@ -285,6 +284,7 @@ namespace Melia.Shared
 					this.LoadDb(this.Data.AccountOptionDb, "db/account_options.txt");
 					this.LoadDb(this.Data.AchievementDb, "db/achievements.txt");
 					this.LoadDb(this.Data.AchievementPointDb, "db/achievement_points.txt");
+					this.LoadDb(this.Data.AchievementStatRewardDb, "db/achievement_stat_rewards.txt");
 					this.LoadDb(this.Data.BarrackDb, "db/barracks.txt");
 					this.LoadDb(this.Data.BuffDb, "db/buffs.txt");
 					this.LoadDb(this.Data.BuffOverrideDb, "db/buffs_overrides.txt");
@@ -347,7 +347,6 @@ namespace Melia.Shared
 
 					this.LoadDb(this.Data.GlobalDropDb, "db/global_drops.txt");
 					this.LoadDb(this.Data.MapBonusDropsDb, "db/map_bonus_drops.txt");
-					this.LoadDb(this.Data.MapRankDb, "db/map_ranks.txt", true);
 					this.LoadDb(this.Data.TreasureDropDb, "db/treasure_drops.txt");
 					this.LoadDb(this.Data.TreasureSpawnPointDb, "db/treasure_spawn_points.txt");
 					this.LoadDb(this.Data.MinigameSpawnPointDb, "db/minigame_spawn_points.txt");
@@ -382,6 +381,7 @@ namespace Melia.Shared
 					this.LoadDb(this.Data.AccountOptionDb, "db/account_options.txt");
 					this.LoadDb(this.Data.AchievementDb, "db/achievements.txt");
 					this.LoadDb(this.Data.AchievementPointDb, "db/achievement_points.txt");
+					this.LoadDb(this.Data.AchievementStatRewardDb, "db/achievement_stat_rewards.txt");
 					this.LoadDb(this.Data.BarrackDb, "db/barracks.txt");
 					this.LoadDb(this.Data.BuffDb, "db/buffs.txt");
 					this.LoadDb(this.Data.BuffOverrideDb, "db/buffs_overrides.txt");
@@ -439,7 +439,6 @@ namespace Melia.Shared
 
 					this.LoadDb(this.Data.GlobalDropDb, "db/global_drops.txt");
 					this.LoadDb(this.Data.MapBonusDropsDb, "db/map_bonus_drops.txt");
-					this.LoadDb(this.Data.MapRankDb, "db/map_ranks.txt", true);
 					this.LoadDb(this.Data.TreasureDropDb, "db/treasure_drops.txt");
 					this.LoadDb(this.Data.TreasureSpawnPointDb, "db/treasure_spawn_points.txt");
 					this.LoadDb(this.Data.MinigameSpawnPointDb, "db/minigame_spawn_points.txt");
@@ -507,18 +506,17 @@ namespace Melia.Shared
 			}
 
 			// --- Load Base (System) Data ---
-			if (File.Exists(systemPathToLoad))
-			{
-				db.LoadFile(systemPathToLoad);
-				foreach (var ex in db.GetWarnings())
-					Log.Warning(ex);
-			}
-			else if (!isOptional)
+			if (!File.Exists(systemPathToLoad))
 			{
 				Log.Error("LoadDb: Base data file '{0}' not found.", systemPathToLoad);
-				ConsoleUtil.Exit(1);
+				if (!isOptional)
+					ConsoleUtil.Exit(1);
 				return;
 			}
+
+			db.LoadFile(systemPathToLoad);
+			foreach (var ex in db.GetWarnings())
+				Log.Warning(ex);
 
 			var isIndexedDb = db.GetType().Name.Contains("Indexed") || db.GetType().BaseType?.Name.Contains("Indexed") == true;
 
@@ -650,19 +648,9 @@ namespace Melia.Shared
 
 				this.ScriptLoader = new ScriptLoader(cachePath);
 
-				// Required for HTTP and other stuff that might be used in
-				// scripts. To make this more flexible, we could potentially
-				// add a way for scripts to specify their own references.
 				this.ScriptLoader.References.Add(typeof(JsonSerializer).Assembly.Location);
 				this.ScriptLoader.References.Add(typeof(HttpClient).Assembly.Location);
 				this.ScriptLoader.References.Add(typeof(Uri).Assembly.Location);
-				this.ScriptLoader.References.Add(typeof(DefaultObjectPool<>).Assembly.Location);
-
-				// ScriptLoader otherwise picks these up only via the entry
-				// assembly, which is the test host when a server is booted
-				// from a test project rather than its own executable.
-				this.ScriptLoader.References.Add(this.GetType().Assembly.Location);
-				this.ScriptLoader.References.Add(typeof(Server).Assembly.Location);
 
 				// Write package script entries into scripts_packages.txt,
 				// which is already required by the system scripts.txt.
@@ -743,9 +731,8 @@ namespace Melia.Shared
 				writer.WriteLine("//---------------------------------------------------------------------------");
 				writer.WriteLine();
 
-				// System scripts that every package set relies on
+				// System-only scripts not provided by packages
 				writer.WriteLine("commands/**/*");
-				writer.WriteLine("require \"scripts_base.txt\"");
 
 				foreach (var (name, path) in packageScriptEntries)
 				{
@@ -956,11 +943,6 @@ namespace Melia.Shared
 		/// </summary>
 		public virtual void UpdateServerInfo(ServerStatus status, int playerCount = 0, ServerRates rates = null)
 		{
-			// Null when the server was booted without a coordinator
-			// connection, as the balance harness does.
-			if (this.Communicator == null)
-				return;
-
 			var serverId = this.ServerInfo.Id;
 
 			var message = new ServerUpdateMessage(this.Type, serverId, playerCount, status, rates);
@@ -977,9 +959,6 @@ namespace Melia.Shared
 
 			if (this.Packages.Packages.Count == 0)
 				Log.Info("  no packages enabled.");
-
-			if (this.Packages.HasConflicts)
-				ConsoleUtil.Exit(1);
 		}
 
 		/// <summary>

@@ -100,7 +100,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 220, 30, 10, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 220, 30, 10, 1, 5, hits);
 		}
 	}
 
@@ -147,7 +147,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}
 
@@ -176,8 +176,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
-			var startingPosition = originPos.GetRelative(farPos, distance: 80f, angle: 20f);
-			var endingPosition = originPos.GetRelative(farPos, distance: 250f, angle: 20f);
+			var startingPosition = originPos.GetRelative(farPos, distance: 80f);
+			var endingPosition = originPos.GetRelative(farPos, distance: 250f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
 				ArrowEffect = new EffectConfig("F_sys_arrow_monster", 1f),
@@ -278,7 +278,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var slamConfig = new EffectHitConfig
+			var targetPos = originPos.GetRelative(farPos);
+			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 150f, 30));
+			var hits = new List<SkillHitInfo>();
+			var effectHitConfig = new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("F_sys_target_boss##0.3", 5f),
 				PositionDelay = 1500,
@@ -294,46 +297,95 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			};
-			var bigSlamConfig = slamConfig;
-			bigSlamConfig.GroundEffect = new EffectConfig("F_sys_target_boss##0.3", 8f);
-			bigSlamConfig.Effect = new EffectConfig("F_burstup029_smoke", 5f);
-			bigSlamConfig.Range = 100f;
 
-			var blastConfig = slamConfig;
-			blastConfig.GroundEffect = new EffectConfig("F_sys_target_boss##0.3", 2.5f);
-			blastConfig.Effect = new EffectConfig("F_burstup029_smoke", 1f);
-			blastConfig.Range = 30f;
-
-			var slamPos = originPos.GetRelative(originPos.GetDirection(farPos), 50f);
-			var schedule = new (int Time, int Kind)[]
+			var position = originPos.GetRelative(farPos, distance: 50);
+			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect, 1, 0f, 10000f, 1, 5, -1, hits);
+			hits.Clear();
+			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			await skill.Wait(TimeSpan.FromMilliseconds(1500));
+			var effectHitConfig2 = new EffectHitConfig
 			{
-				(0, 1), (1500, 0), (1650, 0), (1800, 0), (1950, 0), (3500, 1), (5000, 0), (5150, 0), (5300, 0), (5450, 0), (5450, 0), (7000, 2),
+				GroundEffect = new EffectConfig("F_sys_target_boss##0.3", 2.5f),
+				PositionDelay = 100,
+				Effect = new EffectConfig("F_burstup029_smoke", 1f),
+				Range = 30f,
+				KnockdownPower = 125f,
+				Delay = 0f,
+				HitCount = 1,
+				HitDuration = 0f,
+				CasterEffect = EffectConfig.None,
+				CasterNodeName = "None",
+				KnockType = 3,
+				VerticalAngle = 60f,
+				InnerRange = 0,
 			};
 
-			var elapsed = 0;
-			var tasks = new List<Task>();
-			foreach (var (time, kind) in schedule)
+			for (var i = 0; i < 4; i++)
 			{
-				if (time > elapsed)
+				if (i > 0)
 				{
-					await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
-					elapsed = time;
+					position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+					await skill.Wait(TimeSpan.FromMilliseconds(150));
 				}
-
-				if (kind == 1)
-					tasks.Add(this.Blast(caster, skill, slamPos, slamConfig));
-				else if (kind == 2)
-					tasks.Add(this.Blast(caster, skill, slamPos, bigSlamConfig));
-				else if (caster.Position.InRange2D(target.Position, 300))
-					tasks.Add(this.Blast(caster, skill, originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 1500, 70, caster), 250f), blastConfig));
+				await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect, 1, 0f, 10000f, 1, 5, -1, hits);
+				hits.Clear();
 			}
-			await Task.WhenAll(tasks);
-		}
+			await skill.Wait(TimeSpan.FromMilliseconds(150));
+			position = originPos.GetRelative(farPos, distance: 50);
+			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect, 1, 0f, 10000f, 1, 5, -1, hits);
+			hits.Clear();
+			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 
-		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
-		{
-			var hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
+			var effectHitConfig3 = new EffectHitConfig
+			{
+				GroundEffect = new EffectConfig("F_sys_target_boss##0.3", 1.5f),
+				PositionDelay = 100,
+				Effect = new EffectConfig("F_burstup029_smoke", 1f),
+				Range = 30f,
+				KnockdownPower = 125f,
+				Delay = 0f,
+				HitCount = 1,
+				HitDuration = 0f,
+				CasterEffect = EffectConfig.None,
+				CasterNodeName = "None",
+				KnockType = 3,
+				VerticalAngle = 60f,
+				InnerRange = 0,
+			};
+
+			for (var i = 0; i < 5; i++)
+			{
+				if (i > 0)
+				{
+					position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+					await skill.Wait(TimeSpan.FromMilliseconds(150));
+				}
+				await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect, 1, 0f, 10000f, 1, 5, -1, hits);
+				hits.Clear();
+			}
+			await skill.Wait(TimeSpan.FromMilliseconds(1550));
+			position = originPos.GetRelative(farPos, distance: 50);
+			await EffectAndHit(skill, caster, position, new EffectHitConfig
+			{
+				GroundEffect = new EffectConfig("F_sys_target_boss##0.3", 8f),
+				PositionDelay = 1500,
+				Effect = new EffectConfig("F_burstup029_smoke", 5f),
+				Range = 100f,
+				KnockdownPower = 125f,
+				Delay = 0f,
+				HitCount = 1,
+				HitDuration = 0f,
+				CasterEffect = EffectConfig.None,
+				CasterNodeName = "None",
+				KnockType = 3,
+				VerticalAngle = 60f,
+				InnerRange = 0,
+			}, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect, 1, 0f, 10000f, 1, 5, -1, hits);
 		}
 	}

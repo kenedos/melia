@@ -28,36 +28,10 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		private readonly HashSet<ITriggerableArea> _triggerAreas = new();
 		private readonly HashSet<ITriggerableArea> _currentTriggerAreas = new();
 		private readonly List<ITriggerableArea> _tempEnteredAreas = new();
-		private readonly List<ITriggerableArea> _tempLeftAreas = new();
 
 		private DateTime _lastPartyUpdate = DateTime.MinValue;
 		private static readonly TimeSpan PartyUpdateInterval = TimeSpan.FromMilliseconds(500);
-
-		private static readonly TimeSpan DefaultMoveInterval = TimeSpan.FromMilliseconds(175);
-		private static readonly TimeSpan MaxExtrapolationTime = TimeSpan.FromMilliseconds(500);
-		private static readonly TimeSpan LagCompensationTime = TimeSpan.FromMilliseconds(100);
-		private static readonly TimeSpan MaxLagCompensationJitter = TimeSpan.FromMilliseconds(150);
-		private static readonly TimeSpan MaxPlausibleLatency = TimeSpan.FromSeconds(3);
-		private const double LatencyAlpha = 1 / 4.0;
-		private const double MoveIntervalAlpha = 1 / 16.0;
-		private const double MinOffsetCreepPerSample = 0.0005;
-		private const float SameDirectionThreshold = 0.99f;
-		private const double MaxSpeedTolerance = 1.5;
-		private static readonly TimeSpan MaxProjectionTime = TimeSpan.FromMilliseconds(500);
-
-		private float _lastClientTime;
-		private Direction _lastClientDir;
-		private Position _lastClientPos;
-		private bool _hasClientSample;
-		private double _measuredSpeed;
-		private TimeSpan _avgMoveInterval = DefaultMoveInterval;
-		private TimeSpan _extrapolatedTime;
-		private readonly DateTime _epoch = GameClock.Now;
-		private double _minClientOffset;
-		private double _clientJitter;
-		private double _latencyBaseline;
-		private double _smoothedLatency;
-		private bool _hasLatencyBaseline;
+		private readonly List<ITriggerableArea> _tempLeftAreas = new();
 
 		/// <summary>
 		/// Returns the entity's current destination, if it's moving to
@@ -140,7 +114,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (!this.Entity.CanMove())
 				return;
 
-			await GameClock.Delay(delay);
+			await Task.Delay(delay);
 
 			lock (_positionSyncLock)
 			{
@@ -505,9 +479,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </remarks>
 		/// <param name="pos"></param>
 		/// <param name="dir"></param>
-		/// <param name="clientTime"></param>
+		/// <param name="unkFloat"></param>
 		/// <param name="unkByte"></param>
-		internal void NotifyJump(Position pos, Direction dir, float clientTime, byte unkByte)
+		internal void NotifyJump(Position pos, Direction dir, float unkFloat, byte unkByte)
 		{
 			this.Entity.Position = pos;
 			this.Entity.Direction = dir;
@@ -520,7 +494,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				var staminaUsage = (int)character.Properties.GetFloat(PropertyName.Sta_Jump);
 				character.ModifyStamina(-staminaUsage);
 
-				Send.ZC_JUMP(character, pos, dir, clientTime, unkByte);
+				Send.ZC_JUMP(character, pos, dir, unkFloat, unkByte);
 			}
 		}
 
@@ -562,8 +536,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </remarks>
 		/// <param name="pos"></param>
 		/// <param name="dir"></param>
-		/// <param name="clientTime"></param>
-		internal void NotifyMove(Position pos, Direction dir, float clientTime)
+		/// <param name="unkFloat"></param>
+		internal void NotifyMove(Position pos, Direction dir, float unkFloat)
 		{
 			var fromPos = this.Entity.Position;
 			this.Entity.Position = pos;
@@ -572,10 +546,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			this.IsMoving = true;
 			this.MoveTarget = MoveTargetType.Direction;
 
-			this.RecordClientMoveSample(pos, dir, clientTime);
-
 			if (!UsePositionOnlyMovement)
-				Send.ZC_MOVE_DIR(this.Entity, pos, dir, clientTime);
+				Send.ZC_MOVE_DIR(this.Entity, pos, dir, unkFloat);
 			else
 				Send.ZC_MOVE_POS(this.Entity, fromPos, pos, 60, 0, true);
 			if (this.Entity is Character character)
@@ -589,7 +561,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 				if (character.Connection.Party != null)
 				{
-					var now = GameClock.Now;
+					var now = DateTime.UtcNow;
 					if ((now - _lastPartyUpdate) >= PartyUpdateInterval)
 					{
 						_lastPartyUpdate = now;
@@ -677,31 +649,28 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			// 
 			// Update: By now we know that this is in fact how it works,
 			// but we also know that warps aren't triggered on a delay
-			// as we initially assumed (see below). The game's behavior
+			// as we initially assumed (see below). The official behavior
 			// is to either warp on contact (classic) or after confirming
 			// the warp in a dialog (newer versions). But since I'm not
 			// a fan of either option we'll keep our own implementation.
 			// Eventually we'll make it configurable. -- exec
 
 			var warpNpc = this.Entity.Map.GetNearbyWarp(prevPos);
-			if (warpNpc == null || !warpNpc.CanBeUsedBy(character))
+			if (warpNpc == null)
 				return;
 
 			// Wait 1s to see if the character actually wants to warp
-			// (indicated by him not moving). The game's behavior unknown,
+			// (indicated by him not moving). Official behavior unknown,
 			// as I have never played the game =<
-			GameClock.Delay(1000).ContinueWith(_ =>
+			Task.Delay(1000).ContinueWith(_ =>
 			{
 				// Cancel if character moved in that time
 				if (character.Position != prevPos)
 					return;
 
-				if (!warpNpc.CanBeUsedBy(character))
-					return;
-
 				character.Warp(warpNpc.WarpLocation);
 				warpNpc.IncreaseUseCount();
-			}, TaskContinuationOptions.ExecuteSynchronously);
+			});
 		}
 
 		/// <summary>
@@ -776,13 +745,11 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					return;
 				}
 
-				// Directional movement is driven by client packets, so it's
-				// extrapolated between them rather than pathed.
+				// Don't update the position this way for directional
+				// movement for now. That will require a bit more
+				// research to get right.
 				if (this.MoveTarget != MoveTargetType.Position)
-				{
-					this.UpdateExtrapolatedPosition(elapsed);
 					return;
-				}
 
 				var arrived = (_moveTime -= elapsed) <= TimeSpan.Zero;
 
@@ -822,225 +789,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			}
 
 			this.ExecuteNextMove();
-		}
-
-		/// <summary>
-		/// Records a movement sample reported by the client, updating the
-		/// measured move speed and packet interval used for extrapolation.
-		/// </summary>
-		/// <param name="pos"></param>
-		/// <param name="dir"></param>
-		/// <param name="clientTime"></param>
-		private void RecordClientMoveSample(Position pos, Direction dir, float clientTime)
-		{
-			lock (_positionSyncLock)
-			{
-				_extrapolatedTime = TimeSpan.Zero;
-
-				var deltaTime = clientTime - _lastClientTime;
-				var plausible = deltaTime > 0 && deltaTime <= MaxExtrapolationTime.TotalSeconds * 4;
-
-				// The client clock restarts on relog and map changes, so a
-				// sample spanning one is dropped rather than trusted.
-				if (_hasClientSample && plausible)
-				{
-					var interval = TimeSpan.FromSeconds(deltaTime);
-					_avgMoveInterval += TimeSpan.FromTicks((long)((interval - _avgMoveInterval).Ticks * MoveIntervalAlpha));
-
-					var dot = (dir.Cos * _lastClientDir.Cos) + (dir.Sin * _lastClientDir.Sin);
-					if (dot >= SameDirectionThreshold)
-						_measuredSpeed = _lastClientPos.Get2DDistance(pos) / deltaTime;
-				}
-
-				this.UpdateClientJitter(clientTime);
-				this.UpdateClientLatency(clientTime);
-
-				_lastClientTime = clientTime;
-				_lastClientDir = dir;
-				_lastClientPos = pos;
-				_hasClientSample = true;
-			}
-		}
-
-		/// <summary>
-		/// Updates the estimated delay between the client sending a movement
-		/// packet and the server processing it, above the lowest delay seen.
-		/// </summary>
-		/// <param name="clientTime"></param>
-		private void UpdateClientJitter(float clientTime)
-		{
-			var offset = (GameClock.Now - _epoch).TotalSeconds - clientTime;
-
-			// The floor creeps upwards so a permanently worsened route is
-			// adopted as the new baseline instead of inflating the estimate.
-			if (!_hasClientSample || offset < _minClientOffset)
-			{
-				_minClientOffset = offset;
-				_clientJitter = 0;
-				return;
-			}
-
-			_minClientOffset += MinOffsetCreepPerSample;
-
-			var jitter = offset - _minClientOffset;
-			if (jitter < 0)
-				jitter = 0;
-
-			_clientJitter += (jitter - _clientJitter) * MoveIntervalAlpha;
-		}
-
-		/// <summary>
-		/// Updates the character's measured latency, the delay between the
-		/// client sending a packet and the server processing it.
-		/// </summary>
-		/// <param name="clientTime"></param>
-		private void UpdateClientLatency(float clientTime)
-		{
-			if (this.Entity is not Character character)
-				return;
-
-			var offset = (GameClock.Now - _epoch).TotalSeconds - clientTime;
-			var latency = offset - _latencyBaseline;
-
-			// A reading no delay could explain means the client clock restarted on a relog or warp.
-			if (!_hasLatencyBaseline || latency > MaxPlausibleLatency.TotalSeconds)
-			{
-				_latencyBaseline = offset;
-				_hasLatencyBaseline = true;
-				_smoothedLatency = 0;
-			}
-			else if (latency < 0)
-			{
-				// A better route than any seen means every earlier reading was overstated as much.
-				_latencyBaseline = offset;
-				_smoothedLatency = Math.Max(0, _smoothedLatency + latency);
-			}
-			else
-			{
-				// Single samples carry the full network jitter, which both consumers need smoothed.
-				_smoothedLatency += (latency - _smoothedLatency) * LatencyAlpha;
-			}
-
-			character.Connection.ClientLatency = TimeSpan.FromSeconds(_smoothedLatency);
-		}
-
-		/// <summary>
-		/// Returns the measured move speed, bounded by the speed the entity
-		/// is actually able to travel at.
-		/// </summary>
-		/// <remarks>
-		/// A sample spanning a warp, dash or knockback reports a speed no
-		/// movement could have produced, and one taken before a drastic
-		/// speed change outlives the speed it was measured at.
-		/// </remarks>
-		private double GetExtrapolationSpeed()
-		{
-			var maxSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD) * Movement.UnitsPerMspdSecond * MaxSpeedTolerance;
-			if (_measuredSpeed > maxSpeed)
-				return maxSpeed;
-
-			return _measuredSpeed;
-		}
-
-		/// <summary>
-		/// Returns the position the entity's client is projected to have it
-		/// at after the given lead time, or its current position if it isn't
-		/// moving under client control.
-		/// </summary>
-		/// <remarks>
-		/// The projection runs from the last position the client confirmed,
-		/// so callers asking for different lead times don't stack their
-		/// leads on top of each other's.
-		/// </remarks>
-		/// <param name="leadTime"></param>
-		public Position GetProjectedPosition(TimeSpan leadTime)
-		{
-			lock (_positionSyncLock)
-			{
-				if (!this.IsMoving || this.MoveTarget != MoveTargetType.Direction || !_hasClientSample)
-					return this.Entity.Position;
-
-				// Past the client's latency there's nothing left to catch up
-				// on, so that's as far as the gap since its last packet is
-				// taken to reach.
-				var latency = this.Entity is Character character ? character.Connection.ClientLatency : TimeSpan.Zero;
-				var elapsed = _extrapolatedTime;
-
-				if (elapsed > latency)
-					elapsed = latency;
-
-				var horizon = elapsed + leadTime;
-				if (horizon > MaxProjectionTime)
-					horizon = MaxProjectionTime;
-
-				var speed = this.GetExtrapolationSpeed();
-				var distance = speed * horizon.TotalSeconds;
-
-				if (distance <= 0)
-					return this.Entity.Position;
-
-				var position = _lastClientPos.GetRelative(this.Entity.Direction, (float)distance);
-
-				if (!this.Entity.Map.Ground.IsValidPosition(position))
-					return this.Entity.Position;
-
-				if (this.Entity.Map.Ground.TryGetHeightAt(position, out var height))
-					position.Y = height;
-
-				return position;
-			}
-		}
-
-		/// <summary>
-		/// Returns the position the entity is projected to occupy after the
-		/// configured lag compensation time, or its current position if it
-		/// isn't moving under client control.
-		/// </summary>
-		public Position GetLeadPosition()
-		{
-			var jitter = Math.Min(_clientJitter, MaxLagCompensationJitter.TotalSeconds);
-			var leadTime = LagCompensationTime + TimeSpan.FromSeconds(jitter);
-
-			return this.GetProjectedPosition(leadTime);
-		}
-
-		/// <summary>
-		/// Advances the entity along its last reported direction between
-		/// client movement packets, so its position doesn't trail the one
-		/// the player sees.
-		/// </summary>
-		/// <param name="elapsed"></param>
-		private void UpdateExtrapolatedPosition(TimeSpan elapsed)
-		{
-			var measuredSpeed = this.GetExtrapolationSpeed();
-			if (measuredSpeed <= 0)
-				return;
-
-			var maxTime = _avgMoveInterval + _avgMoveInterval;
-			if (maxTime > MaxExtrapolationTime)
-				maxTime = MaxExtrapolationTime;
-
-			var remaining = maxTime - _extrapolatedTime;
-			if (remaining <= TimeSpan.Zero)
-				return;
-
-			var step = elapsed < remaining ? elapsed : remaining;
-			_extrapolatedTime += step;
-
-			var direction = this.Entity.Direction;
-			var distance = measuredSpeed * step.TotalSeconds;
-			var position = this.Entity.Position;
-
-			position.X += (float)(direction.Cos * distance);
-			position.Z += (float)(direction.Sin * distance);
-
-			if (!this.Entity.Map.Ground.IsValidPosition(position))
-				return;
-
-			if (this.Entity.Map.Ground.TryGetHeightAt(position, out var height))
-				position.Y = height;
-
-			this.Entity.Position = position;
 		}
 
 		/// <summary>

@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CodingSeb.ExpressionEvaluator;
 
+#pragma warning disable CS0436 // Local modified copy intentionally shadows the transitive NuGet types
+
 namespace Melia.Shared.Versioning.MEnums
 {
 	/// <summary>

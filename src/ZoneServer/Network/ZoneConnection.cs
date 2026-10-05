@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -6,7 +6,6 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Database;
 using Melia.Shared.Network;
 using Melia.Zone.Database;
-using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Services;
 using Melia.Zone.World;
@@ -89,7 +88,8 @@ namespace Melia.Zone.Network
 		Duel ActiveDuel { get; set; }
 
 		/// <summary>
-		/// Gets or sets the last heartbeat.
+		/// Gets or sets the last time any packet was received from the
+		/// client (UTC).
 		/// </summary>
 		DateTime LastHeartBeat { get; set; }
 
@@ -97,12 +97,6 @@ namespace Melia.Zone.Network
 		/// Gets or sets the client's selected language name (e.g. "pt-BR").
 		/// </summary>
 		string SelectedLanguage { get; set; }
-
-		/// <summary>
-		/// Gets or sets the delay measured between the client sending a
-		/// packet and the server processing it.
-		/// </summary>
-		TimeSpan ClientLatency { get; set; }
 
 		/// <summary>
 		/// Generate a session key.
@@ -132,7 +126,6 @@ namespace Melia.Zone.Network
 		public Trade ActiveTrade { get; set; }
 		public Duel ActiveDuel { get; set; }
 		public string SelectedLanguage { get; set; }
-		public TimeSpan ClientLatency { get; set; }
 
 		public int IntegritySeed { get; set; }
 
@@ -226,7 +219,8 @@ namespace Melia.Zone.Network
 		public Duel ActiveDuel { get; set; }
 
 		/// <summary>
-		/// Gets or sets the last heartbeat.
+		/// Gets or sets the last time any packet was received from the
+		/// client (UTC).
 		/// </summary>
 		public DateTime LastHeartBeat { get; set; }
 
@@ -234,12 +228,6 @@ namespace Melia.Zone.Network
 		/// Gets or sets the client's selected language name (e.g. "pt-BR").
 		/// </summary>
 		public string SelectedLanguage { get; set; }
-
-		/// <summary>
-		/// Gets or sets the delay measured between the client sending a
-		/// packet and the server processing it.
-		/// </summary>
-		public TimeSpan ClientLatency { get; set; }
 
 		/// <summary>
 		/// Generates a session key
@@ -284,6 +272,11 @@ namespace Melia.Zone.Network
 		/// <param name="packet"></param>
 		protected override void OnPacketReceived(Packet packet)
 		{
+			// Any packet from the client proves the connection is alive.
+			// Stamp before handling so packets whose handlers throw still
+			// count as liveness. Read by DeadConnectionSweepService.
+			this.LastHeartBeat = DateTime.UtcNow;
+
 			ZoneServer.Instance.PacketHandler.Handle(this, packet);
 		}
 
@@ -357,7 +350,6 @@ namespace Melia.Zone.Network
 
 			character.Components.Get<BaseSkillComponent>()?.CancelAllRunningSkills();
 			character.CancelOutOfBody();
-			character.Tracks.Cleanup();
 
 			// Strip temp buffs while the character is still on the map
 			// so that OnEnd handlers have full map context available.
@@ -368,10 +360,6 @@ namespace Melia.Zone.Network
 				var campfires = character.Map.GetMonsters(m => m.Id == 46011 && m.OwnerHandle == character.Handle);
 				foreach (var campfire in campfires)
 					character.Map.RemoveMonster(campfire);
-
-				// Before the character leaves the map, while there are still
-				// people on it to tell. An autotrading owner never gets here.
-				ShopBuilder.ClosePersonalShop(character);
 
 				character.CloseEyes();
 				character.Map.RemoveCharacter(character);

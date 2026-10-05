@@ -119,39 +119,217 @@ namespace Melia.Zone.Scripting.Shared
 			await Task.CompletedTask;
 		}
 
-		private static readonly Dictionary<int, string> TreasureChestKeys = new()
-		{
-			{ 40030, "TreasureboxKey2" },
-			{ 147393, "TreasureboxKey3" },
-			{ 147394, "TreasureboxKey4" },
-			{ 147395, "TreasureboxKey5" },
-		};
-
 		/// <summary>
 		/// Treasure Box
 		/// </summary>
 		/// <param name="dialog"></param>
 		/// <param name="className"></param>
 		/// <param name="amount"></param>
+		/// <param name="itemRequiredToUnlock"></param>
 		/// <returns></returns>
-		public static async Task TREASUREBOX_LV(Dialog dialog, string className, int amount)
+		public static async Task TREASUREBOX_LV(Dialog dialog, string className, int amount, string itemRequiredToUnlock = "")
 		{
 			if (dialog.Npc != null && dialog.Player.GetMapNPCState(dialog.Npc) == NpcState.Invisible)
 				return;
-
-			if (dialog.Npc != null && TreasureChestKeys.TryGetValue(dialog.Npc.Id, out var keyClassName))
-			{
-				if (!dialog.Player.HasItem(keyClassName))
-				{
-					dialog.Player.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("You don't have the required key to open this.{nl}Perhaps the Item Merchant in town can help you out."), 5);
-					return;
-				}
-
-				dialog.Player.RemoveItem(keyClassName);
-			}
-
-			await OpenChest(dialog.Player, dialog.Npc, false, () => dialog.Player.AddItem(className, amount));
+			if (!string.IsNullOrEmpty(itemRequiredToUnlock) && dialog.Player.RemoveItem(itemRequiredToUnlock) > 0)
+				return;
+			await OpenChest(dialog.Player, dialog.Npc);
+			dialog.Player.AddItem(className, amount);
 			await Task.Yield();
+		}
+
+		/// <summary>
+		/// Warp Statues
+		/// </summary>
+		/// <param name="dialog"></param>
+		/// <returns></returns>
+		public static async Task STATUE_WARP(Dialog dialog)
+		{
+			var result = await dialog.TimeAction(ScpArgMsg("Auto_KyeongBae_Jung"), "WORSHIP", TimeSpan.FromSeconds(1));
+			if (result == TimeActionResult.Completed)
+			{
+				if (ZoneServer.Instance.Conf.World.FastTravelEnabled)
+				{
+					await dialog.ExecuteScript("SIMPLEMAP_OPEN_WARP_MODE()");
+				}
+				else
+				{
+					var character = dialog.Player;
+
+					// Define warp destinations and their level ranges
+					Dictionary<string, (string warpCode, int minLevel, int maxLevel)> warpOptions = new()
+					{
+						 // Cities
+						{ "Klaipeda", ("WARP_C_KLAIPE_c_Klaipe", 0, 0) },
+						{ "Fedimian", ("WARP_C_FEDIMIAN_c_fedimian", 0, 0) },
+						{ "Orsha", ("WARP_C_ORSHA_c_orsha", 0, 0) },
+
+						// Level 1-10
+						{ "Woods of the Linked Bridges", ("WARP_F_SIAULIAI_15RE_f_siauliai_15_re", 7, 9) },
+						// { "Ramstis Ridge", ("WARP_F_RAMSTIS_RIDGE", 1, 11) },
+						{ "West Siauliai Woods", ("WARP_F_SIAULIAI_WEST_f_siauliai_west", 1, 3) },
+
+						// Level 11-20
+						{ "Miner's Village", ("WARP_F_SIAULIAI_OUT_f_siauliai_out", 11, 13) },
+						// { "Syla Forest", ("WARP_F_SYLA_FOREST", 11, 13) },
+						// { "Gytis Settlement", ("WARP_F_GYTIS_SETTLEMENT", 14, 20) },
+						// { "Baron Allerno", ("WARP_F_BARON_ALLERNO", 16, 24) },
+
+						// Level 21-30
+						{ "Tenants' Farm", ("WARP_F_FARM_47_1_f_farm_47_1", 24, 30) },
+						{ "Srautas Gorge", ("WARP_F_GELE_57_1_f_gele_57_1", 26, 30) },
+						// { "Gele Plateau", ("WARP_F_GELE_PLATEAU", 29, 31) },
+						// { "Koru Jungle", ("WARP_F_KORU_JUNGLE", 28, 31) },
+
+						// Level 31-40
+						// { "Aqueduct Bridge Area", ("WARP_F_AQUEDUCT_BRIDGE_AREA", 31, 36) },
+						// { "Myrkiti Farm", ("WARP_F_MYRKITI_FARM", 31, 40) },
+						{ "Nefritas Cliff", ("WARP_F_GELE_57_3_f_gele_57_3", 32, 34) },
+						{ "Knidos Jungle", ("WARP_F_BRACKEN_63_2_f_bracken_63_2", 32, 34) },
+						{ "Tenet Garden", ("WARP_F_GELE_57_4_f_gele_57_4", 35, 36) },
+						{ "King's Plateau", ("WARP_F_ROKAS_30_f_rokas_30", 31, 36) },
+
+						// Level 41-50
+						// { "Overlong Bridge Valley", ("WARP_F_OVERLONG_BRIDGE_VALLEY", 42, 48) },
+						{ "Grynas Trails", ("WARP_F_KATYN_45_1_f_katyn_45_1", 45, 48) },
+						// { "Dadan Jungle", ("WARP_F_DADAN_JUNGLE", 46, 51) },
+						// { "Grynas Training Camp", ("WARP_F_GRYNAS_TRAINING_CAMP", 49, 51) },
+						{ "Vieta Gorge", ("WARP_F_HUEVILLAGE_58_2_f_huevillage_58_2", 49, 51) },
+
+						// Level 51-60
+						// { "Shaton Farm", ("WARP_F_SHATON_FARM", 52, 54) },
+						{ "Grynas Hills", ("WARP_F_KATYN_45_3_f_katyn_45_3", 53, 56) },
+						// { "Cobalt Forest", ("WARP_F_COBALT_FOREST", 53, 62) },
+						// { "Laukyme Swamp", ("WARP_F_LAUKYME_SWAMP", 58, 62) },
+						// { "Genar Field", ("WARP_F_GENAR_FIELD", 58, 60) },
+
+						// Level 61-70
+						{ "Dina Bee Farm", ("WARP_F_SIAULIAI_46_4_f_siauliai_46_4", 60, 70) },
+						{ "Gateway of the Great King", ("WARP_F_ROKAS_24_f_rokas_24", 32, 62) },
+						// { "Glade Hillroad", ("WARP_F_GLADE_HILLROAD", 64, 68) },
+						// { "Sekta Forest", ("WARP_F_SEKTA_FOREST", 66, 67) },
+						// { "Alemeth Forest", ("WARP_F_ALEMETH_FOREST", 68, 70) },
+
+						// Level 71-80
+						{ "Viltis Forest", ("WARP_D_THORN_39_1_d_thorn_39_1", 71, 78) },
+						//{ "Ouaas Memorial", ("WARP_F_OUAAS_MEMORIAL", 71, 73) },
+						//{ "Seir Rainforest", ("WARP_F_SEIR_RAINFOREST", 72, 80) },
+						// { "Zeraha", ("WARP_F_ZERAHA", 72, 80) },
+
+						// Mixed/Wide Level Range
+						// { "Salvia Forest", ("WARP_F_SALVIA_FOREST", 26, 62) },
+						{ "Rasvoy Lake", ("WARP_PILGRIMROAD_41_3_f_pilgrimroad_41_3", 42, 70) },
+						{ "Septyni Glen", ("WARP_F_HUEVILLAGE_58_4_f_huevillage_58_4", 55, 65) },
+						{ "Izoliacjia Plateau", ("WARP_WHITETREES_22_3_f_whitetrees_22_3", 42, 65) },
+					};
+
+					// Allow the player to select a level range
+					var levelRangeResponse = await dialog.Select(L("Select map by level range:"),
+						Option("Cities", "cities"),
+						Option("Level 1-10", "range_1_10"),
+						Option("Level 11-20", "range_11_20"),
+						Option("Level 21-30", "range_21_30"),
+						Option("Level 31-40", "range_31_40"),
+						Option("Level 41-50", "range_41_50"),
+						Option("Level 51-60", "range_51_60"),
+						Option("Level 61-70", "range_61_70"),
+						Option("Level 71-80", "range_71_80"),
+						Option("Mixed/Wide Level Range", "mixed_range"));
+
+					int selectedMinLevel = 0, selectedMaxLevel = 0;
+					switch (levelRangeResponse)
+					{
+						case "range_1_10": selectedMinLevel = 1; selectedMaxLevel = 10; break;
+						case "range_11_20": selectedMinLevel = 11; selectedMaxLevel = 20; break;
+						case "range_21_30": selectedMinLevel = 21; selectedMaxLevel = 30; break;
+						case "range_31_40": selectedMinLevel = 31; selectedMaxLevel = 40; break;
+						case "range_41_50": selectedMinLevel = 41; selectedMaxLevel = 50; break;
+						case "range_51_60": selectedMinLevel = 51; selectedMaxLevel = 60; break;
+						case "range_61_70": selectedMinLevel = 61; selectedMaxLevel = 70; break;
+						case "range_71_80": selectedMinLevel = 71; selectedMaxLevel = 80; break;
+						case "mixed_range": selectedMinLevel = 1; selectedMaxLevel = 80; break; // Wide range
+						case "cities": selectedMinLevel = 0; selectedMaxLevel = 0; break; // No monster levels
+						default: return; // Cancel action
+					}
+
+					// Filter destinations based on the selected level range
+					var filteredDestinations = warpOptions
+						.Where(opt =>
+						(ZoneServer.Instance.World.NPCs.TryGetValue(opt.Value.warpCode, out var warpNpc)
+						&& character.SessionObjects.Main.Has(warpNpc.DialogName))
+						&& (opt.Value.minLevel <= selectedMaxLevel && opt.Value.maxLevel >= selectedMinLevel))
+						.Take(12) // Limit to 12 options
+						.ToDictionary(opt => opt.Key, opt => opt.Value.warpCode);
+
+					if (filteredDestinations.Count == 0)
+					{
+						await dialog.Msg("You haven't unlocked a Vakarine statue in this range.");
+						return;
+					}
+
+					// Present filtered destinations to the player
+					var destinationOptions = filteredDestinations.Select(opt => Option(opt.Key, opt.Value)).ToArray();
+					var destinationResponse = await dialog.Select(L("Choose your destination:"), destinationOptions);
+
+					// Warp to the selected location
+					if (ZoneServer.Instance.World.NPCs.TryGetValue($"{destinationResponse}", out var warpNpc))
+					{
+						var mapId = warpNpc.Map.Id;
+						var newPosition = warpNpc.Position.GetRelative(warpNpc.Direction, 50);
+						var newDirection = -warpNpc.Direction;
+						character.SetDirection(newDirection);
+						character.Warp(mapId, newPosition);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Bonus Stat Statues
+		/// </summary>
+		/// <param name="dialog"></param>
+		/// <returns></returns>
+		public static async Task ZEMINA_STATUE(Dialog dialog)
+		{
+			var npc = dialog.Npc;
+			var character = dialog.Player;
+			if (npc.GenType == 0)
+				return;
+
+			var npcState = character.GetMapNPCState(npc);
+			var sessionObject = character.SessionObjects.Main;
+			var sessionObjectPropertyName = npc.DialogName + "_P";
+			sessionObject.TryGetProp(sessionObjectPropertyName, out float propValue);
+			if (propValue == 0)
+			{
+				dialog.PlayAnimation("ON");
+				dialog.PlayAnimation("HOLD");
+				dialog.PlayAnimation(character, "WORSHIP");
+				var result = await dialog.TimeAction(ScpArgMsg("Auto_KyeongBae_Jung"), "WORSHIP", TimeSpan.FromSeconds(2));
+				if (result == TimeActionResult.Completed)
+				{
+					dialog.AttachEffect(character, "F_pc_statue_wing", 10, EffectLocation.Top);
+					var result1 = character.SessionObjects.GetOrCreate("SSN_ATTACH_EFF");
+					if (result1 != null)
+					{
+						var beforeValue = character.Properties[PropertyName.StatByBonus];
+						character.SetMapNPCState(npc, NpcState.Unknown_20);
+						character.ModifyProperty(PropertyName.StatByBonus, 1);
+						character.SetProperty(sessionObject, sessionObjectPropertyName, 300);
+						var afterValue = character.Properties[PropertyName.StatByBonus];
+						character.AddonMessage("NOTICE_Dm_Clear", "STATUE_STAT_01", 3);
+						dialog.DetachEffect(npc, "F_light024_orange");
+						character.RemoveSessionObject(result1.Id);
+					}
+				}
+				else
+				{
+					dialog.PlayAnimation(character, "STD");
+					dialog.DetachEffect(npc, "F_light023_orange");
+					dialog.DetachEffect(npc, "F_light024_orange");
+					dialog.DetachEffect(npc, "statue_zemina_light1");
+				}
+			}
 		}
 
 		/// <summary>
@@ -221,6 +399,9 @@ namespace Melia.Zone.Scripting.Shared
 			await dialog.HooksByDialogName("BeforeEnd");
 		}
 
+		[DialogFunction]
+		public static async Task WARP_C_FEDIMIAN(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction]
 		public static async Task FEDIMIAN_DETECTIVE_GUARD(Dialog dialog)
@@ -1305,6 +1486,9 @@ namespace Melia.Zone.Scripting.Shared
 			}
 		}
 
+		[DialogFunction]
+		public static async Task WARP_C_KLAIPE(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction]
 		public static async Task FEDIMIAN_ROTA_02(Dialog dialog)
@@ -1743,6 +1927,9 @@ namespace Melia.Zone.Scripting.Shared
 			await Task.Yield();
 		}
 
+		[DialogFunction("WARP_C_ORSHA")]
+		public static async Task WARP_C_ORSHA(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("JOB_2_WIZARD_MASTER")]
 		public static async Task JOB_2_WIZARD_MASTER(Dialog dialog)
@@ -2039,6 +2226,9 @@ namespace Melia.Zone.Scripting.Shared
 			await Task.Yield();
 		}
 
+		[DialogFunction("WARP_C_NUNNERY")]
+		public static async Task WARP_C_NUNNERY(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("REQUEST_MISSION_ABBEY")]
 		public static async Task REQUEST_MISSION_ABBEY(Dialog dialog)
@@ -2272,6 +2462,9 @@ namespace Melia.Zone.Scripting.Shared
 			await dialog.HooksByDialogName("BeforeEnd");
 		}
 
+		[DialogFunction("WARP_F_SIAULIAI_WEST")]
+		public static async Task WARP_F_SIAULIAI_WEST(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("SIAUL_WEST_CAMP_MANAGER")]
 		public static async Task SIAUL_WEST_CAMP_MANAGER(Dialog dialog)
@@ -2467,142 +2660,13 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task TREASUREBOX_LV_F_SIAULIAI_WEST2027(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "NECK01_109", 1);
 
+		[DialogFunction("F_SIAULIAI_WEST_EV_55_001")]
+		public static async Task F_SIAULIAI_WEST_EV_55_001(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_WEST2032")]
 		public static async Task TREASUREBOX_LV_F_SIAULIAI_WEST2032(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "BRC02_114", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_WEST9001")]
-		public static async Task TREASUREBOX_LV_F_SIAULIAI_WEST9001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628016", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_WEST9002")]
-		public static async Task TREASUREBOX_LV_F_SIAULIAI_WEST9002(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "expCard1", 2);
-
-		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_WEST9003")]
-		public static async Task TREASUREBOX_LV_F_SIAULIAI_WEST9003(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "expCard1", 2);
-
-		[DialogFunction("TREASUREBOX_LV_D_CMINE_029001")]
-		public static async Task TREASUREBOX_LV_D_CMINE_029001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628002", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_PILGRIMROAD_41_49001")]
-		public static async Task TREASUREBOX_LV_F_PILGRIMROAD_41_49001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628012", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_ORCHARD_34_19001")]
-		public static async Task TREASUREBOX_LV_F_ORCHARD_34_19001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628014", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_WHITETREES_22_39001")]
-		public static async Task TREASUREBOX_LV_F_WHITETREES_22_39001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628026", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_11_RE9001")]
-		public static async Task TREASUREBOX_LV_F_SIAULIAI_11_RE9001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628028", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_11_RE9002")]
-		public static async Task TREASUREBOX_LV_F_SIAULIAI_11_RE9002(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "SHD02_102", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_47_49001")]
-		public static async Task TREASUREBOX_LV_F_SIAULIAI_47_49001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628030", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_ORCHARD_34_29001")]
-		public static async Task TREASUREBOX_LV_F_ORCHARD_34_29001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628031", 1);
-
-		[DialogFunction("TREASUREBOX_LV_D_ZACHARIEL_349001")]
-		public static async Task TREASUREBOX_LV_D_ZACHARIEL_349001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628033", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_KATYN_139001")]
-		public static async Task TREASUREBOX_LV_F_KATYN_139001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628035", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_REMAINS_389001")]
-		public static async Task TREASUREBOX_LV_F_REMAINS_389001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628042", 1);
-
-		[DialogFunction("TREASUREBOX_LV_D_THORN_199001")]
-		public static async Task TREASUREBOX_LV_D_THORN_199001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628080", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_15_RE9001")]
-		public static async Task TREASUREBOX_LV_F_SIAULIAI_15_RE9001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "NECK01_103", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_15_RE9002")]
-		public static async Task TREASUREBOX_LV_F_SIAULIAI_15_RE9002(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "expCard1", 2);
-
-		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_15_RE9003")]
-		public static async Task TREASUREBOX_LV_F_SIAULIAI_15_RE9003(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "expCard1", 2);
-
-		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_15_RE9004")]
-		public static async Task TREASUREBOX_LV_F_SIAULIAI_15_RE9004(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "expCard1", 2);
-
-		[DialogFunction("TREASUREBOX_LV_F_GELE_57_19001")]
-		public static async Task TREASUREBOX_LV_F_GELE_57_19001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "NECK01_104", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_ROKAS_259001")]
-		public static async Task TREASUREBOX_LV_F_ROKAS_259001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "BRC01_122", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_ROKAS_259002")]
-		public static async Task TREASUREBOX_LV_F_ROKAS_259002(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "expCard1", 2);
-
-		[DialogFunction("TREASUREBOX_LV_F_ROKAS_259003")]
-		public static async Task TREASUREBOX_LV_F_ROKAS_259003(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "expCard1", 2);
-
-		[DialogFunction("TREASUREBOX_LV_D_PRISON_62_39001")]
-		public static async Task TREASUREBOX_LV_D_PRISON_62_39001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "BRC02_102", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_GELE_57_29001")]
-		public static async Task TREASUREBOX_LV_F_GELE_57_29001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "NECK02_115", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_WHITETREES_21_29001")]
-		public static async Task TREASUREBOX_LV_F_WHITETREES_21_29001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "NECK02_117", 1);
-
-		[DialogFunction("TREASUREBOX_LV_F_ROKAS_289001")]
-		public static async Task TREASUREBOX_LV_F_ROKAS_289001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "NECK02_119", 1);
-
-		[DialogFunction("TREASUREBOX_LV_D_PRISON_62_19001")]
-		public static async Task TREASUREBOX_LV_D_PRISON_62_19001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "gem_circle_1", 1);
-
-		[DialogFunction("TREASUREBOX_LV_D_PRISON_62_19002")]
-		public static async Task TREASUREBOX_LV_D_PRISON_62_19002(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "gem_diamond_1", 1);
-
-		[DialogFunction("TREASUREBOX_LV_D_PRISON_62_29001")]
-		public static async Task TREASUREBOX_LV_D_PRISON_62_29001(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "gem_star_1", 1);
-
-		[DialogFunction("TREASUREBOX_LV_D_PRISON_62_39002")]
-		public static async Task TREASUREBOX_LV_D_PRISON_62_39002(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "gem_square_1", 1);
-
-		[DialogFunction("TREASUREBOX_LV_D_PRISON_62_39003")]
-		public static async Task TREASUREBOX_LV_D_PRISON_62_39003(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "gem_White_1", 1);
-
-		[DialogFunction("TREASUREBOX_LV_D_CMINE_029002")]
-		public static async Task TREASUREBOX_LV_D_CMINE_029002(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "gem_White_1", 1);
 
 		[DialogFunction("JOB_DIEVDIRBYS2_NPC")]
 		public static async Task JOB_DIEVDIRBYS2_NPC(Dialog dialog)
@@ -2624,7 +2688,7 @@ namespace Melia.Zone.Scripting.Shared
 
 		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_WEST2035")]
 		public static async Task TREASUREBOX_LV_F_SIAULIAI_WEST2035(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628037", 1);
+			=> await TREASUREBOX_LV(dialog, "Hat_628037", 1, "TreasureboxKey3");
 
 		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_WEST2036")]
 		public static async Task TREASUREBOX_LV_F_SIAULIAI_WEST2036(Dialog dialog)
@@ -2702,6 +2766,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_SIAULIAI_EST")]
+		public static async Task WARP_F_SIAULIAI_EST(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("SIAUL_EAST_SUPPLY_MANAGER2")]
 		public static async Task SIAUL_EAST_SUPPLY_MANAGER2(Dialog dialog)
@@ -2741,7 +2808,7 @@ namespace Melia.Zone.Scripting.Shared
 
 		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_210023")]
 		public static async Task TREASUREBOX_LV_F_SIAULIAI_210023(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628032", 1);
+			=> await TREASUREBOX_LV(dialog, "Hat_628032", 1, "TreasureboxKey2");
 
 		[DialogFunction("SAUI_EAST_GUARD_01")]
 		public static async Task SAUI_EAST_GUARD_01(Dialog dialog)
@@ -2769,6 +2836,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction]
+		public static async Task WARP_F_SIAULIAI_OUT(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("JOB_KRIWI1_OUT")]
 		public static async Task JOB_KRIWI1_OUT(Dialog dialog)
@@ -2950,6 +3020,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("F_SIAULIAI_OUT_EV_55_001")]
+		public static async Task F_SIAULIAI_OUT_EV_55_001(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("SOUT_REFUGEE01")]
 		public static async Task SOUT_REFUGEE01(Dialog dialog)
@@ -3052,10 +3125,13 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_CMINE_01")]
+		public static async Task WARP_D_CMINE_01(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_D_CMINE_01533")]
 		public static async Task TREASUREBOX_LV_D_CMINE_01533(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "NECK02_114", 1);
+			=> await TREASUREBOX_LV(dialog, "NECK02_114", 1, "TreasureboxKey2");
 
 		[DialogFunction("MINE_1_CRYSTAL_4")]
 		public static async Task MINE_1_CRYSTAL_4(Dialog dialog)
@@ -3099,6 +3175,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_CMINE_02")]
+		public static async Task WARP_D_CMINE_02(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("BOOKSHELF_02")]
 		public static async Task BOOKSHELF_02(Dialog dialog)
@@ -3243,6 +3322,13 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_CMINE_6")]
+		public static async Task WARP_D_CMINE_6(Dialog dialog)
+			=> await STATUE_WARP(dialog);
+
+		[DialogFunction("TREASUREBOX_LV_D_CMINE_6530")]
+		public static async Task TREASUREBOX_LV_D_CMINE_6530(Dialog dialog)
+			=> await TREASUREBOX_LV(dialog, "emoticonItem_1", 1);
 
 		[DialogFunction("MINE_3_RESIENT1")]
 		public static async Task MINE_3_RESIENT1(Dialog dialog)
@@ -3345,6 +3431,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_GELE_57_1")]
+		public static async Task WARP_F_GELE_57_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("GELE571_NPC_MATTHEW")]
 		public static async Task GELE571_NPC_MATTHEW(Dialog dialog)
@@ -3465,7 +3554,7 @@ namespace Melia.Zone.Scripting.Shared
 
 		[DialogFunction("TREASUREBOX_LV_F_GELE_57_2150")]
 		public static async Task TREASUREBOX_LV_F_GELE_57_2150(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628099", 1);
+			=> await TREASUREBOX_LV(dialog, "Hat_628099", 1, "TreasureboxKey4");
 
 		[DialogFunction("TREASUREBOX_LV_F_GELE_57_2153")]
 		public static async Task TREASUREBOX_LV_F_GELE_57_2153(Dialog dialog)
@@ -3517,6 +3606,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_GELE_57_3")]
+		public static async Task WARP_F_GELE_57_3(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("GELE573_KENNETH")]
 		public static async Task GELE573_KENNETH(Dialog dialog)
@@ -3618,10 +3710,13 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_GELE_57_4")]
+		public static async Task WARP_F_GELE_57_4(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_GELE_57_451")]
 		public static async Task TREASUREBOX_LV_F_GELE_57_451(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "R_Hat_628043", 1);
+			=> await TREASUREBOX_LV(dialog, "R_Hat_628043", 1, "TreasureboxKey2");
 
 		[DialogFunction("UPPER_WARNING_F_GELE_57_4")]
 		public static async Task UPPER_WARNING_F_GELE_57_4(Dialog dialog)
@@ -3668,6 +3763,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_CHAPEL_57_5")]
+		public static async Task WARP_D_CHAPEL_57_5(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("CHAPLE575_MQ_05")]
 		public static async Task CHAPLE575_MQ_05(Dialog dialog)
@@ -3711,6 +3809,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_CHAPEL_57_6")]
+		public static async Task WARP_D_CHAPEL_57_6(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_D_CHAPEL_57_630")]
 		public static async Task TREASUREBOX_LV_D_CHAPEL_57_630(Dialog dialog)
@@ -3859,6 +3960,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_HUEVILLAGE_58_1")]
+		public static async Task WARP_F_HUEVILLAGE_58_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("HUEVILLAGE_58_1_SQ02_NPC")]
 		public static async Task HUEVILLAGE_58_1_SQ02_NPC(Dialog dialog)
@@ -3952,6 +4056,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_HUEVILLAGE_58_2")]
+		public static async Task WARP_F_HUEVILLAGE_58_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_HUEVILLAGE_58_248")]
 		public static async Task TREASUREBOX_LV_F_HUEVILLAGE_58_248(Dialog dialog)
@@ -4117,6 +4224,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_HUEVILLAGE_58_4")]
+		public static async Task WARP_F_HUEVILLAGE_58_4(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_HUEVILLAGE_58_445")]
 		public static async Task TREASUREBOX_LV_F_HUEVILLAGE_58_445(Dialog dialog)
@@ -4337,6 +4447,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_KATYN_7_2")]
+		public static async Task WARP_F_KATYN_7_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("KATYN7_2_FALL")]
 		public static async Task KATYN7_2_FALL(Dialog dialog)
@@ -4374,7 +4487,7 @@ namespace Melia.Zone.Scripting.Shared
 
 		[DialogFunction("TREASUREBOX_LV_D_CMINE_81078")]
 		public static async Task TREASUREBOX_LV_D_CMINE_81078(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "R_Hat_628060", 1);
+			=> await TREASUREBOX_LV(dialog, "R_Hat_628060", 1, "TreasureboxKey3");
 
 		[DialogFunction("CRYSTAL_MACHINE")]
 		public static async Task CRYSTAL_MACHINE(Dialog dialog)
@@ -4408,7 +4521,7 @@ namespace Melia.Zone.Scripting.Shared
 
 		[DialogFunction("TREASUREBOX_LV_D_CMINE_81109")]
 		public static async Task TREASUREBOX_LV_D_CMINE_81109(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "R_SPR02_105", 1);
+			=> await TREASUREBOX_LV(dialog, "R_SPR02_105", 1, "TreasureboxKey2");
 
 		[DialogFunction("TREASUREBOX_LV_D_CMINE_8700")]
 		public static async Task TREASUREBOX_LV_D_CMINE_8700(Dialog dialog)
@@ -4713,6 +4826,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("F_KATYN_14_EV_55_001")]
+		public static async Task F_KATYN_14_EV_55_001(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_KATYN_14601")]
 		public static async Task TREASUREBOX_LV_F_KATYN_14601(Dialog dialog)
@@ -4854,6 +4970,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_THORN_19")]
+		public static async Task WARP_D_THORN_19(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("THORN19_BELIEVER02")]
 		public static async Task THORN19_BELIEVER02(Dialog dialog)
@@ -4878,6 +4997,10 @@ namespace Melia.Zone.Scripting.Shared
 			await dialog.Msg("THORN_BLACKMAN_TRIGGER2_basic02");
 			await COMMON_QUEST_HANDLER(dialog);
 		}
+
+		[DialogFunction("TREASUREBOX_LV_D_THORN_19682")]
+		public static async Task TREASUREBOX_LV_D_THORN_19682(Dialog dialog)
+			=> await TREASUREBOX_LV(dialog, "emoticonItem_2", 1);
 
 		[DialogFunction("THORN19_GATE01_OPEN")]
 		public static async Task THORN19_GATE01_OPEN(Dialog dialog)
@@ -4944,7 +5067,7 @@ namespace Melia.Zone.Scripting.Shared
 
 		[DialogFunction("TREASUREBOX_LV_D_THORN_20865")]
 		public static async Task TREASUREBOX_LV_D_THORN_20865(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628091", 1);
+			=> await TREASUREBOX_LV(dialog, "Hat_628091", 1, "TreasureboxKey3");
 
 		[DialogFunction("SAULE_PURIFICATION")]
 		public static async Task SAULE_PURIFICATION(Dialog dialog)
@@ -5141,6 +5264,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_THORN_22")]
+		public static async Task WARP_D_THORN_22(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_D_THORN_22832")]
 		public static async Task TREASUREBOX_LV_D_THORN_22832(Dialog dialog)
@@ -5224,6 +5350,9 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task TREASUREBOX_LV_D_THORN_23631(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "COLLECT_176", 1);
 
+		[DialogFunction("WARP_F_ROKAS_24")]
+		public static async Task WARP_F_ROKAS_24(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("ROKAS_24_NEALS")]
 		public static async Task ROKAS_24_NEALS(Dialog dialog)
@@ -5733,6 +5862,10 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task TREASUREBOX_LV_F_ROKAS_25679(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "COLLECT_140", 1);
 
+		[DialogFunction("TREASUREBOX_LV_F_ROKAS_25682")]
+		public static async Task TREASUREBOX_LV_F_ROKAS_25682(Dialog dialog)
+			=> await TREASUREBOX_LV(dialog, "JOB_SHINOBI_HIDDEN_ITEM_2", 1);
+
 		[DialogFunction("ROKAS26_BIO")]
 		public static async Task ROKAS26_BIO(Dialog dialog)
 		{
@@ -5960,6 +6093,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_ROKAS_27")]
+		public static async Task WARP_F_ROKAS_27(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("JOB_CORSAIR4_NPC")]
 		public static async Task JOB_CORSAIR4_NPC(Dialog dialog)
@@ -6353,6 +6489,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_ROKAS_30")]
+		public static async Task WARP_F_ROKAS_30(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("ROKAS30_PIPOTI02_TREASUREBOX")]
 		public static async Task ROKAS30_PIPOTI02_TREASUREBOX(Dialog dialog)
@@ -6439,6 +6578,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("F_ROKAS_31_EV_55_001")]
+		public static async Task F_ROKAS_31_EV_55_001(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_ROKAS_31629")]
 		public static async Task TREASUREBOX_LV_F_ROKAS_31629(Dialog dialog)
@@ -6528,6 +6670,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_ZACHARIEL_32")]
+		public static async Task WARP_D_ZACHARIEL_32(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("ZACHA1F_MQ_05_NPC")]
 		public static async Task ZACHA1F_MQ_05_NPC(Dialog dialog)
@@ -6622,6 +6767,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_ZACHARIEL_33")]
+		public static async Task WARP_D_ZACHARIEL_33(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_D_ZACHARIEL_333024")]
 		public static async Task TREASUREBOX_LV_D_ZACHARIEL_333024(Dialog dialog)
@@ -6863,6 +7011,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_ZACHARIEL_36")]
+		public static async Task WARP_D_ZACHARIEL_36(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("ZACHA5F_EQ_04")]
 		public static async Task ZACHA5F_EQ_04(Dialog dialog)
@@ -6922,6 +7073,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_ID_CATACOMB_01")]
+		public static async Task WARP_ID_CATACOMB_01(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("CATACOMB_01_TOMBSTONE_01")]
 		public static async Task CATACOMB_01_TOMBSTONE_01(Dialog dialog)
@@ -7220,6 +7374,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_REMAINS_37")]
+		public static async Task WARP_F_REMAINS_37(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("REMAIN37_MQ05")]
 		public static async Task REMAIN37_MQ05(Dialog dialog)
@@ -7317,6 +7474,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_REMAINS_38")]
+		public static async Task WARP_F_REMAINS_38(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("REMAIN38_HUNTER")]
 		public static async Task REMAIN38_HUNTER(Dialog dialog)
@@ -7339,7 +7499,7 @@ namespace Melia.Zone.Scripting.Shared
 
 		[DialogFunction("TREASUREBOX_LV_F_REMAINS_3886")]
 		public static async Task TREASUREBOX_LV_F_REMAINS_3886(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "expCard5", 1);
+			=> await TREASUREBOX_LV(dialog, "expCard6", 3, "TreasureboxKey3");
 
 		[DialogFunction("MASTER_FLETCHER")]
 		public static async Task MASTER_FLETCHER(Dialog dialog)
@@ -7727,6 +7887,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_FIRETOWER_41")]
+		public static async Task WARP_D_FIRETOWER_41(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("FTOWER41_MQ_01_NPC")]
 		public static async Task FTOWER41_MQ_01_NPC(Dialog dialog)
@@ -8007,6 +8170,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_FIRETOWER_45")]
+		public static async Task WARP_D_FIRETOWER_45(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("FTOWER45_MQ_05_D")]
 		public static async Task FTOWER45_MQ_05_D(Dialog dialog)
@@ -8097,7 +8263,7 @@ namespace Melia.Zone.Scripting.Shared
 
 		[DialogFunction("TREASUREBOX_LV_F_PILGRIMROAD_4652")]
 		public static async Task TREASUREBOX_LV_F_PILGRIMROAD_4652(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "R_TSW03_101", 1);
+			=> await TREASUREBOX_LV(dialog, "R_TSW03_101", 1, "TreasureboxKey3");
 
 		[DialogFunction("JOB_2_PALADIN5_TRIGGER")]
 		public static async Task JOB_2_PALADIN5_TRIGGER(Dialog dialog)
@@ -8323,6 +8489,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_PILGRIMROAD_51")]
+		public static async Task WARP_F_PILGRIMROAD_51(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("PILGRIM51_INFO_BOARD")]
 		public static async Task PILGRIM51_INFO_BOARD(Dialog dialog)
@@ -8993,6 +9162,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_PILGRIMROAD_55")]
+		public static async Task WARP_F_PILGRIMROAD_55(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("PILGRIMROAD55_SQ02")]
 		public static async Task PILGRIMROAD55_SQ02(Dialog dialog)
@@ -9084,7 +9256,7 @@ namespace Melia.Zone.Scripting.Shared
 
 		[DialogFunction("TREASUREBOX_LV_F_PILGRIMROAD_5539")]
 		public static async Task TREASUREBOX_LV_F_PILGRIMROAD_5539(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "Hat_628053", 1);
+			=> await TREASUREBOX_LV(dialog, "Hat_628053", 1, "TreasureboxKey4");
 
 		[DialogFunction("TREASUREBOX_LV_F_PILGRIMROAD_55900")]
 		public static async Task TREASUREBOX_LV_F_PILGRIMROAD_55900(Dialog dialog)
@@ -9455,6 +9627,9 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task TREASUREBOX_LV_F_SIAULIAI_46_323(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "COLLECT_196", 1);
 
+		[DialogFunction("WARP_F_SIAULIAI_46_4")]
+		public static async Task WARP_F_SIAULIAI_46_4(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("SIAULIAI_46_4_MQ01_NPC")]
 		public static async Task SIAULIAI_46_4_MQ01_NPC(Dialog dialog)
@@ -9858,6 +10033,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_PILGRIMROAD_41_3")]
+		public static async Task WARP_PILGRIMROAD_41_3(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("PILGRIM41_3_PAIR")]
 		public static async Task PILGRIM41_3_PAIR(Dialog dialog)
@@ -10409,6 +10587,9 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task TREASUREBOX_LV_F_FLASH_601000(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "COLLECT_210", 1);
 
+		[DialogFunction("WARP_F_FLASH_61")]
+		public static async Task WARP_F_FLASH_61(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("FLASH61_SABINA")]
 		public static async Task FLASH61_SABINA(Dialog dialog)
@@ -10619,6 +10800,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("F_FLASH_64_EV_55_001")]
+		public static async Task F_FLASH_64_EV_55_001(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("FLASH64_KARRIAT")]
 		public static async Task FLASH64_KARRIAT(Dialog dialog)
@@ -10698,6 +10882,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_FLASH_64")]
+		public static async Task WARP_F_FLASH_64(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("UNDER_67_SQ030_NPC")]
 		public static async Task UNDER_67_SQ030_NPC(Dialog dialog)
@@ -10806,6 +10993,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_UNDERFORTRESS_65")]
+		public static async Task WARP_D_UNDERFORTRESS_65(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("UNDER66_DELLOOS01")]
 		public static async Task UNDER66_DELLOOS01(Dialog dialog)
@@ -11315,6 +11505,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_UNDERFORTRESS_69")]
+		public static async Task WARP_D_UNDERFORTRESS_69(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TABLE70_SOLDIER1_1")]
 		public static async Task TABLE70_SOLDIER1_1(Dialog dialog)
@@ -11686,6 +11879,9 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task TREASUREBOX_LV_F_TABLELAND_711000(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "COLLECT_275", 1);
 
+		[DialogFunction("WARP_F_TABLELAND_72")]
+		public static async Task WARP_F_TABLELAND_72(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TABLELAND72_BASE_BALL")]
 		public static async Task TABLELAND72_BASE_BALL(Dialog dialog)
@@ -11965,6 +12161,9 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task TREASUREBOX_LV_F_TABLELAND_741000(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "COLLECT_278", 1);
 
+		[DialogFunction("WARP_D_PRISON_78")]
+		public static async Task WARP_D_PRISON_78(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("PRISON_78_NUMBER_BASEBALL")]
 		public static async Task PRISON_78_NUMBER_BASEBALL(Dialog dialog)
@@ -12320,6 +12519,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_PRISON_81")]
+		public static async Task WARP_D_PRISON_81(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("PRISON_81_NUMBER_BASEBALL")]
 		public static async Task PRISON_81_NUMBER_BASEBALL(Dialog dialog)
@@ -12810,6 +13012,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("F_3CMLAKE_86_EV_55_001")]
+		public static async Task F_3CMLAKE_86_EV_55_001(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("F_3CMLAKE_87_MQ_01_NPC_2")]
 		public static async Task F_3CMLAKE_87_MQ_01_NPC_2(Dialog dialog)
@@ -12976,6 +13181,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_3CMLAKE_87")]
+		public static async Task WARP_F_3CMLAKE_87(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("PAYAUTA_EP11_NPC_87")]
 		public static async Task PAYAUTA_EP11_NPC_87(Dialog dialog)
@@ -13109,6 +13317,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_STARTOWER_88")]
+		public static async Task WARP_D_STARTOWER_88(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("STARTOWER_88_MQ_20_PORTAL_NPC")]
 		public static async Task STARTOWER_88_MQ_20_PORTAL_NPC(Dialog dialog)
@@ -13518,6 +13729,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_STARTOWER_91")]
+		public static async Task WARP_D_STARTOWER_91(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("D_STARTOWER_92_RESISTANCE_LEADER_BAYL_01")]
 		public static async Task D_STARTOWER_92_RESISTANCE_LEADER_BAYL_01(Dialog dialog)
@@ -13818,6 +14032,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_CASTLE_94")]
+		public static async Task WARP_F_CASTLE_94(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("CASTLE95_NPC_MAIN01")]
 		public static async Task CASTLE95_NPC_MAIN01(Dialog dialog)
@@ -14086,6 +14303,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_CASTLE_99")]
+		public static async Task WARP_F_CASTLE_99(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("F_CASTLE_99_MQ_01_NPC")]
 		public static async Task F_CASTLE_99_MQ_01_NPC(Dialog dialog)
@@ -14186,6 +14406,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_CASTLE_101")]
+		public static async Task WARP_F_CASTLE_101(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("WARP_F_DCAPITAL_101_TO_D_DCAPITAL_108")]
 		public static async Task WARP_F_DCAPITAL_101_TO_D_DCAPITAL_108(Dialog dialog)
@@ -14498,6 +14721,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("DCAPITAL_105_EV_55_001")]
+		public static async Task DCAPITAL_105_EV_55_001(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("EP12_PRELUDE_NERINGA_DCAPITAL_105A")]
 		public static async Task EP12_PRELUDE_NERINGA_DCAPITAL_105A(Dialog dialog)
@@ -14583,6 +14809,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_DCAPITAL_106")]
+		public static async Task WARP_DCAPITAL_106(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("EP12_PRELUDE_NERINGA_DCAPITAL_106A")]
 		public static async Task EP12_PRELUDE_NERINGA_DCAPITAL_106A(Dialog dialog)
@@ -14829,6 +15058,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("D_DCAPITAL_108_ZEMINA")]
+		public static async Task D_DCAPITAL_108_ZEMINA(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("GILTINE_GO_GUILDMISSION")]
 		public static async Task GILTINE_GO_GUILDMISSION(Dialog dialog)
@@ -14901,6 +15133,9 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task TREASUREBOX_LV_F_WHITETREES_23_11000(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "COLLECT_301", 1);
 
+		[DialogFunction("WARP_C_MAPLE_23_2")]
+		public static async Task WARP_C_MAPLE_23_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("MAPLE232_SQ_01")]
 		public static async Task MAPLE232_SQ_01(Dialog dialog)
@@ -15244,6 +15479,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_TABLELAND_28_2")]
+		public static async Task WARP_F_TABLELAND_28_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_TABLELAND_28_21000")]
 		public static async Task TREASUREBOX_LV_F_TABLELAND_28_21000(Dialog dialog)
@@ -15318,6 +15556,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_KATYN_45_1")]
+		public static async Task WARP_F_KATYN_45_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("KATYN_45_1_AJEL1")]
 		public static async Task KATYN_45_1_AJEL1(Dialog dialog)
@@ -15551,6 +15792,9 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task TREASUREBOX_LV_F_KATYN_45_21000(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "COLLECT_280", 1);
 
+		[DialogFunction("WARP_F_KATYN_45_3")]
+		public static async Task WARP_F_KATYN_45_3(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("KATYN_45_3_NUMBER_MIXING")]
 		public static async Task KATYN_45_3_NUMBER_MIXING(Dialog dialog)
@@ -15738,6 +15982,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_FARM_49_1")]
+		public static async Task WARP_F_FARM_49_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_FARM_49_142")]
 		public static async Task TREASUREBOX_LV_F_FARM_49_142(Dialog dialog)
@@ -16025,10 +16272,13 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_FARM_49_3")]
+		public static async Task WARP_F_FARM_49_3(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_FARM_49_360")]
 		public static async Task TREASUREBOX_LV_F_FARM_49_360(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "R_TSF02_107", 1);
+			=> await TREASUREBOX_LV(dialog, "R_TSF02_107", 1, "TreasureboxKey2");
 
 		[DialogFunction("TREASUREBOX_LV_F_FARM_49_363")]
 		public static async Task TREASUREBOX_LV_F_FARM_49_363(Dialog dialog)
@@ -16058,6 +16308,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_P_CATHEDRAL_1")]
+		public static async Task WARP_P_CATHEDRAL_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("UPPER_WARNING_P_CATHEDRAL_1")]
 		public static async Task UPPER_WARNING_P_CATHEDRAL_1(Dialog dialog)
@@ -16080,6 +16333,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_P_CATACOMB_1")]
+		public static async Task WARP_P_CATACOMB_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("UPPER_WARNING_P_CATACOMB_1")]
 		public static async Task UPPER_WARNING_P_CATACOMB_1(Dialog dialog)
@@ -16153,6 +16409,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_THORN_39_1")]
+		public static async Task WARP_D_THORN_39_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_D_THORN_39_11000")]
 		public static async Task TREASUREBOX_LV_D_THORN_39_11000(Dialog dialog)
@@ -16999,6 +17258,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_REMAINS_37_3")]
+		public static async Task WARP_F_REMAINS_37_3(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("DRAGOON_MASTER")]
 		public static async Task DRAGOON_MASTER(Dialog dialog)
@@ -17173,6 +17435,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_PILGRIMROAD_48")]
+		public static async Task WARP_F_PILGRIMROAD_48(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_PILGRIMROAD_4826")]
 		public static async Task TREASUREBOX_LV_F_PILGRIMROAD_4826(Dialog dialog)
@@ -17558,6 +17823,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_FLASH_58")]
+		public static async Task WARP_F_FLASH_58(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_FLASH_581000")]
 		public static async Task TREASUREBOX_LV_F_FLASH_581000(Dialog dialog)
@@ -17625,6 +17893,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_C_KLAIPE_CATHEDRAL_MEDIUM")]
+		public static async Task WARP_C_KLAIPE_CATHEDRAL_MEDIUM(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("EP13_GODDESS_LADA4TO5")]
 		public static async Task EP13_GODDESS_LADA4TO5(Dialog dialog)
@@ -17842,6 +18113,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_CASTLE_19_1")]
+		public static async Task WARP_D_CASTLE_19_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("D_CASTLE_19_1_MQ_03_OBJ_1")]
 		public static async Task D_CASTLE_19_1_MQ_03_OBJ_1(Dialog dialog)
@@ -18303,6 +18577,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_CASTLE_20_3")]
+		public static async Task WARP_CASTLE_20_3(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("CASTLE203_KQ_1_NPC")]
 		public static async Task CASTLE203_KQ_1_NPC(Dialog dialog)
@@ -18602,6 +18879,9 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task TREASUREBOX_LV_F_WHITETREES_21_11000(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "COLLECT_306", 1);
 
+		[DialogFunction("WARP_WHITETREES_21_2")]
+		public static async Task WARP_WHITETREES_21_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("WTREES_21_2_NPC_1")]
 		public static async Task WTREES_21_2_NPC_1(Dialog dialog)
@@ -18892,6 +19172,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WHITETREES22_2_EV_55_001")]
+		public static async Task WHITETREES22_2_EV_55_001(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("WTREES22_3_SUBQ1_NPC1")]
 		public static async Task WTREES22_3_SUBQ1_NPC1(Dialog dialog)
@@ -18959,6 +19242,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_WHITETREES_22_3")]
+		public static async Task WARP_WHITETREES_22_3(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("WTREES22_3_BOARD1")]
 		public static async Task WTREES22_3_BOARD1(Dialog dialog)
@@ -19864,6 +20150,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_MAPLE_24_1")]
+		public static async Task WARP_F_MAPLE_24_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("F_MAPLE_241_MQ_01_NPC")]
 		public static async Task F_MAPLE_241_MQ_01_NPC(Dialog dialog)
@@ -20291,6 +20580,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_MAPLE_25_2")]
+		public static async Task WARP_F_MAPLE_25_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("MAPLE_25_2_SQ_20_CLEAR_1")]
 		public static async Task MAPLE_25_2_SQ_20_CLEAR_1(Dialog dialog)
@@ -21365,6 +21657,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_SIAULIAI_35_1")]
+		public static async Task WARP_F_SIAULIAI_35_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("SIAULIAI_35_1_MONSTER_PAIR")]
 		public static async Task SIAULIAI_35_1_MONSTER_PAIR(Dialog dialog)
@@ -21745,6 +22040,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_ABBEY_35_4")]
+		public static async Task WARP_D_ABBEY_35_4(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("ABBEY_35_4_ELDER_2")]
 		public static async Task ABBEY_35_4_ELDER_2(Dialog dialog)
@@ -21914,6 +22212,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_ID_CATACOMB_38_2")]
+		public static async Task WARP_ID_CATACOMB_38_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("WARLOCK_MASTER")]
 		public static async Task WARLOCK_MASTER(Dialog dialog)
@@ -22420,6 +22721,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_LIMESTONE_52_1")]
+		public static async Task WARP_D_LIMESTONE_52_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_D_LIMESTONECAVE_52_11000")]
 		public static async Task TREASUREBOX_LV_D_LIMESTONECAVE_52_11000(Dialog dialog)
@@ -22668,6 +22972,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_LIMESTONE_52_5")]
+		public static async Task WARP_D_LIMESTONE_52_5(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_D_LIMESTONECAVE_52_51000")]
 		public static async Task TREASUREBOX_LV_D_LIMESTONECAVE_52_51000(Dialog dialog)
@@ -22951,6 +23258,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_VPRISON_51_2")]
+		public static async Task WARP_D_VPRISON_51_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("VPRISON512_STONE_01")]
 		public static async Task VPRISON512_STONE_01(Dialog dialog)
@@ -23561,6 +23871,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_BRACKEN_43_2")]
+		public static async Task WARP_F_BRACKEN_43_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_F_BRACKEN_43_21000")]
 		public static async Task TREASUREBOX_LV_F_BRACKEN_43_21000(Dialog dialog)
@@ -23915,6 +24228,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_FARM_47_1")]
+		public static async Task WARP_F_FARM_47_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("FARM47_1_HIDDEN_EVENT")]
 		public static async Task FARM47_1_HIDDEN_EVENT(Dialog dialog)
@@ -24172,7 +24488,7 @@ namespace Melia.Zone.Scripting.Shared
 
 		[DialogFunction("TREASUREBOX_LV_F_FARM_47_339")]
 		public static async Task TREASUREBOX_LV_F_FARM_47_339(Dialog dialog)
-			=> await TREASUREBOX_LV(dialog, "TSW02_104", 1);
+			=> await TREASUREBOX_LV(dialog, "TSW02_104", 1, "TreasureboxKey3");
 
 		[DialogFunction("TREASUREBOX_LV_F_FARM_47_3700")]
 		public static async Task TREASUREBOX_LV_F_FARM_47_3700(Dialog dialog)
@@ -24432,6 +24748,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_F_3CMLAKE_26_1")]
+		public static async Task WARP_F_3CMLAKE_26_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("F_3CMLAKE_26_1_COLLECTION_OBJ")]
 		public static async Task F_3CMLAKE_26_1_COLLECTION_OBJ(Dialog dialog)
@@ -24593,7 +24912,13 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("UNDERF592_ZEMINA_STATUE")]
+		public static async Task UNDERF592_ZEMINA_STATUE(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
+		[DialogFunction("WARP_D_UNDERFORTRESS_59_2")]
+		public static async Task WARP_D_UNDERFORTRESS_59_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("ROKAS_MEMO02_NPC")]
 		public static async Task ROKAS_MEMO02_NPC(Dialog dialog)
@@ -24687,6 +25012,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_STARTOWER_60_1")]
+		public static async Task WARP_D_STARTOWER_60_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("STARTOWER_60_1_MEMO_01")]
 		public static async Task STARTOWER_60_1_MEMO_01(Dialog dialog)
@@ -24782,6 +25110,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_FIRETOWER_61_1")]
+		public static async Task WARP_D_FIRETOWER_61_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("TREASUREBOX_LV_D_FIRETOWER_61_11000")]
 		public static async Task TREASUREBOX_LV_D_FIRETOWER_61_11000(Dialog dialog)
@@ -24899,6 +25230,10 @@ namespace Melia.Zone.Scripting.Shared
 		[DialogFunction("TREASUREBOX_LV_F_SIAULIAI_11_RE634")]
 		public static async Task TREASUREBOX_LV_F_SIAULIAI_11_RE634(Dialog dialog)
 			=> await TREASUREBOX_LV(dialog, "COLLECT_259", 1);
+
+		[DialogFunction("TREASUREBOX_LV_F_KATYN_1232")]
+		public static async Task TREASUREBOX_LV_F_KATYN_1232(Dialog dialog)
+			=> await TREASUREBOX_LV(dialog, "JOB_SHINOBI_HIDDEN_ITEM_2", 1);
 
 		[DialogFunction("TREASUREBOX_LV_F_KATYN_12335")]
 		public static async Task TREASUREBOX_LV_F_KATYN_12335(Dialog dialog)
@@ -25053,6 +25388,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_FIRETOWER_69_2")]
+		public static async Task WARP_D_FIRETOWER_69_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("FTOWER_69_2_G2_1_BOX")]
 		public static async Task FTOWER_69_2_G2_1_BOX(Dialog dialog)
@@ -25192,6 +25530,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_DCAPITAL53_1")]
+		public static async Task WARP_DCAPITAL53_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("DCAPITAL53_1_SUB_OWL_STATUE01")]
 		public static async Task DCAPITAL53_1_SUB_OWL_STATUE01(Dialog dialog)
@@ -25421,6 +25762,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("FD_STARTOWER762_EV_55_001")]
+		public static async Task FD_STARTOWER762_EV_55_001(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("VELNIASPRISON_77_1_TO_FLASH_61")]
 		public static async Task VELNIASPRISON_77_1_TO_FLASH_61(Dialog dialog)
@@ -25518,6 +25862,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_D_IRREDIANS113_1")]
+		public static async Task WARP_D_IRREDIANS113_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("IRREDIANS1131_ENTRANCE")]
 		public static async Task IRREDIANS1131_ENTRANCE(Dialog dialog)
@@ -26059,6 +26406,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("SIAU16_SQ_06_EV_NPC")]
+		public static async Task SIAU16_SQ_06_EV_NPC(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
 		[DialogFunction("EP13_F_SIAULIAI_1_MQ_LADA_2")]
 		public static async Task EP13_F_SIAULIAI_1_MQ_LADA_2(Dialog dialog)
@@ -26133,6 +26483,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_EP13_F_SIAULIAI_2")]
+		public static async Task WARP_EP13_F_SIAULIAI_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("EP13_F_SIAULIAI_2_REPUTATION_01")]
 		public static async Task EP13_F_SIAULIAI_2_REPUTATION_01(Dialog dialog)
@@ -26319,6 +26672,9 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction("WARP_EP13_F_SIAULIAI_4")]
+		public static async Task WARP_EP13_F_SIAULIAI_4(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction("EP13_F_SIAULIAI_4_ZEMINA")]
 		public static async Task EP13_F_SIAULIAI_4_ZEMINA(Dialog dialog)
@@ -26378,6 +26734,9 @@ namespace Melia.Zone.Scripting.Shared
 			await dialog.HooksByDialogName("BeforeEnd");
 		}
 
+		[DialogFunction]
+		public static async Task WARP_EP13_2_D_PRISON_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction]
 		public static async Task EP13_2_DPRISON2_MQ_NPC_2(Dialog dialog)
@@ -26726,7 +27085,13 @@ namespace Melia.Zone.Scripting.Shared
 			await COMMON_QUEST_HANDLER(dialog);
 		}
 
+		[DialogFunction]
+		public static async Task EP14_1_F_CASTLE_2_06_EV_NPC(Dialog dialog)
+			=> await ZEMINA_STATUE(dialog);
 
+		[DialogFunction]
+		public static async Task WARP_EP14_1_F_CASTLE_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction]
 		public static async Task EP14_1_FCASTLE3_MQ_1_NPC1(Dialog dialog)
@@ -26837,6 +27202,9 @@ namespace Melia.Zone.Scripting.Shared
 		{
 		}
 
+		[DialogFunction]
+		public static async Task WARP_EP14_1_F_CASTLE_4(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction]
 		public static async Task EP14_1_FCASTLE5_MQ_1_NPC1(Dialog dialog)
@@ -26923,6 +27291,9 @@ namespace Melia.Zone.Scripting.Shared
 			await dialog.HooksByDialogName("BeforeEnd");
 		}
 
+		[DialogFunction]
+		public static async Task WARP_EP14_2_DCASTLE_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction]
 		public static async Task EP14_2_RED_CRYSTAL(Dialog dialog)
@@ -26952,6 +27323,9 @@ namespace Melia.Zone.Scripting.Shared
 			await dialog.HooksByDialogName("BeforeEnd");
 		}
 
+		[DialogFunction]
+		public static async Task WARP_EP14_2_DCASTLE_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction]
 		public static async Task EP14_2_DCASLTE2_ZEMINA(Dialog dialog)
@@ -27154,6 +27528,9 @@ namespace Melia.Zone.Scripting.Shared
 			await dialog.HooksByDialogName("BeforeEnd");
 		}
 
+		[DialogFunction]
+		public static async Task WARP_EP15_1_F_ABBEY_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction]
 		public static async Task EP15_1_RED_PLANET(Dialog dialog)
@@ -27225,6 +27602,9 @@ namespace Melia.Zone.Scripting.Shared
 			await dialog.HooksByDialogName("BeforeEnd");
 		}
 
+		[DialogFunction]
+		public static async Task WARP_EP15_1_F_ABBEY_2(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction]
 		public static async Task EP15_1_FABBEY2_ZEMINA(Dialog dialog)
@@ -27406,6 +27786,9 @@ namespace Melia.Zone.Scripting.Shared
 			await dialog.HooksByDialogName("BeforeEnd");
 		}
 
+		[DialogFunction]
+		public static async Task WARP_EP15_2_D_NICOPOLIS_1(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 
 		[DialogFunction]
 		public static async Task EP15_2_D_NICO_AUSIRINE_2(Dialog dialog)
@@ -28351,5 +28734,22 @@ namespace Melia.Zone.Scripting.Shared
 			await Task.Yield();
 		}
 
+		[DialogFunction("WARP_F_SIAULIAI_11RE")]
+		[DialogFunction("WARP_F_SIAULIAI_15RE")]
+		[DialogFunction("WARP_F_SIAULIAI_16")]
+		[DialogFunction("WARP_F_ORCHARD_32_3")]
+		[DialogFunction("WARP_F_KATYN_12")]
+		[DialogFunction("WARP_F_PILGRIMROAD_31_3")]
+		[DialogFunction("WARP_ID_CATACOMB_33_1")]
+		[DialogFunction("WARP_D_PRISON_62_1")]
+		[DialogFunction("WARP_D_PRISON_62_2")]
+		[DialogFunction("WARP_D_PRISON_62_3")]
+		[DialogFunction("WARP_F_BRACKEN_63_2")]
+		[DialogFunction("WARP_D_ABBEY_64_1")]
+		[DialogFunction("WARP_D_ABBEY_64_3")]
+		[DialogFunction("WARP_D_CASTLE_67_1")]
+		[DialogFunction("WARP_D_UNDERFORTRESS_68_1")]
+		public static async Task WARP(Dialog dialog)
+			=> await STATUE_WARP(dialog);
 	}
 }

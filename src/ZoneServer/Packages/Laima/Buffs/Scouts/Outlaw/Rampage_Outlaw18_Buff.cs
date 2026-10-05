@@ -1,0 +1,43 @@
+using Melia.Shared.Packages;
+using Melia.Shared.Game.Const;
+using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
+using Melia.Zone.Skills;
+using Melia.Zone.Skills.Combat;
+using Melia.Zone.World.Actors;
+
+namespace Melia.Zone.Buffs.Handlers.Scouts.OutLaw
+{
+	/// <summary>
+	/// Handle for the Rampage Outlaw18 Buff, which gives 10%
+	/// bonus crit chance per debuff that was active when it
+	/// was started (which was calculated when it was applied)
+	/// </summary>
+	/// <remarks>
+	/// NumArg1: Debuff Count
+	/// NumArg2: None
+	/// </remarks>
+	[Package("laima")]
+	[BuffHandler(BuffId.Rampage_Outlaw18_Buff)]
+	public class Rampage_Outlaw18_BuffOverride : BuffHandler
+	{
+		public const float CritBonusPerDebuff = 10f;
+
+		/// <summary>
+		/// Adds the bonus crit chance
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="target"></param>
+		/// <param name="skill"></param>
+		/// <param name="modifier"></param>
+		/// <param name="skillHitResult"></param>
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Rampage_Outlaw18_Buff)]
+		public void OnAttackBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		{
+			if (!attacker.TryGetBuff(BuffId.Rampage_Outlaw18_Buff, out var buff))
+				return;
+
+			modifier.BonusCritChance = CritBonusPerDebuff * buff.NumArg1;
+		}
+	}
+}

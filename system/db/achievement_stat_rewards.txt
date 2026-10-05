@@ -1,0 +1,8 @@
+// Melia
+// Database file
+//
+// Values: id, achieveCount, str, con, int, spr, dex, patk, matk, def, mdef, msp
+//---------------------------------------------------------------------------
+
+[
+]

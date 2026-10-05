@@ -11,7 +11,6 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Extensions;
 using Yggdrasil.Scheduling;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.CombatEntities.Components
 {
@@ -69,7 +68,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			var prevState = this.AttackState;
 
 			this.AttackState = state;
-			this.LastCombatTime = GameClock.Now;
+			this.LastCombatTime = DateTime.UtcNow;
 
 			Send.ZC_PC_ATKSTATE(this.Entity, state);
 
@@ -94,7 +93,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (!this.AttackState)
 				return;
 
-			var timePassed = GameClock.Now - this.LastCombatTime;
+			var timePassed = DateTime.UtcNow - this.LastCombatTime;
 			if (timePassed > AttackStateDuration)
 				this.SetAttackState(false);
 		}
@@ -130,7 +129,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </summary>
 		/// <param name="attacker"></param>
 		/// <returns></returns>
-		private static ICombatEntity ResolveEffectiveAttacker(ICombatEntity attacker)
+		public static ICombatEntity ResolveEffectiveAttacker(ICombatEntity attacker)
 		{
 			if (attacker == null)
 				return null;
@@ -163,13 +162,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					.ToArray();
 			}
 
-			var map = this.Entity.Map;
-			if (map == null)
-				return null;
-
 			foreach (var handle in handles)
 			{
-				if (!map.TryGetCombatEntity(handle, out var attacker))
+				if (!this.Entity.Map.TryGetCombatEntity(handle, out var attacker))
 					continue;
 				if (attacker.IsDead)
 					continue;
@@ -419,7 +414,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			int handle;
 
 			lock (_targets)
-				handle = _targets.PickRandom();
+				handle = _targets.Random();
 
 			if (this.Entity.Map.TryGetCombatEntity(handle, out var entity))
 				return entity;

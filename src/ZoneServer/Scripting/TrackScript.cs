@@ -123,28 +123,6 @@ namespace Melia.Zone.Scripting
 			=> this.Data.StartDelay = startDelay;
 
 		/// <summary>
-		/// Sets how long the track is held open after it is told to end, so
-		/// a closing beat can play before the cast is pulled.
-		/// </summary>
-		/// <remarks>
-		/// A track with a battle box already waits a short delay by default;
-		/// this overrides it.
-		/// </remarks>
-		/// <param name="endDelay"></param>
-		protected void SetEndDelay(TimeSpan endDelay)
-			=> this.Data.EndDelay = endDelay;
-
-		/// <summary>
-		/// Sets the timeline line of each actor returned by OnStart, in order.
-		/// </summary>
-		/// <remarks>
-		/// Only needed when an empty timeline sits between two cast lines.
-		/// </remarks>
-		/// <param name="lines"></param>
-		protected void SetActorLines(params int[] lines)
-			=> this.Data.ActorLines = lines;
-
-		/// <summary>
 		/// Called when a character starts this track.
 		/// </summary>
 		/// <remarks>
@@ -168,24 +146,8 @@ namespace Melia.Zone.Scripting
 		/// </remarks>
 		public virtual async Task OnProgress(Character character, Track track, int frame)
 		{
-			if (track.PendingDialog != null && !track.PendingDialog.IsCompleted)
-				return;
-
 			Send.ZC_NORMAL.SetTrackFrame(character, track.Frame);
 			await Task.Yield();
-		}
-
-		/// <summary>
-		/// Called when the client hands the cutscene's cast back to the
-		/// world, after the last frame it reports.
-		/// </summary>
-		/// <remarks>
-		/// A few timelines arm their fight on a frame past the last one the
-		/// client plays, which no OnProgress case can ever see. Those tracks
-		/// run their hand-over from here instead.
-		/// </remarks>
-		public virtual void OnHandOver(Character character, Track track)
-		{
 		}
 
 		/// <summary>
@@ -203,45 +165,15 @@ namespace Melia.Zone.Scripting
 
 			if (track.Data.QuestId != 0)
 			{
+				character.Quests.UpdateQuestStatus(track.Data.QuestId, track.Data.OnCompleteQuestStatus);
 				if (track.Data.OnCompleteQuestStatus == QuestStatus.Completed)
-				{
 					character.Quests.Complete(track.Data.QuestId);
-				}
-				else
-				{
-					// The cutscene is the quest's objective for the phase it
-					// plays through, so mark it done together with the status.
-					Quest reachedSuccess = null;
-					if (track.Data.OnCompleteQuestStatus == QuestStatus.Success
-						&& character.Quests.TryGetById(track.Data.QuestId, out var quest))
-					{
-						if (quest.Status < QuestStatus.Success)
-							reachedSuccess = quest;
-
-						quest.CompleteObjectives();
-					}
-
-					character.Quests.UpdateQuestStatus(track.Data.QuestId, track.Data.OnCompleteQuestStatus);
-
-					if (reachedSuccess != null && QuestScript.TryGet(reachedSuccess.Data.Id, out var questScript))
-						questScript.OnSuccess(character, reachedSuccess);
-				}
 			}
 
 			if (track.HasBattleBoxInLayer)
 			{
 				Send.ZC_REMOVE_SCROLLLOCKBOX(character);
 				track.HasBattleBoxInLayer = false;
-			}
-
-			// A party track's cast and layer are shared, so only the last
-			// member to finish tears them down.
-			if (track.Group != null)
-			{
-				character.StopLayer();
-
-				if (!track.Group.Leave(character))
-					return;
 			}
 
 			foreach (var actor in track.Actors)
@@ -273,24 +205,6 @@ namespace Melia.Zone.Scripting
 				//character.Quests.UpdateQuestStatus(track.Data.QuestId, track.Data.OriginalQuestStatus);
 			}
 
-			// A death or a relog cancels the track mid-fight, so the box it
-			// locked the character into has to go with it.
-			if (track.HasBattleBoxInLayer)
-			{
-				Send.ZC_REMOVE_SCROLLLOCKBOX(character);
-				track.HasBattleBoxInLayer = false;
-			}
-
-			// A party track's cast and layer are shared, so only the last
-			// member to leave tears them down.
-			if (track.Group != null)
-			{
-				character.StopLayer();
-
-				if (!track.Group.Leave(character))
-					return;
-			}
-
 			if (track.Actors != null)
 			{
 				foreach (var actor in track.Actors)
@@ -302,125 +216,20 @@ namespace Melia.Zone.Scripting
 			character.StopLayer();
 		}
 
-		/// <summary>
-		/// Shows a message from the track and waits for the player to
-		/// confirm it, returning quietly if the track ends first.
-		/// </summary>
-		/// <remarks>
-		/// A track's dialog is cancelled when the track ends, and closing a
-		/// dialog throws by design, so the wait has to tolerate both. The
-		/// player's own OnProgress runs from a packet handler, where an
-		/// escaping cancellation surfaces as an unhandled exception.
-		/// </remarks>
-		/// <param name="track"></param>
-		/// <param name="message"></param>
-		/// <returns></returns>
-		protected static async Task ShowDialog(Track track, string message)
-		{
-			if (track.Dialog == null)
-				return;
-
-			try
-			{
-				await track.Dialog.Msg(message);
-			}
-			catch (OperationCanceledException)
-			{
-			}
-		}
-
-		/// <summary>
-		/// Starts a sequence of messages from the track without holding up
-		/// the cutscene, for a closing frame to wait on with WaitForDialog.
-		/// </summary>
-		/// <remarks>
-		/// The client plays on through its own frames while a message is up,
-		/// so awaiting one here would let the track end underneath it and
-		/// leave the rest of the conversation playing out in the open world.
-		/// </remarks>
-		/// <param name="track"></param>
-		/// <param name="messages"></param>
-		protected static void StartDialog(Track track, params string[] messages)
-		{
-			track.PendingDialog = ShowDialogs(track, messages);
-		}
-
-		/// <summary>
-		/// Waits for the track's messages to be read, if any are still up.
-		/// </summary>
-		/// <param name="track"></param>
-		/// <returns></returns>
-		protected static async Task WaitForDialog(Track track)
-		{
-			var pendingDialog = track.PendingDialog;
-
-			if (pendingDialog != null)
-				await pendingDialog;
-		}
-
-		/// <summary>
-		/// Shows the given messages one after another.
-		/// </summary>
-		/// <param name="track"></param>
-		/// <param name="messages"></param>
-		/// <returns></returns>
-		private static async Task ShowDialogs(Track track, string[] messages)
-		{
-			foreach (var message in messages)
-				await ShowDialog(track, message);
-
-			var character = track.Dialog?.Player;
-
-			if (character != null && character.Tracks.ActiveTrack == track)
-				Send.ZC_NORMAL.SetTrackFrame(character, track.Frame);
-		}
-
-		/// <summary>
-		/// Returns whether the character is a party member following a track
-		/// another character owns, whose cast and layer commands the owner
-		/// has already run.
-		/// </summary>
-		/// <param name="character"></param>
-		/// <param name="track"></param>
-		/// <returns></returns>
-		private static bool IsSharedFollower(Character character, Track track)
-			=> track.Group != null && track.Owner != null && track.Owner != character;
-
-		/// <summary>
-		/// Keeps the track running past its cutscene, until the quest
-		/// reaches the status the track ends with.
-		/// </summary>
-		/// <param name="track"></param>
-		protected static void HoldTrackOpen(Track track)
-		{
-			track.HoldOpen = true;
-		}
-
 		protected static void CreateBattleBoxInLayer(Character character, Track track)
 		{
-			if (IsSharedFollower(character, track))
-				return;
-
 			track.HasBattleBoxInLayer = true;
-
-			// Every member gets the box around their own position, or they
-			// could simply walk out of the shared fight.
-			var members = track.Group != null ? (IEnumerable<Character>)track.Group.Members : new Character[] { character };
-
-			foreach (var member in members)
+			foreach (var actor in track.Actors)
 			{
-				foreach (var actor in track.Actors)
+				if (actor.Handle != character.Handle && actor is ICombatEntity combatEntity && character.CanTarget(combatEntity))
 				{
-					if (actor.Handle != member.Handle && actor is ICombatEntity combatEntity && member.CanTarget(combatEntity))
-					{
-						var distance = (float)member.Position.Get2DDistance(actor.Position);
-						if (distance > 0)
-							distance = (float)Math.Floor(distance / 2 + 150);
-						var lPos = new Position(member.Position.X - distance, 0f, member.Position.Z - distance);
-						var rPos = new Position(member.Position.X + distance, 0f, member.Position.Z + distance);
-						var width = Math.Abs(lPos.X - rPos.X);
-						Send.ZC_CREATE_SCROLLLOCKBOX(member, actor, lPos, rPos, width);
-					}
+					var distance = (float)character.Position.Get2DDistance(actor.Position);
+					if (distance > 0)
+						distance = (float)Math.Floor(distance / 2 + 150);
+					var lPos = new Position(character.Position.X - distance, 0f, character.Position.Z - distance);
+					var rPos = new Position(character.Position.X + distance, 0f, character.Position.Z + distance);
+					var width = Math.Abs(lPos.X - rPos.X);
+					Send.ZC_CREATE_SCROLLLOCKBOX(character, actor, lPos, rPos, width);
 				}
 			}
 		}
@@ -442,88 +251,22 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
-		/// Puts the character at the top of the given track actor's hate
-		/// list, so it comes for them the moment it can act.
-		/// </summary>
-		/// <param name="character"></param>
-		/// <param name="track"></param>
-		/// <param name="actorIndex">Index of the actor in the track's cast.</param>
-		/// <param name="hate"></param>
-		protected static void InsertTrackHate(Character character, Track track, int actorIndex, int hate = 999)
-		{
-			if (IsSharedFollower(character, track))
-				return;
-
-			if (track.Actors == null || actorIndex < 0 || actorIndex >= track.Actors.Length)
-				return;
-
-			if (track.Actors[actorIndex] is not ICombatEntity entity)
-				return;
-
-			if (track.Group != null)
-			{
-				foreach (var member in track.Group.Members)
-					entity.InsertHate(member, hate);
-
-				return;
-			}
-
-			entity.InsertHate(character, hate);
-		}
-
-		/// <summary>
-		/// Removes the given track actor from the map, for the cutscene
-		/// commands that kill off an actor mid-track.
-		/// </summary>
-		/// <param name="character"></param>
-		/// <param name="track"></param>
-		/// <param name="actorIndex">Index of the actor in the track's cast.</param>
-		protected static void RemoveTrackActor(Character character, Track track, int actorIndex)
-		{
-			if (IsSharedFollower(character, track))
-				return;
-
-			if (track.Actors == null || actorIndex < 0 || actorIndex >= track.Actors.Length)
-				return;
-
-			if (track.Actors[actorIndex] is IMonster monster && monster.Map != null && track.Actors[actorIndex] != character)
-				character.Map.RemoveMonster(monster);
-		}
-
-		/// <summary>
 		/// Usually enables aggressive behavior of track monsters
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="track"></param>
 		protected static void SetTrackTendency(Character character, Track track)
 		{
-			if (IsSharedFollower(character, track))
-				return;
-
-			var members = track.Group != null ? (IEnumerable<Character>)track.Group.Members : new Character[] { character };
-
 			foreach (var actor in track.Actors)
 			{
-				if (actor is Character || actor is not ICombatEntity combatEntity)
-					continue;
-
-				// An actor the cutscene already removed is off the map.
-				if (combatEntity.Map == null)
-					continue;
-
-				if (combatEntity is Mob monster)
-					monster.Position = monster.SpawnPosition;
-
-				combatEntity.Components.Add(new MovementComponent(combatEntity));
-				combatEntity.Tendency = TendencyType.Aggressive;
-
-				if (combatEntity.Components.TryGet<AiComponent>(out var aiComponent))
-					aiComponent.Script.RefreshMovement();
-
-				foreach (var member in members)
+				if (actor is ICombatEntity combatEntity)
 				{
-					if (member.CanTarget(combatEntity))
-						combatEntity.InsertHate(member);
+					// Official implementation sets the tendency to attack?
+					// Can I just add the movement component here instead?
+					if (actor is Character)
+						continue;
+					combatEntity.Components.Add(new MovementComponent(combatEntity));
+					combatEntity.Tendency = TendencyType.Aggressive;
 				}
 			}
 		}

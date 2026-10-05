@@ -16,8 +16,6 @@ namespace Melia.Zone.World.Quests
 		public QuestStatus OnTrackStart { get; set; } = QuestStatus.Possible;
 		public QuestStatus OnTrackEnd { get; set; } = QuestStatus.Possible;
 		public TimeSpan StartDelay { get; set; } = TimeSpan.Zero;
-		public bool AutoStart { get; set; } = true;
-		public bool PartyPlay { get; set; }
 		public string EffectName { get; internal set; }
 		public string Dialog { get; internal set; }
 	}

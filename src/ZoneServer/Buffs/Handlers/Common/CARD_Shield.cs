@@ -2,7 +2,6 @@ using System;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
-using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -17,7 +16,7 @@ namespace Melia.Zone.Buffs.Handlers
 	/// NumArg1: Shield value (e.g., star level * 150)
 	/// </remarks>
 	[BuffHandler(BuffId.CARD_Shield)]
-	public class CARD_Shield : BuffHandler
+	public class CARD_Shield : BuffHandler, IBuffCombatDefenseAfterCalcHandler
 	{
 		private const string ShieldValueKey = "Melia.CARD_Shield.RemainingValue";
 
@@ -42,12 +41,8 @@ namespace Melia.Zone.Buffs.Handlers
 			Send.ZC_UPDATE_SHIELD(buff.Target, 0, 1);
 		}
 
-		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.CARD_Shield)]
-		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
-			if (!target.TryGetBuff(BuffId.CARD_Shield, out var buff))
-				return;
-
 			var remainingShield = buff.Vars.GetFloat(ShieldValueKey);
 
 			if (remainingShield <= 0)

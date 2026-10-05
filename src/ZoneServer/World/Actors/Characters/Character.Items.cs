@@ -1,8 +1,6 @@
 ﻿// ===================================================================
 // CharacterItems.cs - Item and inventory management
 // ===================================================================
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
@@ -14,18 +12,6 @@ namespace Melia.Zone.World.Actors.Characters
 {
 	public partial class Character
 	{
-		private static readonly TimeSpan StackPickupMergeDelay = TimeSpan.FromMilliseconds(1500);
-
-		private readonly Dictionary<int, PendingStackPickup> _pendingStackPickups = new();
-		private readonly object _pendingStackPickupsLock = new();
-
-		private class PendingStackPickup
-		{
-			public int ItemId;
-			public int Amount;
-			public DateTime LastPickupTime;
-		}
-
 		/// <summary>
 		/// Returns ids of equipped items.
 		/// </summary>
@@ -65,11 +51,12 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public void PickUp(ItemMonster itemMonster)
 		{
-			if (itemMonster.Item.IsTrashLoot && !LootFilter.IsGraceActive(this))
-				LootFilter.RegisterTrashPickUp(this);
-
 			itemMonster.PickedUp = true;
 			itemMonster.Item.ClearProtections();
+
+			Send.ZC_ITEM_GET(this, itemMonster, itemMonster.Item.Amount);
+
+			this.Inventory.Add(itemMonster.Item, InventoryAddType.PickUp);
 
 			if (itemMonster.Item.Data.Journal)
 			{
@@ -81,116 +68,7 @@ namespace Melia.Zone.World.Actors.Characters
 				this.AdventureBook.AddItemObtained(itemMonster.Item.Id, itemMonster.Item.Amount);
 			}
 
-			// GET's amount also shows its own acquired popup, so it's
-			// zeroed out for follow-up pickups within the merge window.
-			if (itemMonster.Item.Id == ItemId.Silver && this.HasOpenStackPickupWindow(itemMonster.Item.Id))
-			{
-				Send.ZC_ITEM_GET(this, itemMonster, 0);
-				this.Inventory.AddQuiet(itemMonster.Item, InventoryAddType.PickUp);
-				this.QueueStackPickupNotification(itemMonster.Item.Id, itemMonster.Item.Amount);
-			}
-			else
-			{
-				Send.ZC_ITEM_GET(this, itemMonster, itemMonster.Item.Amount);
-				this.Inventory.Add(itemMonster.Item, InventoryAddType.PickUp);
-
-				if (itemMonster.Item.Id == ItemId.Silver)
-					this.OpenStackPickupWindow(itemMonster.Item.Id);
-			}
-
 			this.Map.RemoveMonster(itemMonster);
-		}
-
-		/// <summary>
-		/// Returns true if a stack pickup window is currently open for
-		/// the given item id.
-		/// </summary>
-		private bool HasOpenStackPickupWindow(int itemId)
-		{
-			lock (_pendingStackPickupsLock)
-				return _pendingStackPickups.ContainsKey(itemId);
-		}
-
-		/// <summary>
-		/// Opens a stack pickup window for the given item id, so that
-		/// any further pickups of it within the merge delay are queued
-		/// into a single follow-up notification.
-		/// </summary>
-		private void OpenStackPickupWindow(int itemId)
-		{
-			lock (_pendingStackPickupsLock)
-				_pendingStackPickups[itemId] = new PendingStackPickup { ItemId = itemId, LastPickupTime = DateTime.Now };
-		}
-
-		/// <summary>
-		/// Queues a stackable item pickup notification to be merged with
-		/// other pickups of the same item within the merge delay.
-		/// </summary>
-		private void QueueStackPickupNotification(int itemId, int amount)
-		{
-			lock (_pendingStackPickupsLock)
-			{
-				if (!_pendingStackPickups.TryGetValue(itemId, out var pending))
-				{
-					pending = new PendingStackPickup { ItemId = itemId };
-					_pendingStackPickups[itemId] = pending;
-				}
-
-				pending.Amount += amount;
-				pending.LastPickupTime = DateTime.Now;
-			}
-		}
-
-		/// <summary>
-		/// Sends notifications for any queued stack pickups whose merge
-		/// delay has passed since the last pickup of that item.
-		/// </summary>
-		private void FlushDueStackPickups()
-		{
-			this.FlushStackPickups(force: false);
-		}
-
-		/// <summary>
-		/// Immediately sends notifications for all queued stack pickups,
-		/// regardless of merge delay. Called before the character leaves
-		/// the map, so the client isn't left out of sync.
-		/// </summary>
-		public void FlushAllStackPickups()
-		{
-			this.FlushStackPickups(force: true);
-		}
-
-		private void FlushStackPickups(bool force)
-		{
-			if (_pendingStackPickups.Count == 0)
-				return;
-
-			List<PendingStackPickup> due = null;
-
-			lock (_pendingStackPickupsLock)
-			{
-				foreach (var pending in _pendingStackPickups.Values)
-				{
-					if (force || DateTime.Now - pending.LastPickupTime >= StackPickupMergeDelay)
-						(due ??= new()).Add(pending);
-				}
-
-				if (due != null)
-				{
-					foreach (var pending in due)
-						_pendingStackPickups.Remove(pending.ItemId);
-				}
-			}
-
-			if (due == null)
-				return;
-
-			foreach (var pending in due)
-			{
-				// Amount is 0 if no follow-up pickups happened.
-				if (pending.Amount > 0)
-					this.Inventory.NotifyItemsAdded(pending.ItemId, pending.Amount, InventoryAddType.PickUp);
-			}
 		}
 
 		/// <summary>

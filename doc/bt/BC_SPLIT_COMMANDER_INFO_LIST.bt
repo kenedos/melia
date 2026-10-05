@@ -110,7 +110,7 @@ typedef struct
     short jobIds[jobIdCount];
     
     int i1;
-    int i2;
+    int visualJobId;
     int64 characterId <format=hex>;
     
     short resetTimeCount;

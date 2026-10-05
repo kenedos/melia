@@ -160,26 +160,21 @@ namespace Melia.Zone.Scripting
 		/// <returns></returns>
 		public static void StartAutoReceiveQuests(Character character)
 		{
-			QuestScript[] autoReceiveQuests;
-
-			// Quest checks take the character's quest lock, which is held while scripts call TryGet.
 			lock (ScriptsSyncLock)
 			{
 				if (AutoReceiveQuests.Count == 0)
 					return;
 
-				autoReceiveQuests = AutoReceiveQuests.ToArray();
-			}
+				foreach (var questScript in AutoReceiveQuests)
+				{
+					if (character.Quests.Has(questScript.Data.Id))
+						continue;
 
-			foreach (var questScript in autoReceiveQuests)
-			{
-				if (character.Quests.Has(questScript.Data.Id))
-					continue;
+					if (!character.Quests.MeetsPrerequisites(questScript))
+						continue;
 
-				if (!character.Quests.MeetsPrerequisites(questScript))
-					continue;
-
-				character.Quests.Start(questScript.Data.Id, questScript.Data.StartDelay);
+					character.Quests.Start(questScript.Data.Id, questScript.Data.StartDelay);
+				}
 			}
 		}
 
@@ -243,6 +238,14 @@ namespace Melia.Zone.Scripting
 		protected abstract void Load();
 
 		/// <summary>
+		/// Sets the quest's id.
+		/// </summary>
+		/// <param name="id"></param>
+		[Obsolete("Use SetId(string, int) instead.")]
+		protected void SetId(long id)
+			=> this.SetId(null, id);
+
+		/// <summary>
 		/// Sets the quest's namespace and id.
 		/// </summary>
 		/// <remarks>
@@ -254,70 +257,6 @@ namespace Melia.Zone.Scripting
 		/// <param name="id">The id of the quest within the given namespace. Valid range: 1-65535</param>
 		protected void SetId(string questNamespace, long id)
 			=> this.Data.Id = new QuestId(questNamespace, id);
-
-		/// <summary>
-		/// Sets the quest's id, without placing it in a namespace.
-		/// </summary>
-		/// <param name="id"></param>
-		[Obsolete("Use SetId(string, int) instead.")]
-		protected void SetId(long id)
-			=> this.SetId(null, id);
-
-		/// <summary>
-		/// Sets the quest's id to the raw id the client knows it by.
-		/// </summary>
-		/// <remarks>
-		/// Reserved for quests rebuilt from the client's own quest tables,
-		/// so they keep the id the client data knows them by. The id must
-		/// match a row in the quest database.
-		/// </remarks>
-		/// <param name="id">The quest's ClassID in the client's quest table.</param>
-		protected void SetClientId(int id)
-		{
-			if (!ZoneServer.Instance.Data.QuestDb.Contains(id))
-				throw new ArgumentException($"Quest '{this.GetType().Name}' uses client id {id}, which doesn't exist in the quest database.");
-
-			this.Data.Id = new QuestId(null, id);
-		}
-
-		/// <summary>
-		/// Sets up one of the quest's three phases.
-		/// </summary>
-		/// <param name="status">The status the quest is in during this phase.</param>
-		/// <param name="npcUniqueName">The NPC the phase revolves around.</param>
-		/// <param name="mapClassName">The map the phase takes place on.</param>
-		/// <param name="objectiveLabel">The short label shown in the tracker.</param>
-		/// <param name="story">The longer narration line.</param>
-		protected QuestPhase SetPhase(QuestStatus status, string npcUniqueName, string mapClassName, string objectiveLabel = null, string story = null)
-		{
-			if (status != QuestStatus.Possible && status != QuestStatus.InProgress && status != QuestStatus.Success)
-				throw new ArgumentException($"Quest '{this.GetType().Name}' defines a phase for status '{status}', which isn't a phase status.");
-
-			var phase = new QuestPhase(status)
-			{
-				NpcUniqueName = npcUniqueName,
-				MapClassName = mapClassName,
-				ObjectiveLabel = objectiveLabel,
-				Story = story,
-			};
-
-			this.Data.Phases[status] = phase;
-
-			if (status == QuestStatus.Possible)
-			{
-				this.Data.StartNpcUniqueName = npcUniqueName;
-				this.Data.QuestGiverLocation = mapClassName;
-
-				if (string.IsNullOrEmpty(this.Data.Location))
-					this.Data.Location = mapClassName;
-			}
-			else if (status == QuestStatus.Success)
-			{
-				this.Data.EndNpcUniqueName = npcUniqueName;
-			}
-
-			return phase;
-		}
 
 		/// <summary>
 		/// Sets the quest's name.
@@ -390,14 +329,6 @@ namespace Melia.Zone.Scripting
 			=> this.Data.AutoTrack = enabled;
 
 		/// <summary>
-		/// Sets whether characters who can take the quest may warp to its
-		/// giver before accepting it.
-		/// </summary>
-		/// <param name="enabled"></param>
-		protected void SetPossibleWarp(bool enabled)
-			=> this.Data.PossibleWarp = enabled;
-
-		/// <summary>
 		/// Sets how the quest is given to players.
 		/// </summary>
 		/// <param name="receiveType"></param>
@@ -412,47 +343,21 @@ namespace Melia.Zone.Scripting
 		protected void SetDelay(TimeSpan startDelay)
 			=> this.Data.StartDelay = startDelay;
 
-		/// <summary>
-		/// Binds a track to the quest, which plays when the quest reaches
-		/// the given status and ends when it reaches the other.
-		/// </summary>
-		/// <param name="onTrackStart">Status the track starts on.</param>
-		/// <param name="onTrackEnd">Status the track ends on.</param>
-		/// <param name="track">Name of the track to play.</param>
-		/// <param name="trackStartDelay">Delay in milliseconds before the track starts.</param>
-		/// <param name="autoStart">
-		/// Whether reaching the start status plays the track by itself. Set
-		/// false for tracks a trigger plays, which is how a cutscene is bound
-		/// to a place rather than to the moment the quest is accepted.
-		/// </param>
-		/// <param name="partyPlay">
-		/// Whether party members watching the same track share one layer and
-		/// its objective progress instead of each playing their own copy.
-		/// </param>
-		protected void SetTrack(QuestStatus onTrackStart, QuestStatus onTrackEnd, string track, int trackStartDelay = 0, bool autoStart = true, bool partyPlay = false)
+		protected void SetTrack(QuestStatus onTrackStart, QuestStatus onTrackEnd, string track, int trackStartDelay = 0)
 		{
 			this.TrackData.QuestId = (int)this.QuestId.Value;
 			this.TrackData.TrackName = track;
 			this.TrackData.StartDelay = TimeSpan.FromMilliseconds(trackStartDelay);
 			this.TrackData.OnTrackStart = onTrackStart;
 			this.TrackData.OnTrackEnd = onTrackEnd;
-			this.TrackData.AutoStart = autoStart;
-			this.TrackData.PartyPlay = partyPlay;
 		}
 
-		/// <summary>
-		/// Sets a track for the quest that plays the given effect when it starts.
-		/// </summary>
-		/// <param name="onTrackStart">Status the track starts on.</param>
-		/// <param name="onTrackEnd">Status the track ends on.</param>
-		/// <param name="track">Name of the track to play.</param>
-		/// <param name="effectName">Effect played as the track starts.</param>
-		/// <param name="trackStartDelay">Delay in milliseconds before the track starts.</param>
-		/// <param name="autoStart">Whether reaching the start status plays the track by itself.</param>
-		/// <param name="partyPlay">Whether party members share one layer for the track.</param>
-		protected void SetTrack(QuestStatus onTrackStart, QuestStatus onTrackEnd, string track, string effectName, int trackStartDelay = 0, bool autoStart = true, bool partyPlay = false)
+		protected void SetTrack(QuestStatus onTrackStart, QuestStatus onTrackEnd, string track, string effectName)
 		{
-			this.SetTrack(onTrackStart, onTrackEnd, track, trackStartDelay, autoStart, partyPlay);
+			this.TrackData.QuestId = (int)this.QuestId.Value;
+			this.TrackData.TrackName = track;
+			this.TrackData.OnTrackStart = onTrackStart;
+			this.TrackData.OnTrackEnd = onTrackEnd;
 			this.TrackData.EffectName = effectName;
 		}
 
@@ -465,38 +370,6 @@ namespace Melia.Zone.Scripting
 		protected void AddDrop(int itemId, float dropChance, params int[] monsterIds)
 		{
 			this.AddDrop(new ItemDropModifier(itemId, dropChance, monsterIds));
-		}
-
-		/// <summary>
-		/// Adds an item drop modifier that is guaranteed to drop once the
-		/// character killed the given number of monsters without it.
-		/// </summary>
-		/// <param name="itemId">The ID of the item to drop</param>
-		/// <param name="dropChance">Drop probability (0.0 to 1.0, where 0.5 = 50%)</param>
-		/// <param name="fixedCount">Kills without a drop after which the drop is guaranteed</param>
-		/// <param name="amount">Amount that drops at once</param>
-		/// <param name="monsterIds">Monster IDs that should drop this item</param>
-		protected void AddPityDrop(int itemId, float dropChance, int fixedCount, int amount, params int[] monsterIds)
-		{
-			this.AddDrop(new ItemDropModifier(itemId, dropChance, monsterIds) { FixedCount = fixedCount, Amount = amount });
-		}
-
-		/// <summary>
-		/// Adds an item drop modifier that is guaranteed to drop once the
-		/// character killed the given number of monsters without it, using
-		/// class names instead of ids.
-		/// </summary>
-		/// <param name="itemClassName">Class name of the item to drop</param>
-		/// <param name="dropChance">Drop probability (0.0 to 1.0, where 0.5 = 50%)</param>
-		/// <param name="fixedCount">Kills without a drop after which the drop is guaranteed</param>
-		/// <param name="amount">Amount that drops at once</param>
-		/// <param name="monsterClassNames">Class names of the monsters that should drop this item</param>
-		protected void AddPityDrop(string itemClassName, float dropChance, int fixedCount, int amount, params string[] monsterClassNames)
-		{
-			if (!ZoneServer.Instance.Data.ItemDb.TryFind(itemClassName, out var itemData))
-				throw new ArgumentException($"Item '{itemClassName}' not found in '{this.GetType().Name}'.");
-
-			this.AddDrop(new ItemDropModifier(itemData.Id, dropChance, monsterClassNames) { FixedCount = fixedCount, Amount = amount });
 		}
 
 		/// <summary>
@@ -534,7 +407,6 @@ namespace Melia.Zone.Scripting
 			if (this.Data.Objectives.Exists(a => a.Ident == objective.Ident))
 				throw new ArgumentException($"Duplicate objective ident '{objective.Ident}' in '{this.GetType().Name}'.");
 
-			objective.Id = this.Data.Objectives.Count;
 			this.Data.Objectives.Add(objective);
 
 			return objective;

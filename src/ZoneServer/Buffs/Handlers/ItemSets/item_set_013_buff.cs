@@ -48,7 +48,11 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 				return;
 
 			// Add bonus damage based on overbuff count
-			skillHitResult.AddExtraLine(skillHitResult.Damage * BonusDamageRatio * damageMultiplier);
+			var bonusDamage = skillHitResult.Damage * BonusDamageRatio * damageMultiplier;
+			skillHitResult.Damage += bonusDamage;
+
+			// Add extra hit line to display
+			skillHitResult.HitCount += 1;
 		}
 	}
 }

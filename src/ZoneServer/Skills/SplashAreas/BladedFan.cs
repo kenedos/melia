@@ -2,7 +2,6 @@
 using System.Linq;
 using Melia.Shared.Data.Database;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Yggdrasil.Extensions;
 using Yggdrasil.Geometry;
 using Yggdrasil.Geometry.Shapes;
@@ -156,7 +155,7 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <returns></returns>
 		public Vector2F GetRandomPoint(Random rnd)
 		{
-			var rndShape = _blades.PickRandom();
+			var rndShape = _blades.Random();
 			return rndShape.GetRandomPoint(rnd);
 		}
 

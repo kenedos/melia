@@ -7,7 +7,6 @@ using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.Buffs
 {
@@ -79,7 +78,7 @@ namespace Melia.Zone.Buffs
 		/// <summary>
 		/// Returns the time the buff has left to run.
 		/// </summary>
-		public TimeSpan RemainingDuration => Math2.Max(TimeSpan.Zero, this.RemovalTime - GameClock.LocalNow);
+		public TimeSpan RemainingDuration => Math2.Max(TimeSpan.Zero, this.RemovalTime - DateTime.Now);
 
 		/// <summary>
 		/// Index in world collection?
@@ -235,13 +234,13 @@ namespace Melia.Zone.Buffs
 			if (this.HasDuration)
 			{
 				var remaining = Math2.Max(TimeSpan.Zero, this.Duration - this.RunTime);
-				this.RemovalTime = GameClock.LocalNow.Add(remaining);
+				this.RemovalTime = DateTime.Now.Add(remaining);
 			}
 
 			this.UpdateTime = this.Data.UpdateTime;
 
 			if (this.HasUpdateTime)
-				this.NextUpdateTime = GameClock.LocalNow.Add(this.UpdateTime);
+				this.NextUpdateTime = DateTime.Now.Add(this.UpdateTime);
 		}
 
 		/// <summary>
@@ -251,7 +250,7 @@ namespace Melia.Zone.Buffs
 		public void SetUpdateTime(int updateTime)
 		{
 			this.UpdateTime = TimeSpan.FromMilliseconds(updateTime);
-			this.NextUpdateTime = GameClock.LocalNow.Add(this.UpdateTime);
+			this.NextUpdateTime = DateTime.Now.Add(this.UpdateTime);
 		}
 
 		/// <summary>
@@ -261,7 +260,7 @@ namespace Melia.Zone.Buffs
 		{
 			if (this.HasDuration)
 			{
-				this.RemovalTime = GameClock.LocalNow.Add(amount);
+				this.RemovalTime = DateTime.Now.Add(amount);
 			}
 		}
 
@@ -330,9 +329,14 @@ namespace Melia.Zone.Buffs
 		{
 			this.ExtendDuration();
 
+#pragma warning disable CS0618
+			// Temporarily call OnStart for backwards compatibility until users
+			// had time to update their buff handlers.
+			this.Handler?.OnStart(this);
 			this.Handler?.OnActivate(this, activationType);
 			BuffActivated?.Invoke(this);
 			this.Handler?.OnExtend(this);
+#pragma warning restore CS0618
 		}
 
 		/// <summary>
@@ -356,7 +360,7 @@ namespace Melia.Zone.Buffs
 		{
 			if (this.HasDuration)
 			{
-				var newRemovalTime = GameClock.LocalNow.Add(this.Duration);
+				var newRemovalTime = DateTime.Now.Add(this.Duration);
 				if (newRemovalTime > this.RemovalTime)
 				{
 					this.RunTime = TimeSpan.Zero;
@@ -365,7 +369,7 @@ namespace Melia.Zone.Buffs
 			}
 
 			if (this.HasUpdateTime)
-				this.NextUpdateTime = GameClock.LocalNow.Add(this.Data.UpdateTime);
+				this.NextUpdateTime = DateTime.Now.Add(this.Data.UpdateTime);
 		}
 
 		/// <summary>
@@ -387,10 +391,10 @@ namespace Melia.Zone.Buffs
 			if (!this.HasUpdateTime)
 				return;
 
-			if (GameClock.LocalNow >= this.NextUpdateTime)
+			if (DateTime.Now >= this.NextUpdateTime)
 			{
 				this.Handler?.WhileActive(this);
-				this.NextUpdateTime = GameClock.LocalNow.Add(this.UpdateTime);
+				this.NextUpdateTime = DateTime.Now.Add(this.UpdateTime);
 				this.RunTime += this.UpdateTime;
 			}
 		}

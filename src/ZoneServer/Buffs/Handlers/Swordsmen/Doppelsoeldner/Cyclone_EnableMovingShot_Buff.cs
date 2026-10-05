@@ -1,4 +1,5 @@
-﻿using Melia.Shared.Game.Const;
+﻿using System;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 
 namespace Melia.Zone.Buffs.Handlers.Swordsmen.Doppelsoeldner
@@ -10,7 +11,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsmen.Doppelsoeldner
 	[BuffHandler(BuffId.Cyclone_EnableMovingShot_Buff)]
 	public class Cyclone_EnableMovingShot_Buff : BuffHandler
 	{
-		private const float MovingShotBonusPerLevel = 0.2f;
+		private const float MovingShotBonusPerLevel = 1.5f;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
@@ -24,8 +25,8 @@ namespace Melia.Zone.Buffs.Handlers.Swordsmen.Doppelsoeldner
 
 		private float GetMovingShotBonus(Buff buff)
 		{
-			var skillLevel = buff.NumArg1;
-			return skillLevel * MovingShotBonusPerLevel;
+			var skillLevel = Math.Max(1f, buff.NumArg1);
+			return Math.Min(15f, skillLevel * MovingShotBonusPerLevel);
 		}
 	}
 }

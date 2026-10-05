@@ -5,7 +5,6 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
@@ -18,7 +17,6 @@ using static Melia.Zone.Skills.Helpers.SkillTargetHelper;
 using static Melia.Zone.Skills.Helpers.SkillUtilHelper;
 using System.Linq;
 using Melia.Zone.Skills.Helpers;
-using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -90,28 +88,19 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var throws = new (int Time, float FlyTime)[]
+			var targetPos = originPos.GetRelative(farPos);
+			await skill.Wait(TimeSpan.FromMilliseconds(1400));
+			for (var i = 0; i < 9; i++)
 			{
-				(1400, 1.2f), (1500, 1.2f), (1600, 1.2f), (1700, 1.2f), (1800, 1.2f),
-				(3600, 1f), (3700, 1f), (3800, 1f), (3900, 1f), (4000, 1f), (4000, 1f), (4100, 1f),
-			};
-
-			var elapsed = 0;
-			foreach (var (time, flyTime) in throws)
-			{
-				await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
-				elapsed = time;
-
-				if (!caster.Position.InRange2D(target.Position, 300))
-					continue;
-
-				var position = GetLeadPositionScatter(target, (int)(flyTime * 1000), 50, caster);
-				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), new MissileConfig
+				var rnd = RandomProvider.Get();
+				var distance = 30 + rnd.Next(30);
+				var position = target.Position.GetRandomInRange2D(distance, rnd);
+				await MissileThrow(skill, caster, position, new MissileConfig
 				{
 					Effect = new EffectConfig("I_force011_green#Dummy_effect_tail", 1f),
 					EndEffect = new EffectConfig("F_explosion052_green##0.8", 1f),
 					Range = 10f,
-					FlyTime = flyTime,
+					FlyTime = 1.2f,
 					DelayTime = 0f,
 					Gravity = 800f,
 					Speed = 1f,
@@ -119,6 +108,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 					HitCount = 1,
 					GroundEffect = new EffectConfig("None", 2.5f),
 				});
+				await skill.Wait(TimeSpan.FromMilliseconds(100));
 			}
 		}
 	}
@@ -148,13 +138,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
-			var spawnPos = originPos.GetRelative(farPos, distance: 77f, angle: 119f);
+			var spawnPos = originPos.GetRelative(farPos, distance: 77.427238f);
 			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "Swift-footed Weaver", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 56f, angle: -129f);
+			spawnPos = originPos.GetRelative(farPos, distance: 56.025826f);
 			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "Swift-footed Weaver", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 69f, angle: -83f);
+			spawnPos = originPos.GetRelative(farPos, distance: 69.017403f);
 			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "Swift-footed Weaver", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 84f, angle: 78f);
+			spawnPos = originPos.GetRelative(farPos, distance: 83.855644f);
 			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "Swift-footed Weaver", "BasicMonster_ATK", 0, 0f, "None", "");
 			spawnPos = originPos.GetRelative(farPos, distance: 77.090309f);
 			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "Swift-footed Weaver", "BasicMonster_ATK", 0, 0f, "None", "");
@@ -267,28 +257,19 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var throws = new (int Time, float FlyTime)[]
+			var targetPos = originPos.GetRelative(farPos);
+			await skill.Wait(TimeSpan.FromMilliseconds(1400));
+			for (var i = 0; i < 9; i++)
 			{
-				(1400, 1.2f), (1500, 1.2f), (1600, 1.2f), (1700, 1.2f), (1800, 1.2f),
-				(3600, 1f), (3700, 1f), (3800, 1f), (3900, 1f), (4000, 1f), (4000, 1f), (4100, 1f),
-			};
-
-			var elapsed = 0;
-			foreach (var (time, flyTime) in throws)
-			{
-				await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
-				elapsed = time;
-
-				if (!caster.Position.InRange2D(target.Position, 300))
-					continue;
-
-				var position = GetLeadPositionScatter(target, (int)(flyTime * 1000), 50, caster);
-				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), new MissileConfig
+				var rnd = RandomProvider.Get();
+				var distance = 30 + rnd.Next(30);
+				var position = target.Position.GetRandomInRange2D(distance, rnd);
+				await MissileThrow(skill, caster, position, new MissileConfig
 				{
 					Effect = new EffectConfig("I_force011_green#Dummy_effect_tail", 1f),
 					EndEffect = new EffectConfig("F_explosion052_green##0.8", 1f),
 					Range = 10f,
-					FlyTime = flyTime,
+					FlyTime = 1.2f,
 					DelayTime = 0f,
 					Gravity = 800f,
 					Speed = 1f,
@@ -296,6 +277,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 					HitCount = 1,
 					GroundEffect = new EffectConfig("None", 2.5f),
 				});
+				await skill.Wait(TimeSpan.FromMilliseconds(100));
 			}
 		}
 	}
@@ -365,7 +347,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 40f), 35f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 40);
+			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2700;
 			var aniTime = 2900;
 			var hits = new List<SkillHitInfo>();

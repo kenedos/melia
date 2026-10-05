@@ -43,11 +43,6 @@ namespace Melia.Zone.Skills
 		public TimeSpan CoolDown => TimeSpan.FromMilliseconds(this.GetFloat(PropertyName.CoolDown));
 
 		/// <summary>
-		/// Returns how long the skill's buff lasts, as a TimeSpan.
-		/// </summary>
-		public TimeSpan CaptionTime => TimeSpan.FromSeconds(this.GetFloat(PropertyName.CaptionTime));
-
-		/// <summary>
 		/// Returns the skill's Hit Count.
 		/// </summary>
 		public int HitCount => (int)this.GetFloat(PropertyName.SklHitCount);
@@ -82,10 +77,6 @@ namespace Melia.Zone.Skills
 		{
 			this.AutoUpdate(PropertyName.Level, [PropertyName.LevelByDB, PropertyName.Level_BM, PropertyName.GemLevel_BM]);
 			this.AutoUpdate(PropertyName.SkillFactor, [PropertyName.Level]);
-			this.AutoUpdate(PropertyName.CaptionTime, [PropertyName.Level]);
-			this.AutoUpdate(PropertyName.CaptionRatio, [PropertyName.Level]);
-			this.AutoUpdate(PropertyName.CaptionRatio2, [PropertyName.Level]);
-			this.AutoUpdate(PropertyName.CaptionRatio3, [PropertyName.Level]);
 		}
 
 		/// <summary>
@@ -132,7 +123,7 @@ namespace Melia.Zone.Skills
 			this.Create(new RFloatProperty(PropertyName.MaxR, () => this.Skill.Data.MaxRange));
 			this.Create(PropertyName.CoolDown, "SCR_GET_COOLDOWN");
 			this.Create(new RFloatProperty(PropertyName.HitDelay, () => this.CalculateProperty("SCR_GET_HIT_DELAY")));
-			this.Create(new RFloatProperty(PropertyName.AbleShootRotate, () => this.Skill.Data.EnableCastRotate ? 1f : 0f));
+			this.Create(new RFloatProperty(PropertyName.AbleShootRotate, () => 0f));
 			this.Create(new RFloatProperty(PropertyName.SpendPoison, () => 0f));
 			this.Create(new RFloatProperty(PropertyName.ReadyTime, () => 0f));
 			this.Create(new RFloatProperty(PropertyName.UseOverHeat, () => (int)this.Skill.Data.CooldownTime.TotalMilliseconds));
@@ -154,10 +145,10 @@ namespace Melia.Zone.Skills
 			this.Create(new RFloatProperty(PropertyName.EnableSkillCancel, () => this.Skill.Data.CastInterruptible ? 1f : 0f));
 			this.Create(new RFloatProperty(PropertyName.CancelSkill, () => this.Skill.Data.CastInterruptible ? 1f : 0f));
 
-			this.Create(PropertyName.CaptionTime, "SCR_Get_CaptionTime");
-			this.Create(PropertyName.CaptionRatio, "SCR_Get_CaptionRatio");
-			this.Create(PropertyName.CaptionRatio2, "SCR_Get_CaptionRatio2");
-			this.Create(PropertyName.CaptionRatio3, "SCR_Get_CaptionRatio3");
+			this.Create(new RFloatProperty(PropertyName.CaptionTime, () => 0f)); // Needs to be calculated if used, uses lua script
+			this.Create(new RFloatProperty(PropertyName.CaptionRatio, () => 0f)); // Needs to be calculated if used, uses lua script
+			this.Create(new RFloatProperty(PropertyName.CaptionRatio2, () => 0f)); // Needs to be calculated if used, uses lua script
+			this.Create(new RFloatProperty(PropertyName.CaptionRatio3, () => 0f)); // Needs to be calculated if used, uses lua script
 		}
 
 		/// <summary>

@@ -1,7 +1,6 @@
 ﻿using System;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Pads;
 using Melia.Zone.Pads.Handlers;
@@ -128,7 +127,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 				{
 					modifier.DamageMultiplier += 0.06f * wildNature.OverbuffCounter;
 
-					if (target.IsBuffActive(BuffId.Stun) && GameRandom.Get().Next(100) < wildNature.OverbuffCounter * 6)
+					if (target.IsBuffActive(BuffId.Stun) && RandomProvider.Get().Next(100) < wildNature.OverbuffCounter * 6)
 						modifier.DamageMultiplier++;
 				}
 

@@ -25,13 +25,11 @@ using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
 using Yggdrasil.Composition;
 using Yggdrasil.Extensions;
-using Yggdrasil.Geometry;
 using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Logging;
 using Yggdrasil.Util;
 using static Melia.Shared.Network.NormalOp;
 using static Melia.Zone.Skills.SkillUseFunctions;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors
 {
@@ -538,7 +536,7 @@ namespace Melia.Zone.World.Actors
 		/// <returns></returns>
 		public static async Task PlayEffectToGround(this IActor actor, string effectName, Position position, float scale = 1f, float duration = 0f, float delay = 0, float unk1 = 0)
 		{
-			await GameClock.Delay(TimeSpan.FromMilliseconds(delay));
+			await Task.Delay(TimeSpan.FromMilliseconds(delay));
 			var effectHandle = ZoneServer.Instance.World.CreateEffectHandle();
 			Send.ZC_NORMAL.PlayEffectAtPosition(actor, effectName, position, scale, effectHandle, duration);
 		}
@@ -577,7 +575,7 @@ namespace Melia.Zone.World.Actors
 		/// </summary>
 		public static async void PlayAnimation(this IActor actor, string animationName, bool stopOnLastFrame = false, int delay = 0, byte b1 = 0)
 		{
-			await GameClock.Delay(delay);
+			await Task.Delay(delay);
 			Send.ZC_PLAY_ANI(actor, animationName, stopOnLastFrame, b1);
 		}
 
@@ -763,7 +761,7 @@ namespace Melia.Zone.World.Actors
 			if (mob.Data.Skills.Count == 0)
 				return false;
 
-			var rndSkillId = mob.Data.Skills.Where(a => !caster.IsOnCooldown(a.SkillId)).Select(a => a.SkillId).PickRandom();
+			var rndSkillId = mob.Data.Skills.Where(a => !caster.IsOnCooldown(a.SkillId)).Select(a => a.SkillId).Random();
 
 			if (caster.Components.TryGet<BaseSkillComponent>(out var skills))
 				if (!skills.Has(rndSkillId))
@@ -859,14 +857,6 @@ namespace Melia.Zone.World.Actors
 		public static void InsertHate(this ICombatEntity entity, ICombatEntity targetToHate, int hateToAdd = 999)
 		{
 			entity.Components.Get<AiComponent>()?.Script.QueueEventAlert(new HateIncreaseAlert(targetToHate, hateToAdd));
-		}
-
-		/// <summary>
-		/// Drops all hate the entity holds towards the given target.
-		/// </summary>
-		public static void ForgetHate(this ICombatEntity entity, ICombatEntity target)
-		{
-			entity.Components.Get<AiComponent>()?.Script.QueueEventAlert(new HateResetAlert(target));
 		}
 
 		/// <summary>
@@ -1153,50 +1143,6 @@ namespace Melia.Zone.World.Actors
 		{
 			var isHitByPad = ZoneServer.Instance.Data.FactionDb.IsHitByPad(entity.Faction);
 			return isHitByPad;
-		}
-
-		/// <summary>
-		/// Returns whether the entity is covered by the given attack shape.
-		/// </summary>
-		/// <remarks>
-		/// An entity moving under client control has to be covered both where
-		/// the server currently has it and where it's projected to be after the
-		/// lag compensation time, so an attack the player already ran out of on
-		/// their screen doesn't land.
-		/// </remarks>
-		/// <param name="entity"></param>
-		/// <param name="shape"></param>
-		public static bool IsCoveredBy(this ICombatEntity entity, IShapeF shape)
-		{
-			var radius = entity.AgentRadius + entity.HitRadiusBonus;
-
-			if (!shape.IsInsideOrInRange(entity.Position, radius))
-				return false;
-
-			if (!entity.Components.TryGet<MovementComponent>(out var movement))
-				return true;
-
-			return shape.IsInsideOrInRange(movement.GetLeadPosition(), radius);
-		}
-
-		/// <summary>
-		/// Returns whether the entity is covered by the given attack circle.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="center"></param>
-		/// <param name="radius"></param>
-		public static bool IsCoveredBy(this ICombatEntity entity, Position center, float radius)
-		{
-			var effectiveRadius = radius + entity.AgentRadius + entity.HitRadiusBonus;
-			var rangeSquared = effectiveRadius * effectiveRadius;
-
-			if (center.Get2DDistanceSquared(entity.Position) > rangeSquared)
-				return false;
-
-			if (!entity.Components.TryGet<MovementComponent>(out var movement))
-				return true;
-
-			return center.Get2DDistanceSquared(movement.GetLeadPosition()) <= rangeSquared;
 		}
 
 		/// <summary>
@@ -1756,14 +1702,6 @@ namespace Melia.Zone.World.Actors
 			=> entity.Components.Get<CooldownComponent>()?.Remove(cooldownId) ?? false;
 
 		/// <summary>
-		/// Returns all cooldowns that are currently active on the entity.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns></returns>
-		public static Cooldown[] GetCooldowns(this ICombatEntity entity)
-			=> entity.Components.Get<CooldownComponent>()?.GetAll() ?? [];
-
-		/// <summary>
 		/// Starts the cooldown with a given id and duration.
 		/// </summary>
 		/// <param name="entity"></param>
@@ -2176,7 +2114,7 @@ namespace Melia.Zone.World.Actors
 		/// <param name="chance"></param>
 		public static void RemoveRandomBuff(this ICombatEntity entity, float chance = 100)
 		{
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 
 			if (rnd.Next(100) < chance && entity.Components.TryGet<BuffComponent>(out var buffs))
 				buffs.RemoveRandomBuff();
@@ -2194,7 +2132,7 @@ namespace Melia.Zone.World.Actors
 		/// <param name="chance"></param>
 		public static void RemoveRandomDebuff(this ICombatEntity entity, float chance = 100)
 		{
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 
 			if (rnd.Next(100) < chance && entity.Components.TryGet<BuffComponent>(out var buffs))
 				buffs.RemoveRandomDebuff();
@@ -2296,7 +2234,7 @@ namespace Melia.Zone.World.Actors
 		/// </summary>
 		public static async void Resize(this ICombatEntity entity, float scale)
 		{
-			await GameClock.Delay(500);
+			await Task.Delay(500);
 			if (entity is Character)
 				return;
 

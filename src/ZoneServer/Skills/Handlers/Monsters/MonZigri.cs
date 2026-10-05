@@ -8,7 +8,6 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using Melia.Zone.Skills.SplashAreas;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 
 namespace Melia.Zone.Skills.Handlers.Mon
@@ -75,10 +74,12 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay, int aniTime)
 		{
-			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 4f, angle: -37f), 20f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 15, angle: 10f);
+			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 5f, angle: -36f), 20f);
-			hitDelay = 100;
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 15, angle: 10f);
+			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+			hitDelay = 1200;
 			aniTime = 100;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
@@ -146,10 +147,12 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay, int aniTime)
 		{
-			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 4f, angle: -37f), 20f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 15, angle: 10f);
+			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 5f, angle: -36f), 20f);
-			hitDelay = 100;
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 15, angle: 10f);
+			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+			hitDelay = 1200;
 			aniTime = 100;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
@@ -251,10 +254,12 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay, int aniTime)
 		{
-			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 4f, angle: -37f), 20f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 15, angle: 10f);
+			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
-			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 5f, angle: -36f), 20f);
-			hitDelay = 100;
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 15, angle: 10f);
+			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+			hitDelay = 1200;
 			aniTime = 100;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}

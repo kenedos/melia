@@ -5,7 +5,6 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Pads;
 using Melia.Zone.Skills.Combat;
@@ -44,7 +43,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -53,7 +52,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 59f), 40f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 40, angle: 10f);
+			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 1400;
 			var aniTime = 1600;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
@@ -131,33 +131,147 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var config = new MissileConfig
-			{
-				Effect = new EffectConfig("I_force054_fire#Bip001 Neck", 1f),
-				EndEffect = new EffectConfig("F_ground014_fire", 0.2f),
-				DotEffect = EffectConfig.None,
-				Range = 10f,
-				FlyTime = 0.8f,
-				DelayTime = 0f,
-				Gravity = 300f,
-				Speed = 1f,
-				HitTime = 1000f,
-				HitCount = 1,
-				GroundEffect = new EffectConfig("None", 0.5f),
-				GroundDelay = 0f,
-				EffectMoveDelay = 0f,
-			};
 
-			var waveCounts = new[] { 4, 4, 4, 4, 6 };
-			for (var wave = 0; wave < waveCounts.Length; wave++)
+			// Wave 1 - 5 missiles
+			for (var i = 0; i < 5; i++)
 			{
-				if (wave > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(1000));
-				if (!caster.Position.InRange2D(target.Position, 300))
-					break;
+				var position = GetRelativePosition(PosType.TargetDistance, caster, target, 30f, rand: 110, height: 1);
+				_ = MissilePadThrow(skill, caster, position, new MissileConfig
+				{
+					Effect = new EffectConfig("I_force054_fire#Bip001 Neck", 1f),
+					EndEffect = new EffectConfig("F_ground014_fire", 0.2f),
+					DotEffect = EffectConfig.None,
+					Range = 10f,
+					FlyTime = 0.8f,
+					DelayTime = 0f,
+					Gravity = 300f,
+					Speed = 1f,
+					HitTime = 1000f,
+					HitCount = 1,
+					GroundEffect = new EffectConfig("None", 0.5f),
+					GroundDelay = 0f,
+					EffectMoveDelay = 0f,
+				}, 0f, "Mon_FirePilla_5");
+			}
 
-				foreach (var position in GetScatteredPositions(GetLeadPosition(target, 800, caster), waveCounts[wave], 120, 40))
-					_ = MissilePadThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 200f), config, 0f, "Mon_FirePilla_5");
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+
+			// Wave 2 - 5 missiles
+			for (var i = 0; i < 5; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetDistance, caster, target, 30f, rand: 110, height: 1);
+				_ = MissilePadThrow(skill, caster, position, new MissileConfig
+				{
+					Effect = new EffectConfig("I_force054_fire#Bip001 Neck", 1f),
+					EndEffect = new EffectConfig("F_ground014_fire", 0.2f),
+					DotEffect = EffectConfig.None,
+					Range = 10f,
+					FlyTime = 0.8f,
+					DelayTime = 0f,
+					Gravity = 300f,
+					Speed = 1f,
+					HitTime = 1000f,
+					HitCount = 1,
+					GroundEffect = new EffectConfig("None", 0.5f),
+					GroundDelay = 0f,
+					EffectMoveDelay = 0f,
+				}, 0f, "Mon_FirePilla_5");
+			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+
+			// Wave 3 - 5 missiles
+			for (var i = 0; i < 5; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetDistance, caster, target, 30f, rand: 110, height: 1);
+				_ = MissilePadThrow(skill, caster, position, new MissileConfig
+				{
+					Effect = new EffectConfig("I_force054_fire#Bip001 Neck", 1f),
+					EndEffect = new EffectConfig("F_ground014_fire", 0.2f),
+					DotEffect = EffectConfig.None,
+					Range = 10f,
+					FlyTime = 0.8f,
+					DelayTime = 0f,
+					Gravity = 300f,
+					Speed = 1f,
+					HitTime = 1000f,
+					HitCount = 1,
+					GroundEffect = new EffectConfig("None", 0.5f),
+					GroundDelay = 0f,
+					EffectMoveDelay = 0f,
+				}, 0f, "Mon_FirePilla_5");
+			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+
+			// Wave 4 - 5 missiles
+			for (var i = 0; i < 5; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetDistance, caster, target, 30f, rand: 110, height: 1);
+				_ = MissilePadThrow(skill, caster, position, new MissileConfig
+				{
+					Effect = new EffectConfig("I_force054_fire#Bip001 Neck", 1f),
+					EndEffect = new EffectConfig("F_ground014_fire", 0.2f),
+					DotEffect = EffectConfig.None,
+					Range = 10f,
+					FlyTime = 0.8f,
+					DelayTime = 0f,
+					Gravity = 300f,
+					Speed = 1f,
+					HitTime = 1000f,
+					HitCount = 1,
+					GroundEffect = new EffectConfig("None", 0.5f),
+					GroundDelay = 0f,
+					EffectMoveDelay = 0f,
+				}, 0f, "Mon_FirePilla_5");
+			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+
+			// Wave 5 - 9 missiles
+			for (var i = 0; i < 9; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetDistance, caster, target, 30f, rand: 110, height: 1);
+				_ = MissilePadThrow(skill, caster, position, new MissileConfig
+				{
+					Effect = new EffectConfig("I_force054_fire#Bip001 Neck", 1f),
+					EndEffect = new EffectConfig("F_ground014_fire", 0.2f),
+					DotEffect = EffectConfig.None,
+					Range = 10f,
+					FlyTime = 0.8f,
+					DelayTime = 0f,
+					Gravity = 300f,
+					Speed = 1f,
+					HitTime = 1000f,
+					HitCount = 1,
+					GroundEffect = new EffectConfig("None", 0.5f),
+					GroundDelay = 0f,
+					EffectMoveDelay = 0f,
+				}, 0f, "Mon_FirePilla_5");
+			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+
+			// Wave 6 - 9 missiles
+			for (var i = 0; i < 9; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetDistance, caster, target, 30f, rand: 110, height: 1);
+				_ = MissilePadThrow(skill, caster, position, new MissileConfig
+				{
+					Effect = new EffectConfig("I_force054_fire#Bip001 Neck", 1f),
+					EndEffect = new EffectConfig("F_ground014_fire", 0.2f),
+					DotEffect = EffectConfig.None,
+					Range = 10f,
+					FlyTime = 0.8f,
+					DelayTime = 0f,
+					Gravity = 300f,
+					Speed = 1f,
+					HitTime = 1000f,
+					HitCount = 1,
+					GroundEffect = new EffectConfig("None", 0.5f),
+					GroundDelay = 0f,
+					EffectMoveDelay = 0f,
+				}, 0f, "Mon_FirePilla_5");
 			}
 		}
 	}
@@ -198,7 +312,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 				for (var i = 0; i < 3; i++)
 				{
-					positions[i] = caster.Position.GetRandomInRange2D(30, 200, GameRandom.Get());
+					positions[i] = caster.Position.GetRandomInRange2D(30, 200, RandomProvider.Get());
 					_ = caster.PlayEffectToGround("F_sys_target_boss##0.5", positions[i], 1.5f, 800);
 				}
 

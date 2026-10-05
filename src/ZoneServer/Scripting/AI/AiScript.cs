@@ -6,20 +6,17 @@ using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
-using Melia.Zone.Buffs;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Monsters;
-using Melia.Zone.World.Maps;
 using Yggdrasil.Ai.Enumerable;
 using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Scripting;
 using Yggdrasil.Util;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.Scripting.AI
 {
@@ -62,9 +59,6 @@ namespace Melia.Zone.Scripting.AI
 
 		protected DateTime _lastHelpCallTime = DateTime.MinValue;
 
-		protected TimeSpan _panicFleeDuration = TimeSpan.FromSeconds(10);
-		private DateTime _panicFleeEndTime = DateTime.MinValue;
-
 		protected int MaxChaseDistance = 400;
 		protected int MaxMasterDistance = 200;
 		protected int MaxRoamDistance = 1000;
@@ -82,7 +76,6 @@ namespace Melia.Zone.Scripting.AI
 		private readonly List<ICombatEntity> _nearbyEnemiesBuffer = new();
 		private ICombatEntity _cachedMostHated;
 		private bool _mostHatedDirty = true;
-		private int _hateLayer;
 		private TimeSpan _hateUpdateAccumulator = TimeSpan.Zero;
 
 		private float _wanderRange = 300;
@@ -144,15 +137,6 @@ namespace Melia.Zone.Scripting.AI
 		public bool IsSuspended => _suspensionTime > TimeSpan.Zero;
 
 		/// <summary>
-		/// Re-caches the entity's movement component.
-		/// </summary>
-		/// <remarks>
-		/// Needed when the component is added after the AI was initialized.
-		/// </remarks>
-		internal void RefreshMovement()
-			=> _movement = this.Entity?.Components.Get<MovementComponent>();
-
-		/// <summary>
 		/// Initializes AI for the given entity, setting the initial hostility and tendency.
 		/// </summary>
 		/// <param name="combatEntity"></param>
@@ -171,8 +155,6 @@ namespace Melia.Zone.Scripting.AI
 			this.InitSkills();
 			this.InitializeSkillRotation();
 			this.Setup();
-
-			this.During("Patrol", this.CheckEnemies);
 
 			// Stagger hate updates across monsters to avoid thundering herd
 			_hateUpdateAccumulator = TimeSpan.FromMilliseconds(-(combatEntity.Handle % 500));
@@ -296,7 +278,7 @@ namespace Melia.Zone.Scripting.AI
 				return;
 			}
 
-			var now = GameClock.Now;
+			var now = DateTime.UtcNow;
 			if (_lastTargetDistanceTime != default && (now - _lastTargetDistanceTime) < TimeSpan.FromMilliseconds(100))
 				return;
 
@@ -323,15 +305,12 @@ namespace Melia.Zone.Scripting.AI
 
 		protected virtual void CheckEnemies()
 		{
-			if (this.IsPanicking)
-				return;
-
 			var mostHated = this.GetMostHated();
 			if (mostHated != null && (_target != mostHated || _target == null))
 			{
 				if (_target != mostHated)
 				{
-					_targetAcquiredTime = GameClock.Now;
+					_targetAcquiredTime = DateTime.UtcNow;
 				}
 				_target = mostHated;
 				this.StartRoutine("StopAndAttack", this.StopAndAttack());
@@ -343,9 +322,6 @@ namespace Melia.Zone.Scripting.AI
 				return;
 
 			if (!this.TryGetMaster(out var master))
-				return;
-
-			if (this.HasPatrolFormation && !this.EntityGone(master))
 				return;
 
 			if (this.EntityGone(master) || !this.InRangeOf(master, MaxMasterDistance))
@@ -363,15 +339,12 @@ namespace Melia.Zone.Scripting.AI
 
 		protected virtual void CheckTarget()
 		{
-			if (this.IsPanicking)
-				return;
-
 			if (this.Entity.IsLocked(LockType.Attack))
 			{
 				return;
 			}
 
-			if (this.EntityGone(_target) || _target.Layer != this.Entity.Layer || !this.InRangeOf(_target, MaxChaseDistance))
+			if (this.EntityGone(_target) || !this.InRangeOf(_target, MaxChaseDistance))
 			{
 				_target = null;
 				if (EnableReturnHome)
@@ -485,9 +458,6 @@ namespace Melia.Zone.Scripting.AI
 		/// </summary>
 		protected virtual void CheckFear()
 		{
-			if (this.IsPanicking)
-				return;
-
 			// Check if the entity has any fear debuff
 			if (!this.IsFeared())
 				return;
@@ -499,7 +469,7 @@ namespace Melia.Zone.Scripting.AI
 
 			// Also check if we're still in the skill's animation/recovery period
 			// This ensures the full attack animation completes before fleeing
-			var timeSinceLastSkill = GameClock.Now - _lastSkillUseTime;
+			var timeSinceLastSkill = DateTime.UtcNow - _lastSkillUseTime;
 			if (timeSinceLastSkill < _lastSkillDuration)
 				return;
 
@@ -597,16 +567,7 @@ namespace Melia.Zone.Scripting.AI
 
 			_target = null;
 
-			if (this.TryGetPatrolAnchor(out var patrolAnchor))
-			{
-				const float patrolHomeRadius = 30f;
-				if (this.Entity.Position.Get2DDistance(patrolAnchor) > patrolHomeRadius)
-				{
-					this.SetRunning(true);
-					yield return this.MoveTo(patrolAnchor);
-				}
-			}
-			else if (this.Entity is IMonster monster && monster.SpawnPosition != Position.Zero)
+			if (this.Entity is IMonster monster && monster.SpawnPosition != Position.Zero)
 			{
 				const float homeRadius = 30f;
 				if (monster.Position.Get2DDistance(monster.SpawnPosition) > homeRadius)
@@ -815,22 +776,8 @@ namespace Melia.Zone.Scripting.AI
 			var master = this.GetMaster();
 			if (master != null)
 			{
-				if (this.HasPatrolFormation)
-				{
-					this.StartRoutine("Patrol", this.PatrolFollow(master));
-					yield break;
-				}
-
 				yield return this.Animation("IDLE");
 				yield return this.Follow(master);
-				yield break;
-			}
-
-			// Patrolling monsters are meant to be away from their spawn
-			// point, so they take over before the leashing check.
-			if (this.HasPatrolRoute)
-			{
-				this.StartRoutine("Patrol", this.Patrol());
 				yield break;
 			}
 
@@ -865,7 +812,7 @@ namespace Melia.Zone.Scripting.AI
 			var helpCallRange = 200f;
 
 			// Determine call chance and cooldown based on monster rank
-			var actualCallChance = ZoneServer.Instance.Conf.World.MonsterHelpCallChance;
+			var actualCallChance = 0.003f; // 0.3% chance;
 			var actualCooldown = TimeSpan.FromSeconds(30);
 
 			if (this.Entity is Mob mob)
@@ -873,24 +820,24 @@ namespace Melia.Zone.Scripting.AI
 				if (mob.Rank == MonsterRank.Boss)
 				{
 					// Bosses: 20% chance, 15 second cooldown
-					actualCallChance = 20f;
+					actualCallChance = 0.20f;
 					actualCooldown = TimeSpan.FromSeconds(15);
 				}
 				else if (mob.IsBuffActive(BuffId.EliteMonsterBuff))
 				{
 					// Elite monsters: 10% chance, 20 second cooldown
-					actualCallChance = 10f;
+					actualCallChance = 0.10f;
 					actualCooldown = TimeSpan.FromSeconds(20);
 				}
 				// Regular monsters use default values (1% chance, 30 second cooldown)
 			}
 
 			// Check cooldown
-			if ((GameClock.Now - _lastHelpCallTime) < actualCooldown)
+			if ((DateTime.UtcNow - _lastHelpCallTime) < actualCooldown)
 				return;
 
 			// Random chance check
-			if (GameRandom.Get().NextDouble() * 100 >= actualCallChance)
+			if (RandomProvider.Get().NextDouble() > actualCallChance)
 				return;
 
 			// Find nearby allies of same type
@@ -945,183 +892,8 @@ namespace Melia.Zone.Scripting.AI
 				}
 			}
 
-			_lastHelpCallTime = GameClock.Now;
+			_lastHelpCallTime = DateTime.UtcNow;
 		}
-
-		/// <summary>
-		/// Returns true while the entity is panicking and fleeing from
-		/// its attacker.
-		/// </summary>
-		protected bool IsPanicking => GameClock.Now < _panicFleeEndTime;
-
-		/// <summary>
-		/// Gives a peaceful monster a chance to panic, running from its
-		/// attacker while luring nearby allies onto it.
-		/// </summary>
-		/// <param name="attacker"></param>
-		protected virtual void TryPanicFlee(ICombatEntity attacker)
-		{
-			if (this.IsPanicking)
-				return;
-
-			if (attacker == null || attacker.IsDead)
-				return;
-
-			if (this.Entity is Summon)
-				return;
-
-			if (this.Entity is not Mob mob)
-				return;
-
-			if (mob.IsDead || mob.Rank != MonsterRank.Normal || mob.Tendency != TendencyType.Peaceful)
-				return;
-
-			if (mob.IsBuffActive(BuffId.EliteMonsterBuff))
-				return;
-
-			var map = mob.Map;
-			if (map == null || map == Map.Limbo || map.IsInstance)
-				return;
-
-			if (GameRandom.Get().NextDouble() * 100 >= ZoneServer.Instance.Conf.World.MonsterPanicFleeChance)
-				return;
-
-			_panicFleeEndTime = GameClock.Now + _panicFleeDuration;
-			_target = null;
-
-			this.ExecuteOnce(this.Emoticon("I_emo_exclamation"));
-			this.ExecuteOnce(this.Say("Please, help!"));
-
-			this.StartRoutine("PanicFlee", this.PanicFlee(attacker));
-		}
-
-		/// <summary>
-		/// Makes the monster run away from its attacker for the panic
-		/// duration, luring nearby allies onto the attacker as it goes.
-		/// </summary>
-		/// <param name="attacker"></param>
-		/// <returns></returns>
-		protected virtual IEnumerable PanicFlee(ICombatEntity attacker)
-		{
-			const float FleeDistance = 150f;
-			const float LureRange = 300f;
-			const float LureHate = 150f;
-
-			this.SetRunning(true);
-
-			while (this.IsPanicking && !this.Entity.IsDead)
-			{
-				var threatPosition = attacker.Position;
-
-				Character closestCharacter = null;
-				var closestDist = double.MaxValue;
-				var nearbyEnemies = this.Entity.Map.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, 200);
-				foreach (var e in nearbyEnemies)
-				{
-					if (e is Character c && !c.IsDead)
-					{
-						var dist = c.Position.Get2DDistance(this.Entity.Position);
-						if (dist < closestDist)
-						{
-							closestDist = dist;
-							closestCharacter = c;
-						}
-					}
-				}
-
-				if (closestCharacter != null)
-					threatPosition = closestCharacter.Position;
-
-				this.LureNearbyAllies(attacker, LureRange, LureHate);
-
-				var awayVector = (this.Entity.Position - threatPosition).Normalize2D();
-				var idealDestination = this.Entity.Position + (awayVector * FleeDistance);
-
-				if (this.Entity.Map.Ground.TryGetNearestValidPosition(idealDestination, this.Entity.AgentRadius, out var validDestination, maxDistance: 100f))
-					yield return this.MoveTo(validDestination, wait: false);
-
-				yield return this.Wait(300);
-			}
-
-			this.ResetMoveSpeed();
-
-			if (EnableReturnHome)
-				this.StartRoutine("ReturnHome", this.ReturnHome());
-			else
-				this.StartRoutine("Idle", this.Idle());
-
-			yield break;
-		}
-
-		/// <summary>
-		/// Increases the hate nearby allies of the same type hold for
-		/// the given attacker.
-		/// </summary>
-		/// <param name="attacker"></param>
-		/// <param name="range"></param>
-		/// <param name="hateAmount"></param>
-		protected void LureNearbyAllies(ICombatEntity attacker, float range, float hateAmount)
-		{
-			if (attacker == null || this.Entity is not Mob selfMob)
-				return;
-
-			var candidates = this.Entity.Map.GetAttackableEnemiesInPosition(attacker, this.Entity.Position, range);
-			foreach (var candidate in candidates)
-			{
-				if (candidate is not Mob ally || ally.Id != selfMob.Id || ally.Handle == selfMob.Handle || ally.IsDead)
-					continue;
-
-				if (!ally.Components.TryGet<AiComponent>(out var ai) || ai.Script.Target != null)
-					continue;
-
-				ai.Script.QueueEventAlert(new HateIncreaseAlert(attacker, hateAmount));
-			}
-		}
-
-		/// <summary>
-		/// Gives the entity a chance to ascend into an elite monster,
-		/// healing it to full and granting it the elite buff.
-		/// </summary>
-		protected virtual void TryBecomeElite()
-		{
-			if (this.Entity is Summon)
-				return;
-
-			if (this.Entity is not Mob mob)
-				return;
-
-			if (mob.IsDead)
-				return;
-
-			if (mob.Rank == MonsterRank.Boss ||
-				mob.Rank == MonsterRank.MISC ||
-				mob.Rank == MonsterRank.Material ||
-				mob.Rank == MonsterRank.NPC)
-				return;
-
-			if (mob.IsBuffActive(BuffId.EliteMonsterBuff))
-				return;
-
-			var map = mob.Map;
-			if (map == null || map == Map.Limbo || map.IsInstance)
-				return;
-
-			var worldConf = ZoneServer.Instance.Conf.World;
-			if (mob.Level < worldConf.EliteMinLevel)
-				return;
-
-			if (GameRandom.Get().NextDouble() * 100 >= worldConf.MonsterEliteAscensionChance)
-				return;
-
-			this.ExecuteOnce(this.Say("Unlimited power!!"));
-
-			mob.StartBuff(BuffId.EliteMonsterBuff, 1, 0, TimeSpan.Zero, mob);
-			mob.HealToFull();
-
-			if (worldConf.EliteAlwaysAggressive)
-				mob.Tendency = TendencyType.Aggressive;
-		}
-
 		/// <summary>
 		/// Checks HP and updates phase state automatically
 		/// </summary>
@@ -1156,13 +928,6 @@ namespace Melia.Zone.Scripting.AI
 		/// <param name="elapsed"></param>
 		private void UpdateHate(TimeSpan elapsed)
 		{
-			if (_hateLayer != this.Entity.Layer)
-			{
-				_hateLayer = this.Entity.Layer;
-				_target = null;
-				this.RemoveAllHate();
-			}
-
 			_nearbyEnemiesBuffer.Clear();
 			this.Entity.Map.GetAttackableEnemiesInPosition(
 				this.Entity, this.Entity.Position, _viewRange, _nearbyEnemiesBuffer);
@@ -1193,7 +958,7 @@ namespace Melia.Zone.Scripting.AI
 				{
 					// Check if the entity is dead or gone from the map
 					var entity = this.Entity.Map.GetCombatEntity(handle);
-					if (entity == null || entity.IsDead || entity.Layer != this.Entity.Layer || entity.IsBuffActive(BuffId.Pet_Dead))
+					if (entity == null || entity.IsDead || entity.IsBuffActive(BuffId.Pet_Dead))
 					{
 						// Immediately remove hate for dead or gone entities (including dead pets)
 						_hateLevelsToRemove.Add(handle);
@@ -1303,9 +1068,6 @@ namespace Melia.Zone.Scripting.AI
 		protected void IncreaseHate(ICombatEntity entity, float amount)
 		{
 			if (this.Entity.IsBuffActive(BuffId.Lachrymator_Debuff))
-				return;
-
-			if (entity.Layer != this.Entity.Layer)
 				return;
 
 			var handle = entity.Handle;
@@ -1507,7 +1269,7 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns></returns>
 		protected bool CanAccumulateHate(ICombatEntity entity)
 		{
-			if (entity.IsBuffActiveByKeyword(BuffTag.Cloaking) || ConditionalCloaking.IsHiddenFrom(this.Entity, entity))
+			if (entity.IsBuffActiveByKeyword(BuffTag.Cloaking))
 				return false;
 
 			// Dead pets should never accumulate hate
@@ -1535,10 +1297,26 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns></returns>
 		protected bool CanBeHated(ICombatEntity entity)
 		{
-			if (entity.IsBuffActiveByKeyword(BuffTag.Cloaking) || ConditionalCloaking.IsHiddenFrom(this.Entity, entity))
+			if (entity == null)
 				return false;
 
-			// Dead pets should never be hated or targetted
+			if (entity.IsDead)
+				return false;
+
+			if (this.Entity == null || this.Entity.Map == null)
+				return false;
+
+			if (entity.Map != this.Entity.Map)
+				return false;
+
+			var currentEntity = this.Entity.Map.GetCombatEntity(entity.Handle);
+
+			if (currentEntity == null || !ReferenceEquals(currentEntity, entity))
+				return false;
+
+			if (entity.IsBuffActiveByKeyword(BuffTag.Cloaking))
+				return false;
+
 			if (entity.IsBuffActive(BuffId.Pet_Dead))
 				return false;
 
@@ -1555,23 +1333,30 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns></returns>
 		protected ICombatEntity GetMostHated()
 		{
-			// This buff overrides the most hated target as long as the caster
-			// remains in range.
+			if (this.Entity == null || this.Entity.Map == null)
+				return null;
+
 			if (this.Entity.TryGetBuff(BuffId.ProvocationImmunity_Debuff, out var piDebuff))
 			{
-				var caster = (ICombatEntity)piDebuff.Caster;
+				var caster = piDebuff.Caster as ICombatEntity;
 
-				if (!this.EntityGone(caster) && this.InRangeOf(caster, 300))
+				if (caster != null
+					&& !this.EntityGone(caster)
+					&& this.CanBeHated(caster)
+					&& this.InRangeOf(caster, 300))
+				{
 					return caster;
+				}
 			}
 
-			// Return cached result if hate levels haven't changed and
-			// the cached target is still valid.
-			if (!_mostHatedDirty && _cachedMostHated != null
-				&& !this.EntityGone(_cachedMostHated)
-				&& this.CanBeHated(_cachedMostHated))
+			if (!_mostHatedDirty && _cachedMostHated != null)
 			{
-				return _cachedMostHated;
+				if (!this.EntityGone(_cachedMostHated) && this.CanBeHated(_cachedMostHated))
+					return _cachedMostHated;
+
+				this.RemoveHate(_cachedMostHated);
+				_cachedMostHated = null;
+				_mostHatedDirty = true;
 			}
 
 			var highestHate = 0f;
@@ -1583,30 +1368,25 @@ namespace Melia.Zone.Scripting.AI
 			{
 				var handle = entry.Key;
 				var hate = entry.Value;
-
-				if (hate <= highestHate)
-					continue;
-
 				var entity = this.Entity.Map.GetCombatEntity(handle);
 
-				if (entity == null)
+				if (entity == null || this.EntityGone(entity) || !this.CanBeHated(entity))
 				{
 					_hateLevelsToRemove.Add(handle);
 					continue;
 				}
 
-				if (!this.CanBeHated(entity) || entity.Layer != this.Entity.Layer)
+				if (hate <= highestHate)
 					continue;
 
 				highestHate = hate;
 				mostHated = entity;
 			}
 
-			// Clean up stale entries (entities gone)
 			foreach (var handle in _hateLevelsToRemove)
 				_hateLevels.Remove(handle);
 
-			if (highestHate < _minAggroHateLevel)
+			if (highestHate < _minAggroHateLevel || mostHated == null)
 			{
 				_cachedMostHated = null;
 				_mostHatedDirty = false;
@@ -1615,6 +1395,7 @@ namespace Melia.Zone.Scripting.AI
 
 			_cachedMostHated = mostHated;
 			_mostHatedDirty = false;
+
 			return mostHated;
 		}
 
@@ -1658,9 +1439,7 @@ namespace Melia.Zone.Scripting.AI
 			if (!ZoneServer.Instance.Conf.World.MonstersReturnHome)
 				return false;
 
-			var homePosition = this.TryGetPatrolAnchor(out var patrolAnchor) ? patrolAnchor : this.CreationPosition.Value;
-
-			var distance = this.Entity.Position.Get2DDistance(homePosition);
+			var distance = this.Entity.Position.Get2DDistance(this.CreationPosition.Value);
 			var allowedDistance = _wanderRange * (1 + _extraWanderRangeRate);
 
 			return (distance >= allowedDistance);
@@ -1761,7 +1540,7 @@ namespace Melia.Zone.Scripting.AI
 			if ((damage / maxHp) < this.StaggerThreshold)
 				return;
 
-			var now = GameClock.Now;
+			var now = DateTime.UtcNow;
 			if ((now - _lastStaggerTime) < this.StaggerCooldown)
 				return;
 
@@ -1825,18 +1604,11 @@ namespace Melia.Zone.Scripting.AI
 
 					if (entityWasAttacked)
 					{
-						_lastAttackedTime = GameClock.Now;
+						_lastAttackedTime = DateTime.UtcNow;
 						_lastAttackerHandle = hitEventAlert.Attacker.Handle;
 
 						this.OnTakeDamage(hitEventAlert.Attacker, hitEventAlert.Damage);
-						this.AlertPatrolGroup(hitEventAlert.Attacker);
-						this.TryPanicFlee(hitEventAlert.Attacker);
-
-						if (!this.IsPanicking)
-						{
-							this.TryCallForHelp(hitEventAlert.Attacker);
-							this.TryBecomeElite();
-						}
+						this.TryCallForHelp(hitEventAlert.Attacker);
 					}
 
 					if (entityWasAttacked || masterWasAttacked)
@@ -1846,7 +1618,7 @@ namespace Melia.Zone.Scripting.AI
 						// If we don't have a target, or we're returning home, check for enemies to start combat
 						// This handles the case where the target was cleared above, was already null, 
 						// or we're returning home and need to re-engage when attacked
-						if (!this.IsPanicking && (_target == null || this.CurrentRoutine == "ReturnHome"))
+						if (_target == null || this.CurrentRoutine == "ReturnHome")
 						{
 							this.CheckEnemies();
 						}
@@ -1910,10 +1682,10 @@ namespace Melia.Zone.Scripting.AI
 					if (moveToAlert.SuspendAI)
 					{
 						this.Suspended = true;
-						GameClock.Delay(moveToAlert.MoveTime).ContinueWith(_ =>
+						Task.Delay(moveToAlert.MoveTime).ContinueWith(_ =>
 						{
 							this.Suspended = false;
-						}, TaskContinuationOptions.ExecuteSynchronously);
+						});
 					}
 					break;
 				}
@@ -2010,9 +1782,6 @@ namespace Melia.Zone.Scripting.AI
 			_tempVars.Clear();
 			_usedSkillHistory.Clear();
 			_movement = null;
-			_patrolRoute = null;
-			_patrolVisits = null;
-			_patrolFormationSlot = 0;
 			this.Entity = null;
 			this.Owner = null;
 		}
@@ -2145,14 +1914,7 @@ namespace Melia.Zone.Scripting.AI
 		}
 
 		/// <summary>
-		/// Returns the handle of the AI's master, or zero if it doesn't
-		/// have one.
-		/// </summary>
-		public int MasterHandle => _masterHandle;
-
-		/// <summary>
-		/// Returns the AI's master, or null if it doesn't have one or it
-		/// is no longer on its map.
+		/// Returns the AI's master, or null if it doesn't have one.
 		/// </summary>
 		/// <returns></returns>
 		public ICombatEntity GetMaster()
@@ -2245,7 +2007,18 @@ namespace Melia.Zone.Scripting.AI
 			if (entity.IsDead)
 				return true;
 
-			if (this.Entity.Map.GetCombatEntity(entity.Handle) == null)
+			if (this.Entity == null || this.Entity.Map == null)
+				return true;
+
+			if (entity.Map != this.Entity.Map)
+				return true;
+
+			var currentEntity = this.Entity.Map.GetCombatEntity(entity.Handle);
+
+			if (currentEntity == null)
+				return true;
+
+			if (!ReferenceEquals(currentEntity, entity))
 				return true;
 
 			return false;
@@ -2263,7 +2036,7 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns></returns>
 		protected Position GetAdjacentPosition(ICombatEntity target, float range)
 		{
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 
 			var ground = target.Map.Ground;
 			var targetPos = target.Position;
@@ -2447,7 +2220,7 @@ namespace Melia.Zone.Scripting.AI
 			if (this.Entity.IsLocked(LockType.Attack) || this.Entity.IsCasting())
 				return false;
 
-			if (target.IsLocked(LockType.GetDamaged))
+			if (target.IsLocked(LockType.GetHit))
 				return false;
 
 			if (this.Entity.IsDead || target.IsDead || skill.IsOnCooldown || this.Entity.IsGuarding() || this.Entity.IsKnockedDown() || this.Entity.IsKnockedBack())
@@ -2474,7 +2247,7 @@ namespace Melia.Zone.Scripting.AI
 			if (this.IsUsingSkill())
 				return true;
 
-			return GameClock.Now - _lastSkillUseTime < _lastSkillDuration;
+			return DateTime.UtcNow - _lastSkillUseTime < _lastSkillDuration;
 		}
 
 		#region TempVar Helpers

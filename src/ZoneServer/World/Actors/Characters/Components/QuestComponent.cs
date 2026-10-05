@@ -1,23 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.Scripting;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Game.Properties;
-using Melia.Shared.World;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
-using Melia.Zone.Network.Helpers;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Actors.Monsters;
-using Melia.Zone.World.Maps;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Modifiers;
 using Melia.Zone.World.Quests.Objectives;
-using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
 using System.Threading.Tasks;
@@ -42,19 +34,12 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly static TimeSpan AutoReceiveDelay = TimeSpan.FromMinutes(1);
 		private readonly static TimeSpan LocationCheckInterval = TimeSpan.FromSeconds(1);
 
-		private const int MaxMarkScriptLength = 1500;
-
-		// The distance the client's own return warp puts the player in front of the NPC.
-		private const float ReturnWarpNpcDistance = 20;
-		private const float ReturnWarpStepDistance = 5;
-
 		private readonly object _syncLock = new();
 		private readonly List<Quest> _quests = new();
 		private readonly List<long> _disabledQuests = new();
 		private readonly HashSet<long> _markerNotifiedSuccess = new();
 
 		private TimeSpan _autoReceiveDelay = AutoReceiveDelay;
-		private QuestTrackData _pendingTrack;
 		private TimeSpan _timeSinceLastLocationCheck = TimeSpan.Zero;
 
 		/// <summary>
@@ -95,8 +80,26 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			foreach (var quest in all)
 			{
-				var lua = $"Melia.Quests.Remove('{quest.ObjectIdStr}')";
-				Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
+				if (ZoneServer.Instance.Data.QuestDb.TryFind((int)quest.Data.Id.Value, out var questData) && !string.IsNullOrEmpty(questData.QuestProperty))
+				{
+					var main = this.Character.SessionObjects.Main;
+					if (main.Properties.Has(questData.QuestProperty))
+					{
+						main.Properties.SetFloat(questData.QuestProperty, (float)QuestStatus.Possible);
+						Send.ZC_OBJECT_PROPERTY(this.Character, main, questData.QuestProperty);
+					}
+				}
+
+				if (quest.SessionObjectStaticData != null)
+				{
+					this.Character.SessionObjects.Remove(quest.SessionObjectStaticData.Id);
+					Send.ZC_SESSION_OBJ_REMOVE(this.Character, quest.SessionObjectStaticData.Id);
+				}
+				else
+				{
+					var lua = $"Melia.Quests.Remove('{quest.ObjectIdStr}')";
+					Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
+				}
 			}
 
 			lock (_syncLock)
@@ -223,34 +226,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
-		/// Returns the sum of the given property's bonuses from all of the
-		/// character's completed quests.
-		/// </summary>
-		/// <param name="propertyName"></param>
-		/// <returns></returns>
-		public float GetRewardProperty(string propertyName)
-		{
-			var result = 0f;
-
-			lock (_syncLock)
-			{
-				foreach (var quest in _quests)
-				{
-					if (quest.Status != QuestStatus.Completed)
-						continue;
-
-					foreach (var reward in quest.Data.Rewards)
-					{
-						if (reward is PropertyReward propertyReward && propertyReward.Property == propertyName)
-							result += propertyReward.Amount;
-					}
-				}
-			}
-
-			return result;
-		}
-
-		/// <summary>
 		/// Returns a list with all of the character's quests.
 		/// </summary>
 		/// <returns></returns>
@@ -284,19 +259,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
-		/// Updates the quest's sequential unlocks and notifies every
-		/// objective that just became unlocked.
-		/// </summary>
-		/// <param name="quest"></param>
-		private void UpdateUnlock(Quest quest)
-		{
-			var unlocked = quest.UpdateUnlock();
-
-			for (var i = 0; i < unlocked.Count; i++)
-				unlocked[i].Objective.OnUnlocked(this.Character, quest);
-		}
-
-		/// <summary>
 		/// Iterates over the quests' objectives, runs the given function
 		/// over all objectives with the given type, and updates the quest
 		/// if any progresses changed.
@@ -307,16 +269,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			lock (_syncLock)
 			{
-				foreach (var quest in _quests.ToArray())
+				foreach (var quest in _quests)
 				{
 					if (quest.Status != QuestStatus.InProgress && quest.Status != QuestStatus.Success)
 						continue;
 
 					quest.UpdateObjectives(updater);
 
-					if (quest.ChangesOnLastUpdate && quest.Status != QuestStatus.Completed)
+					if (quest.ChangesOnLastUpdate)
 					{
-						this.UpdateUnlock(quest);
+						quest.UpdateUnlock();
 
 						if (quest.Status == QuestStatus.Success && !quest.IsCompletable)
 							quest.Status = QuestStatus.InProgress;
@@ -348,7 +310,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 					if (quest.ChangesOnLastUpdate)
 					{
-						this.UpdateUnlock(quest);
+						quest.UpdateUnlock();
 					}
 				}
 			}
@@ -412,6 +374,147 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Restores a dynamically generated quest without treating it as a newly
+		/// received quest.
+		/// </summary>
+		/// <param name="generatedData">
+		/// The dynamically generated quest data.
+		/// </param>
+		/// <param name="generatorInstance">
+		/// The script instance associated with the generated quest.
+		/// </param>
+		/// <returns>
+		/// The restored quest instance.
+		/// </returns>
+		public Quest RestoreGeneratedQuest(
+			QuestData generatedData,
+			QuestScript generatorInstance)
+		{
+			if (generatedData == null)
+				throw new ArgumentNullException(nameof(generatedData));
+
+			if (generatorInstance == null)
+				throw new ArgumentNullException(nameof(generatorInstance));
+
+			if (generatedData.Id == QuestId.Zero)
+			{
+				throw new ArgumentException(
+					"Generated QuestData must have a valid unique QuestId.",
+					nameof(generatedData));
+			}
+
+			if (this.TryGetById(generatedData.Id, out var existingQuest))
+				return existingQuest;
+
+			var quest = new Quest(generatedData, generatorInstance);
+
+			quest.Status = QuestStatus.InProgress;
+			quest.StartTime = DateTime.Now;
+			quest.UpdateUnlock();
+
+			this.AddSilent(quest);
+
+			this.RefreshClientQuest(generatedData.Id);
+
+			return quest;
+		}
+
+		/// <summary>
+		/// Replaces an existing dynamically generated quest with a newly generated
+		/// instance using the same quest id.
+		/// </summary>
+		/// <param name="generatedData">
+		/// The newly generated quest data.
+		/// </param>
+		/// <param name="generatorInstance">
+		/// The script instance associated with the generated quest.
+		/// </param>
+		/// <returns>
+		/// The newly created quest instance.
+		/// </returns>
+		public Quest ReplaceGeneratedQuest(
+			QuestData generatedData,
+			QuestScript generatorInstance)
+		{
+			if (generatedData == null)
+				throw new ArgumentNullException(
+					nameof(generatedData));
+
+			if (generatorInstance == null)
+				throw new ArgumentNullException(
+					nameof(generatorInstance));
+
+			if (generatedData.Id == QuestId.Zero)
+			{
+				throw new ArgumentException(
+					"Generated QuestData must have a valid unique QuestId.",
+					nameof(generatedData));
+			}
+
+			if (this.TryGetById(
+				generatedData.Id,
+				out var existingQuest))
+			{
+				this.RemoveGeneratedQuest(
+					existingQuest);
+			}
+
+			var quest = new Quest(
+				generatedData,
+				generatorInstance);
+
+			quest.Status =
+				QuestStatus.InProgress;
+
+			quest.StartTime =
+				DateTime.Now;
+
+			quest.UpdateUnlock();
+
+			this.AddSilent(
+				quest);
+
+			this.UpdateClient();
+
+			return quest;
+		}
+
+		/// <summary>
+		/// Removes one dynamically generated quest from the character.
+		/// </summary>
+		private void RemoveGeneratedQuest(Quest quest)
+		{
+			if (quest == null)
+				return;
+
+			if (quest.InProgress)
+			{
+				this.Cancel(
+					quest);
+			}
+
+			lock (_syncLock)
+			{
+				_quests.Remove(
+					quest);
+
+				_markerNotifiedSuccess.Remove(
+					quest.Data.Id.Value);
+			}
+		}
+
+		public bool RemoveGeneratedQuest(QuestId questId)
+		{
+			if (!this.TryGetById(questId, out var quest))
+				return false;
+
+			this.RemoveGeneratedQuest(quest);
+			this.UpdateClient();
+
+			return true;
+		}
+
+		/// <summary>
 		/// Starts quest for the character, returns false if the quest
 		/// couldn't be started.
 		/// </summary>
@@ -454,10 +557,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			if (delay == TimeSpan.Zero)
 			{
-				// Added to the log first, so the track the quest's status
-				// transition starts finds it there.
-				this.AddSilent(quest);
 				this.Start(quest);
+				this.AddSilent(quest);
 			}
 			else
 			{
@@ -480,7 +581,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			this.InitialChecks(quest);
 
 			quest.Status = QuestStatus.InProgress;
-			this.UpdateUnlock(quest);
+			quest.UpdateUnlock();
 
 			if (quest.StartTime == DateTime.MinValue)
 				quest.StartTime = DateTime.Now;
@@ -493,8 +594,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			questScript?.OnStart(this.Character, quest);
 
 			this.UpdateClient_AddQuest(quest);
-			this.ResetQuestTrack(quest.Data.Id);
-			this.UpdateTrackBinding(quest);
 		}
 
 		/// <summary>
@@ -746,7 +845,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					if (!progress.Done)
 					{
 						progress.SetDone();
-						this.UpdateUnlock(quest);
+						quest.UpdateUnlock();
 						this.UpdateQuestProgress(questId, progress.Objective.Id);
 						this.UpdateClient_UpdateQuest(quest);
 					}
@@ -776,47 +875,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					if (!progress.Done)
 					{
 						progress.SetDone();
-						this.UpdateUnlock(quest);
+						quest.UpdateUnlock();
 						this.UpdateQuestProgress(questId, progress.Objective.Id);
 						this.UpdateClient_UpdateQuest(quest);
 					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// Advances the objective on the quest with the given id by the
-		/// given amount, completing it once it reaches its target.
-		/// </summary>
-		/// <param name="questId"></param>
-		/// <param name="objectiveIdent"></param>
-		/// <param name="amount"></param>
-		public void AddObjectiveProgress(QuestId questId, string objectiveIdent, int amount = 1)
-		{
-			lock (_syncLock)
-			{
-				for (var i = 0; i < _quests.Count; i++)
-				{
-					var quest = _quests[i];
-					if (!quest.InProgress || quest.Data.Id != questId)
-						continue;
-
-					if (!quest.TryGetProgress(objectiveIdent, out var progress))
-						continue;
-
-					if (progress.Done || !progress.Unlocked)
-						continue;
-
-					progress.Count = Math.Min(progress.Objective.TargetCount, progress.Count + amount);
-
-					if (progress.Count >= progress.Objective.TargetCount)
-					{
-						progress.SetDone();
-						this.UpdateUnlock(quest);
-					}
-
-					this.UpdateQuestProgress(questId, progress.Objective.Id);
-					this.UpdateClient_UpdateQuest(quest);
 				}
 			}
 		}
@@ -853,7 +915,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			lock (_syncLock)
 			{
-				foreach (var quest in _quests.ToArray())
+				foreach (var quest in _quests)
 				{
 					if (!quest.InProgress || quest.Data.Id.Value != questId)
 						continue;
@@ -882,12 +944,11 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			this.GiveRewards(quest);
 
-			this.UpdateClient_QuestStatusProperty(quest);
+			// Track achievement points for quest completion via server event
+			ZoneServer.Instance.ServerEvents.PlayerCompletedQuest.Raise(new PlayerCompletedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
+
 			this.UpdateClient_RemoveQuest(quest);
 			this.UpdateClient_CompleteQuest(quest);
-
-			// Raised after the client knows the new status, since handlers redraw the client's map icons from it.
-			ZoneServer.Instance.ServerEvents.PlayerCompletedQuest.Raise(new PlayerCompletedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
 		}
 
 		/// <summary>
@@ -896,312 +957,27 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="quest"></param>
 		public void Cancel(Quest quest)
 		{
-			// A track's own OnCancel can call back into here for the same
-			// quest; without this, the two would cancel each other in a loop.
-			if (quest.Status == QuestStatus.Abandoned)
-				return;
-
 			quest.Status = QuestStatus.Abandoned;
 
 			_markerNotifiedSuccess.Remove(quest.Data.Id.Value);
 
-			// The quest window lets a cancelable quest be abandoned even
-			// while its track is playing, and the track has no other way to
-			// find out the quest is gone - it only ends on a quest status it
-			// will now never reach, stranding the player in its layer.
-			var activeTrack = this.Character.Tracks.ActiveTrack;
-			if (activeTrack != null && activeTrack.Data.QuestId == quest.Data.Id.Value)
-				this.Character.Tracks.Cancel();
+			if (ZoneServer.Instance.Data.QuestDb.TryFind((int)quest.Data.Id.Value, out var questData) && !string.IsNullOrEmpty(quest.QuestStaticData.QuestProperty))
+			{
+				var main = this.Character.SessionObjects.Main;
+
+				if (main.Properties.Has(quest.QuestStaticData.QuestProperty))
+				{
+					main.Properties.SetFloat(quest.QuestStaticData.QuestProperty, (int)quest.Status);
+					Send.ZC_OBJECT_PROPERTY(this.Character, main, quest.QuestStaticData.QuestProperty);
+				}
+			}
 
 			if (QuestScript.TryGet(quest.Data.Id, out var questScript))
 				questScript.OnCancel(this.Character, quest);
 
-			this.UpdateClient_QuestStatusProperty(quest);
-			this.UpdateClient_RemoveQuest(quest);
-
 			ZoneServer.Instance.ServerEvents.PlayerAbandonedQuest.Raise(new PlayerAbandonedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
-		}
 
-		/// <summary>
-		/// Marks the quest as completed without running its scripts or
-		/// giving its rewards, adding it to the log if it's not there.
-		/// </summary>
-		/// <param name="questId"></param>
-		public void ForceComplete(QuestId questId)
-		{
-			Quest quest;
-
-			lock (_syncLock)
-			{
-				quest = _quests.FirstOrDefault(q => q.Data.Id == questId);
-				if (quest == null)
-				{
-					quest = Quest.Create(questId);
-					quest.StartTime = DateTime.Now;
-					_quests.Add(quest);
-				}
-				else if (quest.Status == QuestStatus.Completed)
-				{
-					return;
-				}
-
-				quest.Status = QuestStatus.Completed;
-				quest.CompleteTime = DateTime.Now;
-				quest.CompleteObjectives();
-				_markerNotifiedSuccess.Remove(questId.Value);
-			}
-
-			this.UpdateClient_QuestStatusProperty(quest);
-			this.UpdateClient_CompleteQuest(quest);
-			this.UpdateClient_QuestMarks();
-		}
-
-		/// <summary>
-		/// Removes the quest from the character entirely, as if it had
-		/// never been started. Returns false if the character didn't
-		/// have it.
-		/// </summary>
-		/// <param name="questId"></param>
-		/// <returns></returns>
-		public bool Remove(QuestId questId)
-		{
-			Quest quest;
-
-			lock (_syncLock)
-			{
-				quest = _quests.FirstOrDefault(q => q.Data.Id == questId);
-				if (quest == null)
-					return false;
-			}
-
-			var activeTrack = this.Character.Tracks.ActiveTrack;
-			if (activeTrack != null && activeTrack.Data.QuestId == questId.Value)
-				this.Character.Tracks.Cancel();
-
-			if (_pendingTrack != null && _pendingTrack.QuestId == questId.Value)
-				_pendingTrack = null;
-
-			lock (_syncLock)
-			{
-				_quests.Remove(quest);
-				_markerNotifiedSuccess.Remove(questId.Value);
-			}
-
-			this.ResetQuestTrack(questId);
-
-			quest.Status = QuestStatus.Possible;
-			this.UpdateClient_QuestStatusProperty(quest);
 			this.UpdateClient_RemoveQuest(quest);
-
-			return true;
-		}
-
-		/// <summary>
-		/// Starts the given track, holding it back until the character is
-		/// out of the dialog that triggered it and the quest lock is free.
-		/// </summary>
-		/// <remarks>
-		/// A track opens a dialog of its own, which throws while another is active.
-		/// </remarks>
-		/// <param name="trackData"></param>
-		private void BeginTrack(QuestTrackData trackData)
-		{
-			// A party track start takes TrackGroup.StartLock, which is always taken before quest locks.
-			if (this.Character.Connection.CurrentDialog != null || Monitor.IsEntered(_syncLock))
-			{
-				_pendingTrack = trackData;
-				return;
-			}
-
-			_pendingTrack = null;
-
-			var startTask = this.Character.Tracks.Start(trackData);
-			_ = startTask.ContinueWith(
-				task => Log.Error("QuestComponent.BeginTrack: Track '{0}' failed for '{1}'. {2}", trackData.TrackName, this.Character.Name, task.Exception),
-				TaskContinuationOptions.OnlyOnFaulted);
-		}
-
-		/// <summary>
-		/// Clears the record of the quest's track having played, so that
-		/// starting the quest again plays the track again.
-		/// </summary>
-		/// <param name="questId"></param>
-		private void ResetQuestTrack(QuestId questId)
-		{
-			if (!QuestScript.TryGet(questId, out var questScript))
-				return;
-
-			var trackName = questScript.TrackData.TrackName;
-			if (string.IsNullOrEmpty(trackName))
-				return;
-
-			var propertyName = trackName;
-			if (TrackScript.TryGet(trackName, out var trackScript) && !string.IsNullOrEmpty(trackScript.Data.PropertyId))
-				propertyName = trackScript.Data.PropertyId;
-
-			this.Character.SetEtcProperty(propertyName, 0);
-		}
-
-		/// <summary>
-		/// Starts or ends the track bound to the quest, based on the status
-		/// the quest is in now.
-		/// </summary>
-		/// <param name="quest"></param>
-		private void UpdateTrackBinding(Quest quest)
-		{
-			if (!QuestScript.TryGet(quest.Data.Id, out var questScript))
-				return;
-
-			var trackData = questScript.TrackData;
-			if (string.IsNullOrEmpty(trackData.TrackName))
-				return;
-
-			var activeTrack = this.Character.Tracks.ActiveTrack;
-
-			if (activeTrack != null)
-			{
-				if (activeTrack.Id == trackData.TrackName && quest.Status >= trackData.OnTrackEnd)
-					this.Character.Tracks.End(trackData.TrackName);
-
-				return;
-			}
-
-			if (trackData.AutoStart && quest.Status == trackData.OnTrackStart)
-				this.BeginTrack(trackData);
-		}
-
-		/// <summary>
-		/// Plays the track bound to the given quest, returns false if the
-		/// quest has none or a track is already running.
-		/// </summary>
-		/// <remarks>
-		/// For tracks a trigger plays rather than the quest's own status
-		/// transition. See SetTrack's autoStart parameter.
-		/// </remarks>
-		/// <param name="questId"></param>
-		/// <returns></returns>
-		public bool StartQuestTrack(QuestId questId)
-		{
-			// A track held back until the dialog closes is not active yet,
-			// so without this a second conversation queues it twice.
-			if (this.Character.Tracks.ActiveTrack != null || _pendingTrack != null)
-				return false;
-
-			if (!QuestScript.TryGet(questId, out var questScript))
-				return false;
-
-			if (string.IsNullOrEmpty(questScript.TrackData.TrackName))
-				return false;
-
-			this.BeginTrack(questScript.TrackData);
-			return true;
-		}
-
-		/// <summary>
-		/// Clears the record of the quest's track having played, so the
-		/// trigger that owns it can play it again.
-		/// </summary>
-		/// <remarks>
-		/// For a track bound to a place rather than to the quest's status.
-		/// Replaying such a track from the quest giver would stage the
-		/// cutscene wherever the player happens to be standing.
-		/// </remarks>
-		/// <param name="questId"></param>
-		public void ClearQuestTrack(QuestId questId)
-		{
-			if (this.Character.Tracks.ActiveTrack != null)
-				return;
-
-			this.ResetQuestTrack(questId);
-		}
-
-		/// <summary>
-		/// Clears the quest's track record and plays it again, so a track
-		/// that death or a relog interrupted can be restarted on demand.
-		/// </summary>
-		/// <param name="questId"></param>
-		/// <returns></returns>
-		public bool ReplayQuestTrack(QuestId questId)
-		{
-			if (this.Character.Tracks.ActiveTrack != null || _pendingTrack != null)
-				return false;
-
-			this.ResetQuestTrack(questId);
-
-			return this.StartQuestTrack(questId);
-		}
-
-		/// <summary>
-		/// Stores the item the character picked out of the quest's
-		/// pick-one-of reward, returns false if the quest doesn't offer it.
-		/// </summary>
-		/// <param name="questId"></param>
-		/// <param name="itemId"></param>
-		/// <returns></returns>
-		public bool SelectReward(QuestId questId, int itemId)
-		{
-			lock (_syncLock)
-			{
-				foreach (var quest in _quests)
-				{
-					if (quest.Data.Id != questId)
-						continue;
-
-					if (!quest.Data.Rewards.OfType<SelectItemReward>().Any(a => a.IsOption(itemId)))
-						return false;
-
-					quest.Vars.SetInt(SelectItemReward.SelectionVarName, itemId);
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Returns the quest's pick-one-of reward, if it has one.
-		/// </summary>
-		/// <param name="questId"></param>
-		/// <param name="reward"></param>
-		/// <returns></returns>
-		public bool TryGetSelectItemReward(QuestId questId, out SelectItemReward reward)
-		{
-			lock (_syncLock)
-			{
-				foreach (var quest in _quests)
-				{
-					if (quest.Data.Id != questId)
-						continue;
-
-					reward = quest.Data.Rewards.OfType<SelectItemReward>().FirstOrDefault();
-					return reward != null;
-				}
-			}
-
-			reward = null;
-			return false;
-		}
-
-		/// <summary>
-		/// Returns true if the quest has at least one reward defined,
-		/// item, EXP, or otherwise.
-		/// </summary>
-		/// <param name="questId"></param>
-		/// <returns></returns>
-		public bool HasRewards(QuestId questId)
-		{
-			lock (_syncLock)
-			{
-				foreach (var quest in _quests)
-				{
-					if (quest.Data.Id != questId)
-						continue;
-
-					return quest.Data.Rewards.Count > 0;
-				}
-			}
-
-			return false;
 		}
 
 		/// <summary>
@@ -1211,7 +987,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private void GiveRewards(Quest quest)
 		{
 			foreach (var reward in quest.Data.Rewards)
-				reward.Give(this.Character, quest);
+				reward.Give(this.Character);
 		}
 
 		/// <summary>
@@ -1259,13 +1035,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					if (quest.Data.Id.Value != questId)
 						continue;
 
-					if (quest.Status == QuestStatus.Completed)
-						break;
-
 					quest.Status = status;
 
 					this.UpdateClient_UpdateQuest(quest);
-					this.UpdateTrackBinding(quest);
 					break;
 				}
 			}
@@ -1305,10 +1077,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				}
 			}
 
-			var pendingTrack = _pendingTrack;
-			if (pendingTrack != null && this.Character.Connection.CurrentDialog == null)
-				this.BeginTrack(pendingTrack);
-
 			// --- 3. Handle Auto-Receive Quests (Outside main lock if QuestScript.StartAuto... is safe) ---
 			_autoReceiveDelay = Math2.Max(TimeSpan.Zero, _autoReceiveDelay - elapsed);
 			if (_autoReceiveDelay == TimeSpan.Zero)
@@ -1325,51 +1093,33 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			var quests = this.GetList();
 
-			// The client tracks each quest's status in its own session
-			// property, so completed quests stop offering a start marker.
-			foreach (var quest in quests)
-				this.UpdateClient_QuestStatusProperty(quest);
-
 			foreach (var quest in quests.Where(a => a.InProgress))
 			{
-				// Re-check quest objectives to sync with current state (e.g., collection items in inventory)
 				this.InitialChecks(quest);
 
-				this.UpdateClient_AddQuestSessionObject(quest);
+				var removeLua = $"Melia.Quests.Remove('{quest.ObjectIdStr}')";
+				Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, removeLua);
 
 				var questTable = this.QuestToTable(quest);
-
-				var lua = "Melia.Quests.Restore(" + questTable.Serialize() + ")";
-				Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
+				var restoreLua = "Melia.Quests.Restore(" + questTable.Serialize() + ")";
+				Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, restoreLua);
 			}
-
-			this.UpdateClient_NotifyQuests();
 		}
 
-		/// <summary>
-		/// Replays the client's new-quest notification for every available
-		/// quest, so the client rebuilds its tracker after a relog.
-		/// </summary>
-		private void UpdateClient_NotifyQuests()
+		public void RefreshClientQuest(QuestId questId)
 		{
-			foreach (var questScript in QuestScript.GetAll().OrderBy(a => a.Data.Id.Value))
-			{
-				var questId = questScript.Data.Id;
+			if (!this.TryGetById(questId, out var quest))
+				return;
 
-				if (questId.NamespaceId != 0)
-					continue;
+			if (!quest.InProgress)
+				return;
 
-				if (!ZoneServer.Instance.Data.QuestDb.Contains((int)questId.Value))
-					continue;
+			var removeLua = $"Melia.Quests.Remove('{quest.ObjectIdStr}')";
+			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, removeLua);
 
-				if (this.HasCompleted(questId))
-					continue;
-
-				if (!this.MeetsPrerequisites(questScript))
-					continue;
-
-				Send.ZC_ADDON_MSG(this.Character, AddonMessage.GET_NEW_QUEST, (int)questId.Value);
-			}
+			var questTable = this.QuestToTable(quest);
+			var restoreLua = "Melia.Quests.Restore(" + questTable.Serialize() + ")";
+			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, restoreLua);
 		}
 
 		/// <summary>
@@ -1378,6 +1128,33 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="quest"></param>
 		private void UpdateClient_AddQuest(Quest quest)
 		{
+			if (ZoneServer.Instance.Data.QuestDb.TryFind((int)quest.Data.Id.Value, out var questData))
+			{
+				if (quest.QuestStaticData != null)
+				{
+					var main = this.Character.SessionObjects.Main;
+
+					if (!string.IsNullOrWhiteSpace(quest.QuestStaticData.QStartZone)
+						&& quest.QuestStaticData.QStartZone != main.Properties.GetString(PropertyName.QSTARTZONETYPE))
+					{
+						main.Properties.SetString(PropertyName.QSTARTZONETYPE, quest.QuestStaticData.QStartZone);
+						Send.ZC_OBJECT_PROPERTY(this.Character, main, PropertyName.QSTARTZONETYPE);
+					}
+				}
+				if (quest.SessionObjectStaticData != null)
+				{
+					var questSessionObject = this.Character.SessionObjects.GetOrCreate(quest.SessionObjectStaticData.Id);
+					if (questSessionObject != null)
+					{
+						if (quest.SessionObjectStaticData.QuestData.InfoMaxCount != null)
+							questSessionObject.Properties.SetFloat(PropertyName.QuestInfoValue1, 0f);
+						Send.ZC_SESSION_OBJ_ADD(this.Character, questSessionObject, quest.QuestStaticData.Id);
+					}
+					UpdateClient_UpdateQuest(quest);
+				}
+				return;
+			}
+
 			var questTable = this.QuestToTable(quest);
 
 			var table = new LuaTable();
@@ -1386,11 +1163,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			var lua = "Melia.Quests.Add(" + questTable.Serialize() + ")";
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
-
-			this.UpdateClient_AddQuestSessionObject(quest);
-
-			this.UpdateClient_QuestStatusProperty(quest);
-			this.UpdateClient_QuestMarks();
 
 			//Log.Debug(lua);
 		}
@@ -1401,6 +1173,20 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="quest"></param>
 		public void UpdateClient_UpdateQuest(Quest quest)
 		{
+			if (ZoneServer.Instance.Data.QuestDb.TryFind((int)quest.Data.Id.Value, out var questData) && !string.IsNullOrEmpty(quest.QuestStaticData.QuestProperty))
+			{
+				var main = this.Character.SessionObjects.Main;
+
+				if (!main.Properties.Has(quest.QuestStaticData.QuestProperty))
+				{
+					main.Properties.SetFloat(quest.QuestStaticData.QuestProperty, 1);
+					Send.ZC_OBJECT_PROPERTY(this.Character, main, quest.QuestStaticData.QuestProperty);
+				}
+				main.Properties.SetFloat(quest.QuestStaticData.QuestProperty, (int)quest.Status);
+				Send.ZC_OBJECT_PROPERTY(this.Character, main, quest.QuestStaticData.QuestProperty);
+				return;
+			}
+
 			var objectivesTable = this.ObjectivesToTable(quest);
 
 			var questTable = new LuaTable();
@@ -1411,9 +1197,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			var lua = "Melia.Quests.Update(" + questTable.Serialize() + ")";
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
-
-			this.UpdateClient_QuestStatusProperty(quest);
-			this.UpdateClient_QuestMarks();
 
 			//Log.Debug(lua);
 
@@ -1429,176 +1212,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="quest"></param>
 		private void UpdateClient_RemoveQuest(Quest quest)
 		{
+			if (ZoneServer.Instance.Data.QuestDb.TryFind((int)quest.Data.Id.Value, out var questData) && quest.SessionObjectStaticData != null)
+			{
+				this.Character.SessionObjects.Remove(quest.SessionObjectStaticData.Id);
+				Send.ZC_SESSION_OBJ_REMOVE(this.Character, quest.SessionObjectStaticData.Id);
+				return;
+			}
+
 			var lua = $"Melia.Quests.Remove('{quest.ObjectIdStr}')";
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
-
-			this.UpdateClient_QuestMarks();
 		}
-
-		/// <summary>
-		/// Updates the markers displayed above the quest NPCs on the
-		/// character's current map.
-		/// </summary>
-		public void UpdateClient_QuestMarks()
-		{
-			var map = this.Character.Map;
-
-			if (map == null || map == Map.Limbo)
-				return;
-
-			var marks = new Dictionary<string, (QuestMarkType Type, QuestType QuestType, string Icon)>();
-
-			foreach (var questScript in QuestScript.GetAll())
-			{
-				if (!questScript.Data.TryGetPhase(QuestStatus.Possible, out var phase))
-					continue;
-
-				if (!this.IsMarkPhaseOn(phase, map))
-					continue;
-
-				if (this.Has(questScript.Data.Id) || !this.MeetsPrerequisites(questScript))
-					continue;
-
-				var markType = QuestMarkType.Available;
-				AddMarkType(marks, phase.NpcUniqueName, markType, questScript.Data.Type, GetMarkIcon(markType, questScript.Data.Type));
-			}
-
-			foreach (var quest in this.GetList())
-			{
-				if (!quest.InProgress)
-					continue;
-
-				if (!TryGetCurrentPhase(quest, out var phase))
-					continue;
-
-				if (!this.IsMarkPhaseOn(phase, map))
-					continue;
-
-				var markType = quest.ObjectivesCompleted ? QuestMarkType.Complete : QuestMarkType.InProgress;
-				AddMarkType(marks, phase.NpcUniqueName, markType, quest.Data.Type, GetMarkIcon(markType, quest.Data.Type));
-			}
-
-			var npcs = map.GetNpcs(a => a.Id != MonsterId.HiddenTrigger && a.UniqueName != null && marks.ContainsKey(a.UniqueName));
-
-			var entries = new StringBuilder();
-			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, "Melia.QuestMarks.Begin()");
-
-			foreach (var npc in npcs)
-			{
-				entries.Append($"[\"{npc.GetClientDialogName()}\"]=\"{marks[npc.UniqueName].Icon}\",");
-
-				if (entries.Length > MaxMarkScriptLength)
-				{
-					Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, "Melia.QuestMarks.Add({" + entries + "})");
-					entries.Clear();
-				}
-			}
-
-			if (entries.Length > 0)
-				Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, "Melia.QuestMarks.Add({" + entries + "})");
-
-			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, "Melia.QuestMarks.Commit()");
-		}
-
-		/// <summary>
-		/// Re-shows the client's quest tracker, which the client hides when
-		/// the character's layer changes.
-		/// </summary>
-		public void RefreshChase()
-		{
-			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, "M_CHASE_UPDATE_VISIBILITY()");
-		}
-
-		/// <summary>
-		/// Mirrors the quest's status onto the session property the client
-		/// tracks it by, so the client's own quest UI and minimap markers
-		/// agree with the quest's real state.
-		/// </summary>
-		/// <param name="quest"></param>
-		private void UpdateClient_QuestStatusProperty(Quest quest)
-		{
-			var propertyName = quest.QuestStaticData?.QuestProperty;
-			if (string.IsNullOrEmpty(propertyName) || propertyName == "None")
-				return;
-
-			this.Character.SetProperty(this.Character.SessionObjects.Main, propertyName, (float)quest.Status);
-		}
-
-		/// <summary>
-		/// Returns true if the phase puts a marker on an NPC on the given
-		/// map.
-		/// </summary>
-		/// <param name="phase"></param>
-		/// <param name="map"></param>
-		/// <returns></returns>
-		private bool IsMarkPhaseOn(QuestPhase phase, Map map)
-		{
-			if (string.IsNullOrWhiteSpace(phase.NpcUniqueName))
-				return false;
-
-			return string.IsNullOrEmpty(phase.MapClassName) || phase.MapClassName == map.ClassName;
-		}
-
-		/// <summary>
-		/// Notes the marker for the NPC, keeping the more important one if
-		/// it already has a marker from another quest. A main quest shadows
-		/// a sub quest of the same kind, being the one the chain gives next.
-		/// </summary>
-		/// <param name="marks"></param>
-		/// <param name="npcUniqueName"></param>
-		/// <param name="markType"></param>
-		/// <param name="questType"></param>
-		/// <param name="icon"></param>
-		private static void AddMarkType(Dictionary<string, (QuestMarkType Type, QuestType QuestType, string Icon)> marks, string npcUniqueName, QuestMarkType markType, QuestType questType, string icon)
-		{
-			if (marks.TryGetValue(npcUniqueName, out var existing))
-			{
-				if (existing.Type > markType)
-					return;
-
-				if (existing.Type == markType && (existing.QuestType == QuestType.Main || questType != QuestType.Main))
-					return;
-			}
-
-			marks[npcUniqueName] = (markType, questType, icon);
-		}
-
-		/// <summary>
-		/// Returns the effect name for the given marker state and quest
-		/// type, mirroring the client's own mark naming.
-		/// </summary>
-		/// <param name="markType"></param>
-		/// <param name="questType"></param>
-		/// <returns></returns>
-		private static string GetMarkIcon(QuestMarkType markType, QuestType questType)
-		{
-			var stateName = markType switch
-			{
-				QuestMarkType.Available => "possible",
-				QuestMarkType.InProgress => "progress",
-				QuestMarkType.Complete => "success",
-				_ => null,
-			};
-
-			if (stateName == null)
-				return null;
-
-			return "I_quest_mask_" + stateName + GetMarkTail(questType);
-		}
-
-		/// <summary>
-		/// Returns the effect name suffix for the given quest type.
-		/// </summary>
-		/// <param name="questType"></param>
-		/// <returns></returns>
-		private static string GetMarkTail(QuestType questType) => questType switch
-		{
-			QuestType.Sub => "_sub",
-			QuestType.Repeat => "_repeat",
-			QuestType.Party => "_party",
-			QuestType.KeyItem => "_key",
-			_ => "",
-		};
 
 		/// <summary>
 		/// Notifies the client that the quest was completed.
@@ -1606,195 +1229,18 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="quest"></param>
 		private void UpdateClient_CompleteQuest(Quest quest)
 		{
+			if (ZoneServer.Instance.Data.QuestDb.TryFind((int)quest.Data.Id.Value, out var questData) && !string.IsNullOrEmpty(questData.QuestProperty))
+			{
+				var main = this.Character.SessionObjects.Main;
+				var propertyName = questData.QuestProperty;
+
+				main.Properties.SetFloat(propertyName, (float)QuestStatus.Completed);
+				Send.ZC_OBJECT_PROPERTY(this.Character, main, propertyName);
+				return;
+			}
+
 			var lua = $"Melia.Quests.Remove('{quest.ObjectIdStr}')";
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
-		}
-
-		/// <summary>
-		/// Returns the phase the quest is in, based on its status and
-		/// whether its objectives are done.
-		/// </summary>
-		/// <param name="quest"></param>
-		/// <param name="phase"></param>
-		/// <returns></returns>
-		public static bool TryGetCurrentPhase(Quest quest, out QuestPhase phase)
-		{
-			var status = quest.ObjectivesCompleted ? QuestStatus.Success : quest.Status;
-
-			if (quest.Data.TryGetPhase(status, out phase))
-				return true;
-			if (quest.Data.TryGetPhase(QuestStatus.InProgress, out phase))
-				return true;
-
-			return quest.Data.TryGetPhase(QuestStatus.Possible, out phase);
-		}
-
-		/// <summary>
-		/// Returns the map and position the quest's current phase points at,
-		/// which is where the quest's return warp sends the character.
-		/// </summary>
-		/// <param name="quest"></param>
-		/// <param name="mapClassName"></param>
-		/// <param name="position"></param>
-		/// <returns></returns>
-		public static bool TryGetPhaseDestination(Quest quest, out string mapClassName, out Position position)
-		{
-			mapClassName = null;
-			position = Position.Zero;
-
-			var hasPhase = TryGetCurrentPhase(quest, out var phase);
-
-			if (hasPhase && phase.WarpPosition.HasValue && !string.IsNullOrEmpty(phase.MapClassName))
-			{
-				mapClassName = phase.MapClassName;
-				position = phase.WarpPosition.Value;
-
-				return true;
-			}
-
-			// Quests with no phases still name their giver, who takes the turn-in in practice.
-			var npcUniqueNames = new[] { hasPhase ? phase.NpcUniqueName : null, quest.Data.EndNpcUniqueName, quest.Data.StartNpcUniqueName };
-			var phaseMapClassName = hasPhase ? phase.MapClassName : null;
-
-			foreach (var npcUniqueName in npcUniqueNames)
-			{
-				if (string.IsNullOrEmpty(npcUniqueName))
-					continue;
-
-				if (!TryFindQuestNpc(quest.Data, npcUniqueName, phaseMapClassName, out var npc))
-					continue;
-
-				mapClassName = npc.Map.ClassName;
-				position = GetReturnWarpPosition(npc);
-
-				return true;
-			}
-
-			if (!hasPhase || string.IsNullOrEmpty(phase.MapClassName) || phase.Position == Position.Zero)
-				return false;
-
-			mapClassName = phase.MapClassName;
-			position = phase.Position;
-
-			return true;
-		}
-
-		/// <summary>
-		/// Returns the map and position of the NPC that offers the quest,
-		/// which is where the return warp sends a character who can take it.
-		/// </summary>
-		/// <param name="questData"></param>
-		/// <param name="mapClassName"></param>
-		/// <param name="position"></param>
-		/// <returns></returns>
-		public static bool TryGetStartDestination(QuestData questData, out string mapClassName, out Position position)
-		{
-			mapClassName = null;
-			position = Position.Zero;
-
-			var hasPhase = questData.TryGetPhase(QuestStatus.Possible, out var phase);
-
-			if (hasPhase && phase.WarpPosition.HasValue && !string.IsNullOrEmpty(phase.MapClassName))
-			{
-				mapClassName = phase.MapClassName;
-				position = phase.WarpPosition.Value;
-
-				return true;
-			}
-
-			var npcUniqueNames = new[] { hasPhase ? phase.NpcUniqueName : null, questData.StartNpcUniqueName };
-			var phaseMapClassName = hasPhase ? phase.MapClassName : null;
-
-			foreach (var npcUniqueName in npcUniqueNames)
-			{
-				if (!TryFindQuestNpc(questData, npcUniqueName, phaseMapClassName, out var npc))
-					continue;
-
-				mapClassName = npc.Map.ClassName;
-				position = GetReturnWarpPosition(npc);
-
-				return true;
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Returns the NPC a quest names, whether it uses the NPC's unique
-		/// name or its display name, which is how custom quests point at
-		/// their giver.
-		/// </summary>
-		/// <param name="questData"></param>
-		/// <param name="npcName"></param>
-		/// <param name="mapClassName"></param>
-		/// <param name="npc"></param>
-		/// <returns></returns>
-		private static bool TryFindQuestNpc(QuestData questData, string npcName, string mapClassName, out IMonster npc)
-		{
-			npc = null;
-
-			if (string.IsNullOrEmpty(npcName))
-				return false;
-
-			if (ZoneServer.Instance.World.TryGetMonster(a => a.UniqueName == npcName, out npc))
-				return true;
-
-			// The same display name can be used on several maps, so prefer the one the quest places it on.
-			var location = !string.IsNullOrEmpty(mapClassName) ? mapClassName : questData.QuestGiverLocation;
-
-			if (!string.IsNullOrEmpty(location)
-				&& ZoneServer.Instance.World.TryGetMap(location, out var map)
-				&& map.TryGetMonster(a => GetNpcDisplayName(a) == npcName, out npc))
-			{
-				return true;
-			}
-
-			return ZoneServer.Instance.World.TryGetMonster(a => GetNpcDisplayName(a) == npcName, out npc);
-		}
-
-		/// <summary>
-		/// Returns the spot in front of the NPC that the return warp puts
-		/// the character on, closing in on the NPC and then searching around
-		/// the spot when what's directly in front isn't standable.
-		/// </summary>
-		/// <param name="npc"></param>
-		/// <returns></returns>
-		private static Position GetReturnWarpPosition(IMonster npc)
-		{
-			var npcPosition = npc.Position;
-			var ground = npc.Map.Ground;
-
-			// Stepping inwards keeps the player in front of the NPC and every step reachable from them.
-			for (var distance = ReturnWarpNpcDistance; distance >= ReturnWarpStepDistance; distance -= ReturnWarpStepDistance)
-			{
-				var stepPosition = npcPosition.GetRelative(npc.Direction, distance);
-
-				if (ground.AnyObstacles(npcPosition, stepPosition) || !ground.TryGetHeightAt(stepPosition, out var stepHeight))
-					continue;
-
-				return stepPosition.WithHeight(stepHeight);
-			}
-
-			var targetPosition = npcPosition.GetRelative(npc.Direction, ReturnWarpNpcDistance);
-
-			if (ground.TryGetNearestValidPosition(targetPosition, out var nearestPosition))
-				return nearestPosition;
-
-			return npcPosition;
-		}
-
-		/// <summary>
-		/// Returns the NPC's display name with the client's line break
-		/// removed, or null if it has none.
-		/// </summary>
-		/// <param name="npc"></param>
-		/// <returns></returns>
-		private static string GetNpcDisplayName(IMonster npc)
-		{
-			if (npc == null || string.IsNullOrEmpty(npc.Name))
-				return null;
-
-			return npc.Name.Replace("{nl}", " ").Trim();
 		}
 
 		/// <summary>
@@ -1839,9 +1285,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			var rewardsTable = new LuaTable();
 			foreach (var reward in quest.Data.Rewards)
 			{
-				if (!reward.Displayed)
-					continue;
-
 				var rewardTable = new LuaTable();
 				rewardTable.Insert("Text", reward.ToString());
 				rewardTable.Insert("Icon", reward.Icon);
@@ -1882,11 +1325,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			questTable.Insert("ObjectId", "0x" + quest.ObjectId.ToString("X16"));
 			questTable.Insert("ClassId", "0x" + quest.Data.Id.Value.ToString("X16"));
-
-			// Sent only for quests the client knows by id, so its absence marks a custom quest.
-			if (quest.QuestStaticData != null && quest.Data.Id.NamespaceId == 0)
-				questTable.Insert("ClientId", quest.QuestStaticData.Id);
-
 			questTable.Insert("Name", quest.Data.Name);
 			questTable.Insert("Description", quest.Data.Description);
 			questTable.Insert("Location", locationName);
@@ -1900,21 +1338,12 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			questTable.Insert("Rewards", rewardsTable);
 
 			// Add quest giver information if available
-			var questGiverName = TryFindQuestNpc(quest.Data, quest.Data.StartNpcUniqueName, null, out var questGiver)
-				? GetNpcDisplayName(questGiver)
-				: null;
-
-			if (!string.IsNullOrEmpty(questGiverName))
-				questTable.Insert("QuestGiver", questGiverName);
+			if (!string.IsNullOrEmpty(quest.Data.StartNpcUniqueName))
+				questTable.Insert("QuestGiver", quest.Data.StartNpcUniqueName);
 
 			// Add quest giver location if available
 			if (!string.IsNullOrEmpty(questGiverLocationName))
 				questTable.Insert("QuestGiverLocation", questGiverLocationName);
-
-			// The client's return warp compares this with the map it's on to
-			// tell a local warp from a map change.
-			if (quest.ObjectivesCompleted && TryGetPhaseDestination(quest, out var warpMapClassName, out _))
-				questTable.Insert("WarpMap", warpMapClassName);
 
 			return questTable;
 		}
@@ -1939,7 +1368,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				objectiveTable.Insert("Done", progress.Done);
 				objectiveTable.Insert("Count", progress.Count);
 				objectiveTable.Insert("TargetCount", objective.TargetCount);
-				objectiveTable.Insert("Unlimited", objective is UnlimitedKillObjective);
+				objectiveTable.Insert("Unlimited", objective is UnlimitedKillObjective || objective is WorldBossParticipationObjective);
 
 				// Add monster names for collection objectives with drop modifiers
 				if (objective is CollectItemObjective collectObjective)
@@ -2045,15 +1474,43 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			if (this.TryGetById(questId, out var quest))
 			{
+				var character = this.Character;
 				var progress = quest.Progresses[objectiveId];
-				this.UpdateClient_ObjectiveProperty(quest, objectiveId);
+				if (quest.QuestStaticData != null)
+				{
+					var mainSessionObject = character.SessionObjects.Get(SessionObjectId.Main);
+					// In case quest doesn't exist, set it's state to started (1)
+					if (!mainSessionObject.Properties.Has(quest.QuestStaticData.QuestProperty))
+					{
+						mainSessionObject.Properties.SetFloat(quest.QuestStaticData.QuestProperty, 1);
+						Send.ZC_OBJECT_PROPERTY(character, mainSessionObject, quest.QuestStaticData.QuestProperty);
+					}
+
+					var questSessionObject = character.SessionObjects.GetOrCreate(quest.SessionObjectStaticData.Id);
+					if (questSessionObject != null)
+					{
+						string propertyName;
+						if (quest.Progresses[objectiveId].Objective is KillObjective)
+							propertyName = $"KillMonster{objectiveId + 1}";
+						else
+							propertyName = $"QuestInfoValue{objectiveId + 1}";
+
+						questSessionObject.Properties.SetFloat(propertyName, quest.ProgressValue(objectiveId));
+						Send.ZC_OBJECT_PROPERTY(character, questSessionObject, propertyName);
+						if (progress.Done)
+						{
+							var goalPropertyName = $"Goal{objectiveId + 1}";
+							questSessionObject.Properties.SetFloat(goalPropertyName, 1);
+							Send.ZC_OBJECT_PROPERTY(character, questSessionObject, goalPropertyName);
+						}
+					}
+				}
 				if (QuestScript.TryGet(quest.Data.Id, out var questScript))
 					questScript.OnProgress(this.Character, quest, progress.Objective.Id, quest.ProgressValue(objectiveId));
 				if (quest.IsCompletable)
 				{
 					quest.Status = QuestStatus.Success;
 					questScript?.OnSuccess(this.Character, quest);
-					this.UpdateTrackBinding(quest);
 				}
 			}
 		}
@@ -2067,155 +1524,50 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			if (this.TryGetById(questId, out var quest))
 			{
+				var character = this.Character;
 				var progress = quest.Progresses[objectiveId];
-				this.UpdateClient_ObjectiveProperty(quest, objectiveId);
+				if (quest.QuestStaticData != null)
+				{
+					var mainSessionObject = character.SessionObjects.Get(SessionObjectId.Main);
+					// In case quest doesn't exist, set it's state to started (1)
+					if (!mainSessionObject.Properties.Has(quest.QuestStaticData.QuestProperty))
+					{
+						mainSessionObject.Properties.SetFloat(quest.QuestStaticData.QuestProperty, 1);
+						Send.ZC_OBJECT_PROPERTY(character, mainSessionObject, quest.QuestStaticData.QuestProperty);
+					}
+
+					var questSessionObject = character.SessionObjects.GetOrCreate(quest.SessionObjectStaticData.Id);
+					if (questSessionObject != null)
+					{
+						string propertyName;
+						if (quest.Progresses[objectiveId].Objective is KillObjective)
+							propertyName = $"KillMonster{objectiveId + 1}";
+						else
+							propertyName = $"QuestInfoValue{objectiveId + 1}";
+
+						questSessionObject.Properties.SetFloat(propertyName, quest.ProgressValue(objectiveId));
+						Send.ZC_OBJECT_PROPERTY(character, questSessionObject, propertyName);
+						if (progress.Done)
+						{
+							var goalPropertyName = $"Goal{objectiveId + 1}";
+							questSessionObject.Properties.SetFloat(goalPropertyName, 1);
+							Send.ZC_OBJECT_PROPERTY(character, questSessionObject, goalPropertyName);
+						}
+					}
+				}
 				if (QuestScript.TryGet(quest.Data.Id, out var questScript))
 					questScript.OnProgress(this.Character, quest, progress.Objective.Id, quest.ProgressValue(objectiveId));
 				if (quest.IsCompletable)
 				{
 					quest.Status = QuestStatus.Success;
 					questScript?.OnSuccess(this.Character, quest);
-					this.UpdateTrackBinding(quest);
 				}
-			}
-		}
-
-		/// <summary>
-		/// Raises the character's progress on the given quest to the furthest
-		/// point any of the source characters reached, so a player joining a
-		/// party track starts where the party already is.
-		/// </summary>
-		/// <param name="questId"></param>
-		/// <param name="sources"></param>
-		public void SyncProgressFrom(long questId, IEnumerable<Character> sources)
-		{
-			if (!this.TryGetById(questId, out var quest))
-				return;
-
-			// Read outside this character's lock, so no two members' quest locks are ever nested.
-			var sourceProgresses = new List<(string Ident, int Count, bool Done, bool Unlocked)>();
-
-			foreach (var source in sources)
-			{
-				if (source == this.Character || source?.Quests == null)
-					continue;
-
-				if (!source.Quests.TryGetById(questId, out var sourceQuest))
-					continue;
-
-				foreach (var src in sourceQuest.Progresses)
-					sourceProgresses.Add((src.Objective.Ident, src.Count, src.Done, src.Unlocked));
-			}
-
-			lock (_syncLock)
-			{
-				var changed = false;
-
-				foreach (var src in sourceProgresses)
-				{
-					if (!quest.TryGetProgress(src.Ident, out var dst))
-						continue;
-
-					if (src.Count > dst.Count)
-					{
-						dst.Count = src.Count;
-						changed = true;
-					}
-
-					if (src.Done && !dst.Done)
-					{
-						dst.SetDone();
-						changed = true;
-					}
-
-					if (src.Unlocked && !dst.Unlocked)
-					{
-						dst.Unlocked = true;
-						changed = true;
-					}
-				}
-
-				if (!changed)
-					return;
-
-				for (var i = 0; i < quest.Progresses.Count; i++)
-					this.UpdateClient_ObjectiveProperty(quest, i);
-			}
-
-			this.UpdateClient_UpdateQuest(quest);
-
-			// Arriving on a fight the party has already won ends the track
-			// here, the same way the last kill would have.
-			if (quest.IsCompletable)
-			{
-				quest.Status = QuestStatus.Success;
-
-				if (QuestScript.TryGet(quest.Data.Id, out var questScript))
-					questScript.OnSuccess(this.Character, quest);
-
-				this.UpdateTrackBinding(quest);
-			}
-		}
-
-		/// <summary>
-		/// Creates the quest's own session object and sends it, so the
-		/// client's tracker has the object it reads counts from.
-		/// </summary>
-		/// <param name="quest"></param>
-		private void UpdateClient_AddQuestSessionObject(Quest quest)
-		{
-			if (quest.QuestStaticData == null || quest.SessionObjectStaticData == null)
-				return;
-
-			var questSessionObject = this.Character.SessionObjects.GetOrCreate(quest.SessionObjectStaticData.Id);
-			if (questSessionObject == null)
-				return;
-
-			Send.ZC_SESSION_OBJ_ADD(this.Character, questSessionObject, quest.QuestStaticData.Id);
-		}
-
-		/// <summary>
-		/// Mirrors an objective's progress onto the quest's own session
-		/// object, which the client's tracker reads its counts from.
-		/// </summary>
-		/// <param name="quest"></param>
-		/// <param name="objectiveId"></param>
-		private void UpdateClient_ObjectiveProperty(Quest quest, int objectiveId)
-		{
-			if (quest.QuestStaticData == null || quest.SessionObjectStaticData == null)
-				return;
-
-			var progress = quest.Progresses[objectiveId];
-
-			var questSessionObject = this.Character.SessionObjects.GetOrCreate(quest.SessionObjectStaticData.Id);
-			if (questSessionObject == null)
-				return;
-
-			var propertyName = progress.Objective is KillObjective
-				? $"KillMonster{objectiveId + 1}"
-				: $"QuestInfoValue{objectiveId + 1}";
-
-			if (!PropertyTable.Exists("SessionObject", propertyName))
-				return;
-
-			questSessionObject.Properties.SetFloat(propertyName, quest.ProgressValue(objectiveId));
-			Send.ZC_OBJECT_PROPERTY(this.Character, questSessionObject, propertyName);
-
-			if (progress.Done)
-			{
-				var goalPropertyName = $"Goal{objectiveId + 1}";
-
-				if (!PropertyTable.Exists("SessionObject", goalPropertyName))
-					return;
-
-				questSessionObject.Properties.SetFloat(goalPropertyName, 1);
-				Send.ZC_OBJECT_PROPERTY(this.Character, questSessionObject, goalPropertyName);
 			}
 		}
 
 		public IList<Quest> GetCompletedQuests()
 		{
-			lock (_syncLock)
+			lock (_quests)
 				return _quests.Where(a => a.Status == QuestStatus.Completed).ToList();
 		}
 
@@ -2249,7 +1601,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 									 $"for Quest {quest.Data.Id.Value} by reaching {visitObjective.TargetPosition} (Radius: {visitObjective.TargetRadius}).");
 
 							progress.SetDone();
-							this.UpdateUnlock(quest); // Potentially unlocks next objective
+							quest.UpdateUnlock(); // Potentially unlocks next objective
 							questModifiedInThisIteration = true; // Mark that quest state changed
 
 							// --- Handle OnProgress/OnSuccess Callbacks ---
@@ -2321,17 +1673,34 @@ namespace Melia.Zone.World.Actors.Characters.Components
 							if (progress.Count >= variableObjective.TargetCount)
 							{
 								progress.SetDone();
-								this.UpdateUnlock(quest); // Potentially unlocks next objective
+								quest.UpdateUnlock(); // Potentially unlocks next objective
+								questModifiedInThisIteration = true; // Mark that quest state changed
+
+								// Handle OnProgress/OnSuccess Callbacks
+								if (QuestScript.TryGet(quest.Data.Id, out var callbackScript))
+								{
+									callbackScript.OnProgress(this.Character, quest, progress.Objective.Id, progress.Count);
+								}
+								else if (quest.Data.Id.NamespaceId != 0)
+								{
+									Log.Warning($"No QuestScript found for procedural quest {quest.Data.Id.Value} during VariableCheckObjective completion.");
+								}
+
+								if (quest.IsCompletable && quest.Status < QuestStatus.Success)
+								{
+									quest.Status = QuestStatus.Success;
+									Log.Debug($"Quest {quest.Data.Id.Value} now in Success state after variable check.");
+									callbackScript?.OnSuccess(this.Character, quest);
+								}
+
+								// If this quest is now fully done, no need to check its other objectives in this pass
+								if (quest.ObjectivesCompleted) break;
 							}
-
-							// Updates the client's session property, runs the
-							// script's callbacks and moves the quest and its
-							// track along once the last objective is done.
-							this.UpdateQuestProgress(quest.Data.Id, progress.Objective.Id);
-							questModifiedInThisIteration = true;
-
-							// If this quest is now fully done, no need to check its other objectives in this pass
-							if (quest.ObjectivesCompleted) break;
+							else
+							{
+								// Value changed but not complete yet - still need to update the client
+								questModifiedInThisIteration = true;
+							}
 						}
 					}
 				}

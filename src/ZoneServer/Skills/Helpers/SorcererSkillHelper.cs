@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
@@ -112,6 +112,35 @@ namespace Melia.Zone.Skills.Helpers
 		public static Skill GetSkill(this Character character, SkillId skillId)
 		{
 			return character.Skills.Get(skillId);
+		}
+
+		/// <summary>
+		/// Gets the level of an ability if active.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="abilityId"></param>
+		/// <returns>The ability level, or 0 if not active.</returns>
+		public static int GetAbilityLevel(this Character character, AbilityId abilityId)
+		{
+			var ability = character.Abilities.Get(abilityId);
+			if (ability != null && ability.Active)
+				return ability.Level;
+
+			return 0;
+		}
+
+		/// <summary>
+		/// Gets the level of an ability if active for any combat entity.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="abilityId"></param>
+		/// <returns>The ability level, or 0 if not active or not a character.</returns>
+		public static int GetAbilityLevel(this ICombatEntity entity, AbilityId abilityId)
+		{
+			if (entity is Character character)
+				return character.GetAbilityLevel(abilityId);
+
+			return 0;
 		}
 
 		/// <summary>

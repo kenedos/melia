@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.Skills.Helpers
 {
@@ -146,7 +145,7 @@ namespace Melia.Zone.Skills.Helpers
 			this.Token = token;
 		}
 
-		public Task Delay(int milliseconds) => GameClock.Delay(milliseconds, this.Token);
-		public Task Delay(TimeSpan time) => GameClock.Delay(time, this.Token);
+		public Task Delay(int milliseconds) => Task.Delay(milliseconds, this.Token);
+		public Task Delay(TimeSpan time) => Task.Delay(time, this.Token);
 	}
 }

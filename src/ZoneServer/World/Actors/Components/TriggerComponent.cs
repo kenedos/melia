@@ -8,7 +8,6 @@ using Melia.Zone.World.Actors.Pads;
 using Yggdrasil.Geometry;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.Components
 {
@@ -274,9 +273,6 @@ namespace Melia.Zone.World.Actors.Components
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
-			if (_destroyed || this.Actor.Map == null)
-				return;
-
 			// Make sure the elapsed time is not the full update time if
 			// we run for the first time, since the component might not
 			// have been around for the full update interval, which would
@@ -285,7 +281,7 @@ namespace Melia.Zone.World.Actors.Components
 			// we would want to know. TODO.
 			if (!_elapsedInitalized)
 			{
-				elapsed = Math2.Max(TimeSpan.Zero, GameClock.LocalNow - _creationTime);
+				elapsed = Math2.Max(TimeSpan.Zero, DateTime.Now - _creationTime);
 				_elapsedInitalized = true;
 			}
 
@@ -334,18 +330,15 @@ namespace Melia.Zone.World.Actors.Components
 				foreach (var a in _actorsInsideBuffer)
 					_nowInsideSet.Add(a);
 
-				// Find entered actors (in now but not in previous). Walked in
-				// list order rather than set order, which is the order the
-				// actors' identity hashes happen to fall in and differs
-				// between runs of the same fight.
+				// Find entered actors (in now but not in previous)
 				_tempEntered.Clear();
-				foreach (var a in _actorsInsideBuffer)
+				foreach (var a in _nowInsideSet)
 					if (!_actorsInsideSet.Contains(a))
 						_tempEntered.Add(a);
 
 				// Find left actors (in previous but not in now)
 				_tempLeft.Clear();
-				foreach (var a in _actorsInside)
+				foreach (var a in _actorsInsideSet)
 					if (!_nowInsideSet.Contains(a))
 						_tempLeft.Add(a);
 
@@ -470,7 +463,7 @@ namespace Melia.Zone.World.Actors.Components
 		internal void OnAddedToMap()
 		{
 			_destroyed = false;
-			_creationTime = GameClock.LocalNow;
+			_creationTime = DateTime.Now;
 
 			this.Created?.Invoke(this, new TriggerArgs(TriggerType.Create, this.Actor));
 		}

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
@@ -36,12 +35,6 @@ namespace Melia.Zone.World.Tracks
 		public Dialog Dialog { get; set; }
 
 		/// <summary>
-		/// Gets or sets the dialog sequence the track is playing, which its
-		/// closing frame waits on before it hands the player back.
-		/// </summary>
-		public Task PendingDialog { get; set; }
-
-		/// <summary>
 		/// Returns the track's current frame.
 		/// </summary>
 		public int Frame { get; set; }
@@ -52,40 +45,9 @@ namespace Melia.Zone.World.Tracks
 		public IActor[] Actors { get; set; }
 
 		/// <summary>
-		/// Gets or sets the party the track is shared with, or null for a
-		/// track that only its own character plays.
+		/// Returns if a battle box is created.
 		/// </summary>
-		public TrackGroup Group { get; set; }
-
-		/// <summary>
-		/// Gets or sets the character that created the track and owns the
-		/// cast on its shared layer.
-		/// </summary>
-		public Character Owner { get; set; }
-
-		/// <summary>
-		/// Gets or sets whether the track runs on past its cutscene, ending
-		/// with the quest instead.
-		/// </summary>
-		public bool HoldOpen { get; internal set; }
-
-		private bool _hasBattleBoxInLayer;
-
-		/// <summary>
-		/// Returns if a battle box is created, for the group when the track
-		/// is a party track.
-		/// </summary>
-		public bool HasBattleBoxInLayer
-		{
-			get => this.Group?.HasBattleBoxInLayer ?? this._hasBattleBoxInLayer;
-			internal set
-			{
-				this._hasBattleBoxInLayer = value;
-
-				if (value && this.Group != null)
-					this.Group.HasBattleBoxInLayer = true;
-			}
-		}
+		public bool HasBattleBoxInLayer { get; internal set; }
 
 		/// <summary>
 		/// Creates new track.

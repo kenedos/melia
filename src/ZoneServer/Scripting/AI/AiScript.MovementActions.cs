@@ -6,6 +6,7 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Logging;
+using Yggdrasil.Util; // For RandomProvider
 
 namespace Melia.Zone.Scripting.AI
 {

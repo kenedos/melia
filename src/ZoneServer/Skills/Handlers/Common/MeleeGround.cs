@@ -1,14 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
-using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Yggdrasil.Util;
 using static Melia.Zone.Skills.SkillUseFunctions;
@@ -21,8 +19,18 @@ namespace Melia.Zone.Skills.Handlers.Common
 	/// </summary>
 	[SkillHandler(SkillId.Normal_Attack, SkillId.Normal_Attack_TH, SkillId.Hammer_Attack, SkillId.Hammer_Attack_TH, SkillId.Common_DaggerAries,
 		SkillId.Sword_Attack, SkillId.SpearMaster_Attack, SkillId.SpearMaster_Attack_TH, SkillId.Common_StaffAttack)]
-	public class MeleeGroundSkillHandler : IMeleeGroundSkillHandler
+	public class MeleeGroundSkillHandler : IMeleeGroundSkillHandler, IGroundSkillHandler
 	{
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		{
+			var targets = new List<ICombatEntity>();
+
+			if (target != null)
+				targets.Add(target);
+
+			this.Handle(skill, caster, originPos, farPos, targets);
+		}
+
 		/// <summary>
 		/// Handles usage of the skill.
 		/// </summary>
@@ -42,7 +50,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, 0, null, includeCaster: false);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			if (caster is Character character && Feature.IsEnabled("BattleManager") && targets.Count > 0)
 				ZoneServer.Instance.World.BattleManager.StartBattle(character, targets[0]);
@@ -81,7 +89,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 			await skill.Wait(skillHitDelay);
 
 			var hits = new List<SkillHitInfo>();
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 
 			foreach (var target in targets)
 			{
@@ -98,11 +106,11 @@ namespace Melia.Zone.Skills.Handlers.Common
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				// This does not match the game, as the damage delay is the same for
+				// This is unofficial, as the damage delay is the same for
 				// multi hits in the logs, but if we don't do this, the
 				// animation isn't in sync with the weapon swing, which
 				// just doesn't look right. I honestly can't tell what
-				// the game's behavior is, because it kind of looks
+				// the official behavior is, because it kind of looks
 				// correct there for me, but that might very well be
 				// the lag at play...
 				var hitAniTime = aniTime;
@@ -110,8 +118,6 @@ namespace Melia.Zone.Skills.Handlers.Common
 					hitAniTime = TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / skillHitResult.HitCount);
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, hitAniTime, skillHitDelay);
-				SkillDamageHelper.ApplyExtraLines(skillHit);
-
 				hits.Add(skillHit);
 			}
 

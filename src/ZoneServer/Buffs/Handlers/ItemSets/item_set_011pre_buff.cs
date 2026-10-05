@@ -1,6 +1,5 @@
 using System;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
@@ -51,7 +50,7 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 				return;
 
 			// 1% chance to proc
-			var roll = GameRandom.Get().Next(1, 101);
+			var roll = RandomProvider.Get().Next(1, 101);
 			if (roll > ProcChance)
 				return;
 

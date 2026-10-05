@@ -59,14 +59,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("None", 0.7f),
 			};
 
-			if (!caster.Position.InRange2D(target.Position, 300))
-				return;
-
-			var positions = GetScatteredPositions(GetLeadPosition(target, 1300, caster), 11, 140, 40);
 			var delays = new[] { 100, 200, 100, 100, 100, 100, 100, 100, 100, 100 };
-			for (var i = 0; i < positions.Count; i++)
+			for (var i = 0; i < 11; i++)
 			{
-				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(positions[i], 250f), config);
+				var position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 140);
+				await MissileThrow(skill, caster, position, config);
 
 				if (i < delays.Length)
 					await skill.Wait(TimeSpan.FromMilliseconds(delays[i]));

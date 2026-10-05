@@ -16,7 +16,6 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
-using Melia.Zone.World.Patrols;
 using Melia.Zone.World.Spawning;
 using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
@@ -60,15 +59,10 @@ namespace Melia.Zone.World
 		public int Count => this.Maps.Count;
 
 		/// <summary>
-		/// The delay between heartbeat ticks, in milliseconds.
-		/// </summary>
-		public const int HeartbeatDelay = 10;
-
-		/// <summary>
 		/// Returns the world's heartbeat, a manager for regularly
 		/// occurring events.
 		/// </summary>
-		public Heartbeat Heartbeat { get; } = new Heartbeat(HeartbeatDelay);
+		public Heartbeat Heartbeat { get; } = new Heartbeat(10);
 
 		/// <summary>
 		/// Returns the world's day/night cycle manager.
@@ -115,11 +109,6 @@ namespace Melia.Zone.World
 		/// all loaded maps.
 		/// </summary>
 		public MapManager Maps { get; } = new MapManager();
-
-		/// <summary>
-		/// Returns the manager for the monster patrols of dungeon maps.
-		/// </summary>
-		public PatrolManager Patrols { get; } = new PatrolManager();
 
 		/// <summary>
 		/// Returns the world's trades.
@@ -273,8 +262,6 @@ namespace Melia.Zone.World
 		private void InitUpdatables()
 		{
 			this.Heartbeat.Add(new TimeEventRaiser());
-			this.Heartbeat.Add(new AmbushManager());
-			this.Heartbeat.Add(this.Patrols);
 			if (Feature.IsEnabled(FeatureId.DayNightCycle))
 				this.Heartbeat.Add(this.DayNightCycle = new DayNightCycle());
 			if (Feature.IsEnabled(FeatureId.BattleManager))

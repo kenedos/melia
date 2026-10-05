@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.L10N;
-using Melia.Shared.Util;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
@@ -271,7 +270,7 @@ namespace Melia.Zone.Scripting.Extensions.LivelyDialog
 			if (memory > 5)
 				return string.Format(Localization.Get("({0} is really giving me a friendly vibe.)"), npcName);
 
-			var rnd = GameRandom.Get();
+			var rnd = RandomProvider.Get();
 			switch (rnd.Next(4))
 			{
 				default:

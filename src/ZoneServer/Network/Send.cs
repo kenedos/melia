@@ -18,7 +18,6 @@ using Melia.Zone.Events;
 using Melia.Zone.Network.Helpers;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
-using Melia.Zone.Skills.Helpers;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors;
@@ -505,7 +504,6 @@ namespace Melia.Zone.Network
 				var compressedData = packet.CompressData(p =>
 				{
 					var quickSlotsStr = serialized.Split('#', StringSplitOptions.RemoveEmptyEntries);
-					var claimedItemIds = new HashSet<long>();
 
 					p.PutByte(quickSlotRows);
 
@@ -519,39 +517,32 @@ namespace Melia.Zone.Network
 
 						if (type == QuickSlotType.Item)
 						{
-							// Object ids don't survive a relog, so a slot is
-							// saved with the item's database id and matched
-							// back to whichever object holds it now.
-							Item item = null;
-
-							if (objectId != 0)
-							{
-								item = character.Inventory.GetItems().Values.FirstOrDefault(a => a.Id == id && a.DbId == objectId)
-									?? character.Inventory.GetEquip().Values.FirstOrDefault(a => a.Id == id && a.DbId == objectId);
-
-								if (item == null && character.Inventory.TryGetItemOrEquip(objectId, out var sessionItem) && sessionItem.Id == id)
-									item = sessionItem;
-							}
-
-							if (item == null)
-							{
-								// Items of one class are interchangeable,
-								// except skill scrolls, where the skill and
-								// its level live on the item itself.
-								item = character.Inventory.GetItems().Values.FirstOrDefault(a => a.Id == id && (!a.IsSkillScroll || !claimedItemIds.Contains(a.ObjectId)))
-									?? character.Inventory.GetEquip().Values.FirstOrDefault(a => a.Id == id && (!a.IsSkillScroll || !claimedItemIds.Contains(a.ObjectId)));
-							}
-
-							if (item != null)
+							if (character.Inventory.TryGetItemOrEquip(objectId, out var item) && item.Id == id)
 							{
 								objectId = item.ObjectId;
-								claimedItemIds.Add(objectId);
 							}
 							else
 							{
-								type = QuickSlotType.None;
-								id = 0;
-								objectId = 0;
+								item = character.Inventory.GetItems().Values.FirstOrDefault(item => item.Id == id);
+								if (item != null)
+								{
+									objectId = item.ObjectId;
+								}
+								else
+								{
+									item = character.Inventory.GetEquip().Values.FirstOrDefault(item => item.Id == id);
+
+									if (item != null)
+									{
+										objectId = item.ObjectId;
+									}
+									else
+									{
+										type = QuickSlotType.None;
+										id = 0;
+										objectId = 0;
+									}
+								}
 							}
 						}
 
@@ -630,7 +621,7 @@ namespace Melia.Zone.Network
 			// but it's a bit long for that. A couple dozens updates
 			// ago there were also only two bytes before the properties,
 			// but one garbage byte at the end of the packet to pad it.
-			// We'll just mimic the game's packets for now.
+			// We'll just mimic the official packets for now.
 			//
 			// Alternative theory: It could also be a string that wasn't
 			// zeroed, and maybe a few bytes or something.
@@ -726,7 +717,7 @@ namespace Melia.Zone.Network
 		/// <param name="hits"></param>
 		public static void ZC_SKILL_FORCE_TARGET(ICombatEntity entity, ICombatEntity target, Skill skill, int forceId, IEnumerable<SkillHitInfo> hits)
 		{
-			var shootTime = SkillTimingHelper.GetClientShootTime(entity, skill, skill.Properties.GetFloatSafe(PropertyName.ShootTime));
+			var shootTime = skill.Properties.GetFloatSafe(PropertyName.ShootTime);
 			var sklSpdRate = skill.Properties.GetFloatSafe(PropertyName.SklSpdRate);
 
 			using var packet = Packet.Rent(Op.ZC_SKILL_FORCE_TARGET);
@@ -775,7 +766,7 @@ namespace Melia.Zone.Network
 		/// <param name="hits"></param>
 		public static void ZC_SKILL_FORCE_TARGET_DUMMY(ICombatEntity entity, ICombatEntity target, Skill skill, SkillId visualSkillId, int forceId, IEnumerable<SkillHitInfo> hits)
 		{
-			var shootTime = SkillTimingHelper.GetClientShootTime(entity, skill, skill.Properties.GetFloat(PropertyName.ShootTime));
+			var shootTime = skill.Properties.GetFloat(PropertyName.ShootTime);
 			var sklSpdRate = skill.Properties.GetFloat(PropertyName.SklSpdRate);
 
 			using var packet = Packet.Rent(Op.ZC_SKILL_FORCE_TARGET);
@@ -817,7 +808,7 @@ namespace Melia.Zone.Network
 		/// <param name="hits"></param>
 		public static void ZC_SKILL_FORCE_GROUND(ICombatEntity entity, Skill skill, Position targetPos, int forceId, IEnumerable<SkillHitInfo> hits)
 		{
-			var shootTime = SkillTimingHelper.GetClientShootTime(entity, skill, skill.Properties.GetFloat(PropertyName.ShootTime));
+			var shootTime = skill.Properties.GetFloat(PropertyName.ShootTime);
 			var sklSpdRate = skill.Properties.GetFloat(PropertyName.SklSpdRate);
 
 			using var packet = Packet.Rent(Op.ZC_SKILL_FORCE_GROUND);
@@ -889,10 +880,9 @@ namespace Melia.Zone.Network
 		/// <param name="targetPos"></param>
 		/// <param name="forceId"></param>
 		/// <param name="hits"></param>
-		/// <param name="includeCaster"></param>
-		public static void ZC_SKILL_MELEE_GROUND(ICombatEntity entity, Skill skill, Position targetPos, int forceId, IEnumerable<SkillHitInfo> hits, bool includeCaster = true)
+		public static void ZC_SKILL_MELEE_GROUND(ICombatEntity entity, Skill skill, Position targetPos, int forceId, IEnumerable<SkillHitInfo> hits)
 		{
-			var shootTime = SkillTimingHelper.GetClientShootTime(entity, skill, skill.Properties.GetFloat(PropertyName.ShootTime));
+			var shootTime = skill.Properties.GetFloat(PropertyName.ShootTime);
 			var sklSpdRate = skill.Properties.GetFloatSafe(PropertyName.SklSpdRate);
 			var enableCastMove = skill.Properties.GetFloat(PropertyName.EnableShootMove) == 1f;
 
@@ -932,7 +922,7 @@ namespace Melia.Zone.Network
 					packet.AddSkillHitInfo(hit);
 			}
 
-			entity.Map.Broadcast(packet, entity, includeCaster);
+			entity.Map.Broadcast(packet, entity);
 		}
 
 		/// <summary>
@@ -954,7 +944,7 @@ namespace Melia.Zone.Network
 		/// <param name="hits"></param>
 		public static void ZC_SKILL_MELEE_TARGET(ICombatEntity entity, Skill skill, ICombatEntity target, IEnumerable<SkillHitInfo> hits)
 		{
-			var shootTime = SkillTimingHelper.GetClientShootTime(entity, skill, skill.Properties.GetFloat(PropertyName.ShootTime));
+			var shootTime = skill.Properties.GetFloat(PropertyName.ShootTime);
 			var sklSpdRate = skill.Properties.GetFloat(PropertyName.SklSpdRate);
 			var forceId = hits?.FirstOrDefault()?.ForceId ?? 0;
 
@@ -1157,7 +1147,7 @@ namespace Melia.Zone.Network
 		/// <param name="conn"></param>
 		public static void ZC_OPTION_LIST(IZoneConnection conn)
 		{
-			// The game doesn't always send all options, but only the ones
+			// Officials don't always send all options, but only the ones
 			// that were changed from their default values, resulting in
 			// an empty string in this packet if no options were changed
 			// yet. We could technically do that as well, but we'd need
@@ -2104,9 +2094,9 @@ namespace Melia.Zone.Network
 		/// <param name="character"></param>
 		/// <param name="pos"></param>
 		/// <param name="dir"></param>
-		/// <param name="clientTime"></param>
+		/// <param name="unkFloat"></param>
 		/// <param name="unkByte"></param>
-		public static void ZC_JUMP(Character character, Position pos, Direction dir, float clientTime, byte unkByte)
+		public static void ZC_JUMP(Character character, Position pos, Direction dir, float unkFloat, byte unkByte)
 		{
 			using var packet = Packet.Rent(Op.ZC_JUMP);
 
@@ -2118,7 +2108,7 @@ namespace Melia.Zone.Network
 			{
 				packet.PutPosition(pos);
 				packet.PutDirection(dir);
-				packet.PutFloat(clientTime);
+				packet.PutFloat(unkFloat);
 				packet.PutEmptyBin(13);
 				packet.PutLong(unkByte);
 				packet.PutShort(0);
@@ -2340,17 +2330,13 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Sends ZC_CAMPINFO to connection, naming the map the account's
-		/// Base Camp stands on.
+		/// Sends ZC_CAMPINFO to connection.
 		/// </summary>
 		/// <param name="conn"></param>
-		/// <param name="accountId"></param>
-		/// <param name="mapId">Zero when the account has no camp standing.</param>
-		public static void ZC_CAMPINFO(IZoneConnection conn, long accountId = 0, int mapId = 0)
+		public static void ZC_CAMPINFO(IZoneConnection conn)
 		{
 			using var packet = Packet.Rent(Op.ZC_CAMPINFO); // Size: 18 (12)
-			packet.PutLong(accountId);
-			packet.PutFloat(mapId);
+			packet.PutEmptyBin(12);
 			conn.Send(packet);
 		}
 
@@ -2899,7 +2885,7 @@ namespace Melia.Zone.Network
 			var s1 = 1;
 
 			// Items don't seem to disappear with our default, 1, nor with
-			// 2, which is used in the game. 4 does get rid of the items
+			// 2, which is used on officials. 4 does get rid of the items
 			// though. However, if you use 4, the pick up animation doesn't
 			// play. I'm guessing the item can't be removed if it's supposed
 			// to get picked up for this very reason, so we'll check whether
@@ -2921,7 +2907,7 @@ namespace Melia.Zone.Network
 		/// Makes actor appear dead on all clients in range of it.
 		/// </summary>
 		/// <param name="actor"></param>
-		public static void ZC_DEAD(IActor actor, IActor killer = null, bool showCorpse = true, bool isOverkill = false, bool isSpecialDrop = false)
+		public static void ZC_DEAD(IActor actor, IActor killer = null, bool showCorpse = true, bool isOverkill = false, bool isSpecialDrop = false, int overkillAmount = 0)
 		{
 			using var packet = Packet.Rent(Op.ZC_DEAD);
 
@@ -2948,8 +2934,8 @@ namespace Melia.Zone.Network
 			// The overkill amount is the percentage displayed on the
 			// client. It needs to be at least 100 for the overkill
 			// effect to appear.
-			//if (isOverkill)
-			//	packet.PutByte((byte)overkillAmount);
+			if (isOverkill)
+				packet.PutByte((byte)overkillAmount);
 
 			actor.Map.Broadcast(packet, actor);
 		}
@@ -3029,15 +3015,34 @@ namespace Melia.Zone.Network
 		/// <param name="hitInfo"></param>
 		public static void ZC_HIT_INFO(ICombatEntity attacker, ICombatEntity target, HitInfo hitInfo)
 		{
-			// A hit whose target's death already went out would play on the corpse.
-			if (target.IsDeathAnnounced)
-				return;
-
-			target.DelayDeathBroadcast(hitInfo.HitDelay);
-
 			using var packet = Packet.Rent(Op.ZC_HIT_INFO);
 
-			packet.AddHitInfoPacket(attacker, target, hitInfo);
+			packet.PutInt(target.Handle);
+			packet.PutInt(attacker.Handle);
+			packet.PutInt((int)hitInfo.SkillId);
+
+			packet.AddHitInfo(hitInfo);
+
+			packet.PutByte(0);
+			packet.PutInt(0);
+			packet.PutInt(0);
+			packet.PutInt(hitInfo.ForceId);
+			if (Versions.Client > KnownVersions.ClosedBeta1)
+			{
+				packet.PutByte(0);
+				packet.PutByte(0);
+				packet.PutFloat(hitInfo.UnkFloat1);
+				packet.PutFloat(hitInfo.UnkFloat2);
+				packet.PutInt(hitInfo.HitCount);
+				packet.PutByte(1);
+				packet.PutInt(0);
+				packet.PutInt((int)hitInfo.AniTime.TotalMilliseconds);
+			}
+			else
+			{
+				packet.PutByte(1);
+				packet.PutInt((int)hitInfo.AniTime.TotalMilliseconds);
+			}
 
 			target.Map.Broadcast(packet, target);
 		}
@@ -3067,20 +3072,12 @@ namespace Melia.Zone.Network
 		/// <param name="hits"></param>
 		public static void ZC_SKILL_HIT_INFO(IActor attacker, IEnumerable<SkillHitInfo> hits)
 		{
-			// Hits whose target's death already went out would play on the corpse.
-			var liveHits = hits.Where(a => !a.Target.IsDeathAnnounced).ToList();
-			if (liveHits.Count == 0)
-				return;
-
-			foreach (var skillHit in liveHits)
-				skillHit.Target.DelayDeathBroadcast(skillHit.HitDelay);
-
 			using var packet = Packet.Rent(Op.ZC_SKILL_HIT_INFO);
 
 			packet.PutInt(attacker.Handle);
-			packet.PutByte((byte)liveHits.Count);
+			packet.PutByte((byte)hits.Count());
 
-			foreach (var skillHit in liveHits)
+			foreach (var skillHit in hits)
 				packet.AddSkillHitInfo(skillHit);
 
 			attacker.Map.Broadcast(packet, attacker);
@@ -3473,7 +3470,7 @@ namespace Melia.Zone.Network
 			foreach (var character in characters)
 			{
 				var jobs = character.Jobs.GetList();
-				packet.PutInt(GameRandom.Get().Next(2)); // Could be team id? 1 or 2
+				packet.PutInt(RandomProvider.Next(2)); // Could be team id? 1 or 2
 				packet.PutInt(0);
 				packet.PutInt(0); // Random values 4334, 1015, 603
 				packet.PutLong(character.AccountObjectId);
@@ -3519,7 +3516,7 @@ namespace Melia.Zone.Network
 
 			packet.PutInt(revealedMaps.Length);
 
-			// The game appears to compress the actual data nowadays, but it seems
+			// Officials appear to compress the actual data nowadays, but it seems
 			// like the client can still handle the raw data as well.
 			foreach (var revealedMap in revealedMaps)
 			{
@@ -3595,11 +3592,11 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Updates the shield value of the actor.
+		/// Updates "shield" (?) for actor on nearby clients.
 		/// </summary>
 		/// <param name="actor"></param>
 		/// <param name="shield"></param>
-		public static void ZC_UPDATE_SHIELD(IActor actor, long shield, byte refreshTargetGauge = 1)
+		public static void ZC_UPDATE_SHIELD(IActor actor, long shield, byte b1 = 1)
 		{
 			using var packet = Packet.Rent(Op.ZC_UPDATE_SHIELD);
 
@@ -3608,7 +3605,7 @@ namespace Melia.Zone.Network
 			if (Versions.Client > KnownVersions.PreReBuild)
 			{
 				packet.PutLong(shield);
-				packet.PutByte(refreshTargetGauge);
+				packet.PutByte(b1);
 			}
 			else if (Versions.Client > KnownVersions.ClosedBeta1 && Versions.Client <= KnownVersions.PreReBuild)
 			{
@@ -3621,11 +3618,11 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Updates the shield value of the actor.
+		/// Updates "shield" (?) for actor on nearby clients.
 		/// </summary>
 		/// <param name="actor"></param>
 		/// <param name="shield"></param>
-		public static void ZC_UPDATE_SHIELD(IZoneConnection conn, IActor actor, long shield, byte refreshTargetGauge = 0)
+		public static void ZC_UPDATE_SHIELD(IZoneConnection conn, IActor actor, long shield, byte b1 = 0)
 		{
 			using var packet = Packet.Rent(Op.ZC_UPDATE_SHIELD);
 
@@ -3634,7 +3631,7 @@ namespace Melia.Zone.Network
 			if (Versions.Client > KnownVersions.PreReBuild)
 			{
 				packet.PutLong(shield);
-				packet.PutByte(refreshTargetGauge);
+				packet.PutByte(b1);
 			}
 			else if (Versions.Client > KnownVersions.ClosedBeta1 && Versions.Client <= KnownVersions.PreReBuild)
 			{
@@ -3652,8 +3649,8 @@ namespace Melia.Zone.Network
 		/// <param name="entity"></param>
 		/// <param name="pos"></param>
 		/// <param name="dir"></param>
-		/// <param name="clientTime"></param>
-		public static void ZC_MOVE_DIR(ICombatEntity entity, Position pos, Direction dir, float clientTime)
+		/// <param name="unkFloat"></param>
+		public static void ZC_MOVE_DIR(ICombatEntity entity, Position pos, Direction dir, float unkFloat)
 		{
 			using var packet = Packet.Rent(Op.ZC_MOVE_DIR);
 
@@ -3664,7 +3661,7 @@ namespace Melia.Zone.Network
 			packet.PutFloat(entity.Properties.GetFloat(PropertyName.MSPD));
 			if (Versions.Protocol > 500)
 			{
-				packet.PutFloat(clientTime);
+				packet.PutFloat(unkFloat);
 				packet.PutEmptyBin(24);
 				packet.PutInt(6);
 				packet.PutInt(0);
@@ -3673,7 +3670,7 @@ namespace Melia.Zone.Network
 			else
 			{
 				packet.PutByte(1);
-				packet.PutFloat(clientTime);
+				packet.PutFloat(unkFloat);
 			}
 
 			entity.Map.Broadcast(packet, entity);
@@ -4928,37 +4925,30 @@ namespace Melia.Zone.Network
 			packet.PutInt(shop.EffectId);
 			packet.PutByte(shop.IsClosed);
 			packet.PutInt((int)shop.Type);
+			packet.PutInt(shop.SkillIcon);
 			if (!shop.IsClosed)
 			{
-				packet.PutInt(shop.SkillIcon);
 				packet.PutInt(shop.Level);
 				packet.PutString(shop.Name, 64);
 				packet.PutInt(shop.Products.Count);
 				foreach (var product in shop.Products.Values)
 				{
 					packet.PutInt(product.ItemId);
-					packet.PutInt(product.RequiredAmount); // Amount Left
+					packet.PutInt(product.RequiredAmount);
 					packet.PutInt(product.Price);
-					packet.PutInt(product.Amount);
-					packet.PutEmptyBin(260);
-				}
 
-				// A Refreshment Table's window reads its owner and who they
-				// opened it to from here, in place of the property list
-				// every other shop ends with.
-				if (shop.Type == PersonalShopType.FoodTable)
-				{
-					packet.PutLong(character.ObjectId);
-					packet.PutInt(shop.Shared);
-				}
-				else
-				{
-					packet.PutInt(0); // Seller property count
+					packet.PutInt(product.Amount);
+
+					if (shop.Type == PersonalShopType.Portal)
+						packet.PutString(product.PortalDestination ?? "", 260);
+					else if (shop.SkillIcon == 0)
+						packet.PutEmptyBin(260);
+					else
+						packet.PutEmptyBin(256);
 				}
 			}
 			else
 			{
-				packet.PutInt(0);
 				packet.PutInt(0);
 				packet.PutString("", 64);
 				packet.PutInt(0);
@@ -4983,41 +4973,43 @@ namespace Melia.Zone.Network
 
 			using var packet = Packet.Rent(Op.ZC_AUTOSELLER_LIST);
 
+			var packetType = shop.Type == PersonalShopType.Portal
+				? PersonalShopType.PersonalSell
+				: shop.Type;
+
 			packet.PutInt(character.Handle);
 			packet.PutInt(shop.EffectId);
 			packet.PutByte(shop.IsClosed);
-			packet.PutInt((int)shop.Type);
+			packet.PutInt((int)packetType);
+			packet.PutInt(shop.SkillIcon);
+
 			if (!shop.IsClosed)
 			{
-				packet.PutInt(shop.SkillIcon);
 				packet.PutInt(shop.Level);
 				packet.PutString(shop.Name, 64);
 				packet.PutInt(shop.Products.Count);
+
+				if (shop.SkillIcon == (int)SkillId.Pardoner_Oblation)
+					packet.PutInt(0);
+
 				foreach (var product in shop.Products.Values)
 				{
 					packet.PutInt(product.ItemId);
-					packet.PutInt(product.RequiredAmount); // Amount Left
+					packet.PutInt(product.RequiredAmount);
 					packet.PutInt(product.Price);
 					packet.PutInt(product.Amount);
-					packet.PutEmptyBin(260);
-				}
 
-				// A Refreshment Table's window reads its owner and who they
-				// opened it to from here, in place of the property list
-				// every other shop ends with.
-				if (shop.Type == PersonalShopType.FoodTable)
-				{
-					packet.PutLong(character.ObjectId);
-					packet.PutInt(shop.Shared);
-				}
-				else
-				{
-					packet.PutInt(0); // Seller property count
+					if (shop.Type == PersonalShopType.Portal)
+						packet.PutString(product.PortalDestination ?? "", 260);
+					else if (shop.SkillIcon == 0)
+						packet.PutEmptyBin(260);
+					else
+						packet.PutEmptyBin(256);
 				}
 			}
+
 			else
 			{
-				packet.PutInt(0);
 				packet.PutInt(0);
 				packet.PutString("", 64);
 				packet.PutInt(0);
@@ -5470,7 +5462,7 @@ namespace Melia.Zone.Network
 				packet.PutInt((i % 3) + 1); // Shop Category Type (1 = Regular, 2 = Rotational, 3 = Event)
 				packet.PutInt(100 + i); // Item Cost
 				packet.PutInt(999); // Maximum Purchase Amount
-				packet.PutString(ZoneServer.Instance.Data.ItemDb.Entries.Values.PickRandom().ClassName, 64);
+				packet.PutString(ZoneServer.Instance.Data.ItemDb.Entries.Values.Random().ClassName, 64);
 				packet.PutInt(0);
 				packet.PutInt(20); // Item Amount
 				packet.PutInt(dateTime.Year);
@@ -6176,8 +6168,8 @@ namespace Melia.Zone.Network
 			using var packet = Packet.Rent(Op.ZC_CREATE_SCROLLLOCKBOX);
 
 			packet.PutInt(actor.Handle);
-			packet.PutPosition(leftPos);
-			packet.PutPosition(rightPos);
+			packet.PutPosition2D(leftPos);
+			packet.PutPosition2D(rightPos);
 			packet.PutFloat(width);
 
 			character.Connection.Send(packet);
@@ -7100,7 +7092,7 @@ namespace Melia.Zone.Network
 			using var packet = Packet.Rent(Op.ZC_ADVENTURE_BOOK_INFO);
 
 			packet.PutInt(infoList.Count);
-			packet.PutShort((short)type);
+			packet.PutShort(GetAdventureBookClientType(type));
 			packet.PutByte(1);
 			packet.PutByte(1);
 			packet.PutShort(1);
@@ -7111,6 +7103,44 @@ namespace Melia.Zone.Network
 				{
 					zpacket.PutInt(info.Key);
 					zpacket.PutInt(info.Value);
+				}
+			});
+
+			character.Connection.Send(packet);
+		}
+
+		private static short GetAdventureBookClientType(AdventureBookType type)
+		{
+			switch (type)
+			{
+				case AdventureBookType.Dungeon:
+					return 4;
+
+				default:
+					return (short)type;
+			}
+		}
+
+		public static void ZC_ADVENTURE_BOOK_ACHIEVEMENTS(Character character, IEnumerable<int> achievementIds)
+		{
+			var achievements = achievementIds.ToArray();
+
+			using var packet = Packet.Rent(Op.ZC_ADVENTURE_BOOK_INFO);
+
+			packet.PutInt(achievements.Length);
+			packet.PutShort((short)AdventureBookType.Achievement);
+			packet.PutByte(1);
+			packet.PutByte(1);
+			packet.PutShort(1);
+
+			var unlockDate = DateTime.Now.ToFileTime();
+
+			packet.Zlib(true, zpacket =>
+			{
+				foreach (var achievementId in achievements)
+				{
+					zpacket.PutInt(achievementId);
+					zpacket.PutLong(unlockDate);
 				}
 			});
 
@@ -7906,10 +7936,6 @@ namespace Melia.Zone.Network
 			if (kbInfo == null)
 				return;
 
-			// A knockdown whose target's death already went out would move the corpse.
-			if (actor.IsDeathAnnounced)
-				return;
-
 			using var packet = Packet.Rent(Op.ZC_KNOCKDOWN_INFO);
 
 			packet.PutInt(actor.Handle);
@@ -8008,10 +8034,6 @@ namespace Melia.Zone.Network
 		/// <param name="knockBackInfo"></param>
 		public static void ZC_KNOCKDOWN_INFO(ICombatEntity entity, ICombatEntity target, KnockBackInfo knockBackInfo)
 		{
-			// A knockdown whose target's death already went out would move the corpse.
-			if (target.IsDeathAnnounced)
-				return;
-
 			using var packet = Packet.Rent(Op.ZC_KNOCKDOWN_INFO);
 
 			packet.PutInt(target.Handle);

@@ -7,7 +7,6 @@ using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
 using static Melia.Shared.Util.TaskHelper;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.Buffs.Handlers.Swordsmen.Peltasta
 {
@@ -100,7 +99,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsmen.Peltasta
 		private async Task ReflectDamage(ICombatEntity attacker, ICombatEntity target, float damage)
 		{
 			// We delay the reflect hit so the animation looks better
-			await GameClock.Delay(100);
+			await Task.Delay(100);
 
 			attacker.TakeSimpleHit(damage, target, SkillId.None);
 		}

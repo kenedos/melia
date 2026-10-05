@@ -89,6 +89,7 @@ namespace Melia.Zone.Abilities
 			if (handler is IAbilityPropertyHandler propertyHandler)
 				_propertyHandlers[abilityId] = propertyHandler;
 
+			this.LoadCombatEvents(abilityId, handler);
 			ScriptableFunctions.Load(handler);
 		}
 

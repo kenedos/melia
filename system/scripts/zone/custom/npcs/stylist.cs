@@ -25,12 +25,7 @@ public class CustomNpcStylist : GeneralScript
 {
 	protected override void Load()
 	{
-		if (!Melia.Zone.Feature.IsEnabled("CustomNpcs"))
-			return;
-
 		AddNpc(57223, L("[Stylist] Jeremy"), "c_Klaipe", -66, -547, 180, NpcDialog);
-		AddNpc(57223, L("[Stylist] Jeremy"), "c_fedimian", 245, -137, 0, NpcDialog);
-		AddNpc(57223, L("[Stylist] Jeremy"), "c_orsha", 385, 600, 0, NpcDialog);
 	}
 
 	private async Task NpcDialog(Dialog dialog)
@@ -39,94 +34,78 @@ public class CustomNpcStylist : GeneralScript
 		var hairType = GetHairType(pc.Gender, pc.Hair);
 
 		dialog.SetTitle(L("Jeremy"));
-		dialog.SetPortrait("Dlg_port_Vlaentinas_Naimon");
 
-		// If player's current hairstyle doesn't exist in database (e.g., after removing styles),
-		// default to the first available hairstyle for their gender
-		if (hairType == null)
+		var selection = await dialog.Select(L("What can I do for you today?"),
+			Option(L("Change Hair Style"), "hair"),
+			Option(L("Change Hair Color"), "color"),
+			Option(L("Nothing"), "end")
+		);
+
+		if (selection == "end")
 		{
-			hairType = ZoneServer.Instance.Data.HairTypeDb.Entries.FirstOrDefault(a => a.Gender == pc.Gender);
-			if (hairType != null)
-				pc.ChangeHair(hairType.Index);
+			await dialog.Msg(L("Please come back any time."));
+			return;
 		}
+
+		var changeType = selection == "hair" ? StyleChangeType.Hair : StyleChangeType.Color;
+		var direction = RotationDirection.Forward;
+
+		await dialog.Msg(L("Good decision, one should treat themselves once in a while."));
 
 		while (true)
 		{
-			var selection = await dialog.Select(L("What can I do for you today?"),
-				Option(L("Change Hair Style"), "hair"),
-				Option(L("Change Hair Color"), "color"),
-				Option(L("Nothing"), "end")
-			);
+			var options = GetOptions(direction);
 
-			if (selection == "end")
+			pc.ChangeHair(hairType.Index);
+
+			selection = await dialog.Select(LF("This style is called \"{0} (#{1})\", what do you think?", L(hairType.Name), hairType.Index), options);
+
+			switch (selection)
 			{
-				await dialog.Msg(L("Please come back any time."));
-				return;
-			}
-
-			var changeType = selection == "hair" ? StyleChangeType.Hair : StyleChangeType.Color;
-			var direction = RotationDirection.Forward;
-
-			while (true)
-			{
-				var options = GetOptions(direction);
-
-				pc.ChangeHair(hairType.Index);
-
-				var coloredName = GetColoredText(L(hairType.Name), hairType.Color);
-				var coloredColor = GetColoredText(hairType.Color, hairType.Color);
-				selection = await dialog.Select(LF("This style is called {0} in {1} (#{2}), what do you think?", coloredName, coloredColor, hairType.Index), options);
-
-				switch (selection)
+				case "next":
 				{
-					case "next":
-					{
-						if (changeType == StyleChangeType.Hair)
-							hairType = GetNextStyle(pc.Gender, hairType);
-						else
-							hairType = GetNextColor(pc.Gender, hairType);
+					if (changeType == StyleChangeType.Hair)
+						hairType = GetNextStyle(pc.Gender, hairType);
+					else
+						hairType = GetNextColor(pc.Gender, hairType);
 
-						direction = RotationDirection.Forward;
-						break;
-					}
-					case "prev":
-					{
-						if (changeType == StyleChangeType.Hair)
-							hairType = GetPrevStyle(pc.Gender, hairType);
-						else
-							hairType = GetPrevColor(pc.Gender, hairType);
-
-						direction = RotationDirection.Backward;
-						break;
-					}
-					case "jump":
-					{
-						var jumpStr = await dialog.Input(L("Which style would you like to see, do you have a number for me?"));
-
-						if (!int.TryParse(jumpStr, out var index))
-						{
-							await dialog.Msg(L("Hm... Not a number, is it?"));
-							break;
-						}
-
-						hairType = GetHairType(pc.Gender, index);
-						if (hairType == null)
-						{
-							await dialog.Msg(L("I'm sorry, I don't know that style."));
-							break;
-						}
-
-						break;
-					}
-					default:
-					{
-						// Go back to main menu
-						break;
-					}
-				}
-
-				if (selection == "end")
+					direction = RotationDirection.Forward;
 					break;
+				}
+				case "prev":
+				{
+					if (changeType == StyleChangeType.Hair)
+						hairType = GetPrevStyle(pc.Gender, hairType);
+					else
+						hairType = GetPrevColor(pc.Gender, hairType);
+
+					direction = RotationDirection.Backward;
+					break;
+				}
+				case "jump":
+				{
+					var jumpStr = await dialog.Input(L("Which style would you like to see, do you have a number for me?"));
+
+					if (!int.TryParse(jumpStr, out var index))
+					{
+						await dialog.Msg(L("Hm... Not a number, is it?"));
+						break;
+					}
+
+					hairType = GetHairType(pc.Gender, index);
+					if (hairType == null)
+					{
+						await dialog.Msg(L("I'm sorry, I don't know that style."));
+						break;
+					}
+
+					break;
+				}
+				default:
+				{
+					await dialog.Msg(L("Hm, hm, I agree. That style does suit you. Please come back any time."));
+					return;
+				}
 			}
 		}
 	}
@@ -153,52 +132,6 @@ public class CustomNpcStylist : GeneralScript
 
 	private HairTypeData GetHairType(Gender gender, int index)
 		=> ZoneServer.Instance.Data.HairTypeDb.Entries.FirstOrDefault(a => a.Gender == gender && a.Index == index);
-
-	private string GetColoredText(string text, string colorName)
-	{
-		var hexColor = colorName.ToLower() switch
-		{
-			"default" => "9B7653",
-			"black" => "2A2A2A",
-			"blue" => "4A7DB8",
-			"pink" => "D48AA0",
-			"white" => "A0A0A0",
-			"blond" => "C9A86C",
-			"red" => "B85454",
-			"green" => "5A9B6B",
-			"gray" => "7A7A7A",
-			"lightsalmon" => "D4937A",
-			"purple" => "8B6AAE",
-			"orange" => "D4864A",
-			"rightorange" => "D4864A",
-			"brown" => "8B6B4A",
-			"midnightblue" => "3A4A6B",
-			"rightviolet" => "9B6AAE",
-			"ashgrey" => "8A8A8A",
-			"ashblue" => "6B7A8B",
-			"ashgreen" => "6B8B7A",
-			"indigo" => "4A5A8B",
-			"whiteviolet" => "B8A0C8",
-			"rightmint" => "6BB8A0",
-			"silvergreen" => "8BAA8B",
-			"gold" => "C9A840",
-			"applemint" => "7AC8A0",
-			"rightgreen" => "5AAA6B",
-			"rightpink" => "D48AAA",
-			"rubywine" => "8B4A5A",
-			"ashwine" => "8B6A7A",
-			"charcoal" => "4A4A4A",
-			"copper" => "B87A4A",
-			"flame" => "D46A4A",
-			"violet" => "8B5AAE",
-			"mint" => "6AC8A0",
-			"lightbrown" => "AA8B6A",
-			"darkblue" => "3A4A7A",
-			"paleblue" => "8AAAC8",
-			_ => "9B9B9B"
-		};
-		return $"{{#{hexColor}}}{text}{{/}}";
-	}
 
 	private HairTypeData GetHairType(Gender gender, string className)
 		=> ZoneServer.Instance.Data.HairTypeDb.Entries.FirstOrDefault(a => a.Gender == gender && a.ClassName == className);

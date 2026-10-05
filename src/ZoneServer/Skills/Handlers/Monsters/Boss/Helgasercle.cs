@@ -12,7 +12,6 @@ using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 using Melia.Zone.Skills.Helpers;
-using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -129,11 +128,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			for (var i = 0; i < 5; i++)
 			{
+				var targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 250f);
 				await skill.Wait(TimeSpan.FromMilliseconds(250));
-				if (!caster.Position.InRange2D(target.Position, 300))
-					break;
-
-				var targetPos = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 300, 50, caster), 250f);
 				_ = MissileThrow(skill, caster, targetPos, missileConfig);
 			}
 			
@@ -165,7 +161,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 7f, angle: -13f), 100f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 100, angle: 10f);
+			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2300;
 			var aniTime = 2500;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
@@ -189,7 +186,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), Position.Zero);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);

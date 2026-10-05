@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Melia.Shared.Game.Const;
+﻿using Melia.Shared.Game.Const;
 
 namespace Melia.Zone.Skills.Combat
 {
@@ -31,19 +30,6 @@ namespace Melia.Zone.Skills.Combat
 		public int HitCount { get; set; } = 1;
 
 		/// <summary>
-		/// Returns the extra damage lines effects added to this hit, in the
-		/// order their hooks ran.
-		/// </summary>
-		/// <remarks>
-		/// One SkillHitResult travels through every phase of one hit, so the
-		/// list collects what every hook on the same hit added, and the next
-		/// hit starts empty because it builds a new result. The lines are
-		/// dealt and embedded by SkillDamageHelper.ApplyExtraLines, at the
-		/// site that builds the hit's packet.
-		/// </remarks>
-		public List<ExtraHitLine> ExtraLines { get; } = new();
-
-		/// <summary>
 		/// Gets or sets the knock back parameters for this hit.
 		/// </summary>
 		/// <remarks>
@@ -52,37 +38,5 @@ namespace Melia.Zone.Skills.Combat
 		/// set set manually.
 		/// </remarks>
 		public KnockBackParameters KnockBack { get; set; } = new();
-
-		/// <summary>
-		/// Adds an extra line of damage to this hit, shown as a number of its
-		/// own beside the hit's damage.
-		/// </summary>
-		/// <param name="damage"></param>
-		public void AddExtraLine(float damage)
-			=> this.AddExtraLine(damage, SkillId.None, this.Effect);
-
-		/// <summary>
-		/// Adds an extra line of damage to this hit, attributed to the given
-		/// skill, shown as a number of its own beside the hit's damage.
-		/// </summary>
-		/// <param name="damage"></param>
-		/// <param name="skillId"></param>
-		public void AddExtraLine(float damage, SkillId skillId)
-			=> this.AddExtraLine(damage, skillId, this.Effect);
-
-		/// <summary>
-		/// Adds an extra line of damage to this hit, attributed to the given
-		/// skill, shown as a number of its own beside the hit's damage.
-		/// </summary>
-		/// <param name="damage"></param>
-		/// <param name="skillId"></param>
-		/// <param name="effect"></param>
-		public void AddExtraLine(float damage, SkillId skillId, HitEffect effect)
-		{
-			if (damage <= 0)
-				return;
-
-			this.ExtraLines.Add(new ExtraHitLine { Damage = damage, SkillId = skillId, Effect = effect });
-		}
 	}
 }

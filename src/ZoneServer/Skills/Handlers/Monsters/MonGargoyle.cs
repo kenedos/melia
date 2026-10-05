@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
@@ -93,7 +92,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				Effect = new EffectConfig("I_smoke011_smoke#Bip001 L Finger0Nub", 0.5f),
 				EndEffect = new EffectConfig("F_smoke025_blue", 0.4f),
 				Range = 20f,
-				FlyTime = (0.7f + (float)GameRandom.Get().NextDouble() * 1.8f),
+				FlyTime = (0.7f + (float)RandomProvider.Get().NextDouble() * 1.8f),
 				DelayTime = 0f,
 				Gravity = 0f,
 				Speed = 1f,
@@ -110,7 +109,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				Effect = new EffectConfig("I_smoke011_smoke#Bip001 R Finger0Nub", 0.5f),
 				EndEffect = new EffectConfig("F_smoke025_blue", 0.4f),
 				Range = 20f,
-				FlyTime = (0.7f + (float)GameRandom.Get().NextDouble() * 1.8f),
+				FlyTime = (0.7f + (float)RandomProvider.Get().NextDouble() * 1.8f),
 				DelayTime = 0f,
 				Gravity = 0f,
 				Speed = 1f,

@@ -2,6 +2,8 @@ using System;
 using Yggdrasil.Logging;
 using Yggdrasil.Security.Hashing;
 
+#nullable enable
+
 namespace Melia.Web.Database
 {
 	public partial class WebDb

@@ -40,7 +40,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			var hits = new List<SkillHitInfo>();
-			var startingPosition = originPos.GetRelative(farPos, distance: 20f);
+			var startingPosition = originPos;
 			var endingPosition = originPos.GetRelative(farPos, distance: 180f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
@@ -83,7 +83,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 			var targetHandle = target.Handle;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -91,6 +91,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			var hits = new List<SkillHitInfo>();
 			var effectHitConfig = new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 1.2f),
@@ -108,31 +109,42 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			var effectHitConfig2 = effectHitConfig;
-			effectHitConfig2.PositionDelay = 800;
-			effectHitConfig2.Effect = new EffectConfig("F_rize004_dark", 2f);
-			effectHitConfig2.KnockdownPower = 100f;
-
-			var baseDir = originPos.GetDirection(farPos);
-			var angles = new[] { 75f, 0f, -75f };
-			var tasks = new List<Task>();
-
-			foreach (var angle in angles)
-				tasks.Add(this.Blast(caster, skill, originPos.GetRelative(baseDir.AddDegreeAngle(angle), 60f), effectHitConfig));
-
+			var angles = new[] { 74f, 0f, -74f };
+			Position position;
+			for (var i = 0; i < 3; i++)
+			{
+				position = originPos.GetRelative(farPos, distance: 60, angle: angles[i]);
+				await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 6000f, 1, 20, -1, hits);
+				hits.Clear();
+			}
 			await skill.Wait(TimeSpan.FromMilliseconds(1100));
+			var effectHitConfig2 = new EffectHitConfig
+			{
+				GroundEffect = new EffectConfig("None", 1.2f),
+				PositionDelay = 800,
+				Effect = new EffectConfig("F_rize004_dark", 2f),
+				Range = 35f,
+				KnockdownPower = 100f,
+				Delay = 0f,
+				HitCount = 1,
+				HitDuration = 1000f,
+				CasterEffect = EffectConfig.None,
+				CasterNodeName = "None",
+				KnockType = 1,
+				VerticalAngle = 60f,
+				InnerRange = 0,
+			};
 
-			foreach (var angle in angles)
-				tasks.Add(this.Blast(caster, skill, originPos.GetRelative(baseDir.AddDegreeAngle(angle), 60f), effectHitConfig2));
-
-			await Task.WhenAll(tasks);
-		}
-
-		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
-		{
-			var hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 6000f, 1, 20, -1, hits);
+			var angles2 = new[] { 74f, -74f, 0f };
+			for (var i = 0; i < 3; i++)
+			{
+				position = originPos.GetRelative(farPos, distance: 60, angle: angles2[i]);
+				await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 6000f, 1, 20, -1, hits);
+				if (i < 2)
+					hits.Clear();
+			}
 		}
 	}
 
@@ -157,7 +169,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 			var targetHandle = target.Handle;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));

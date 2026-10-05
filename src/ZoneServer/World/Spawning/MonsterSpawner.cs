@@ -5,7 +5,6 @@ using System.Threading;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.AI;
 using Melia.Zone.World.Actors;
@@ -36,7 +35,6 @@ namespace Melia.Zone.World.Spawning
 		private const float FlexMeterIncreasePerDeath = 10;
 		private const float FlexMeterDecreasePerSecond = 0.5f;
 		private readonly static TimeSpan FlexSpawnInterval = TimeSpan.FromSeconds(5);
-		private readonly static TimeSpan SpawnPointsRetryInterval = TimeSpan.FromSeconds(30);
 
 		private static int Ids;
 
@@ -50,7 +48,6 @@ namespace Melia.Zone.World.Spawning
 
 		private SpawnAreaCollection _spawnAreas;
 		private bool _spawnPointsLoadFailed;
-		private TimeSpan _spawnPointsRetryDelay = TimeSpan.Zero;
 
 		/// <summary>
 		/// The identifier of the spawn areas collection this spawner will
@@ -194,15 +191,6 @@ namespace Melia.Zone.World.Spawning
 		/// </summary>
 		/// <param name="amount"></param>
 		public void Spawn(int amount)
-			=> this.SpawnMonsters(amount);
-
-		/// <summary>
-		/// Spawns the given number of monsters in a random spawn area and
-		/// returns how many of them were actually accepted by their map.
-		/// </summary>
-		/// <param name="amount"></param>
-		/// <returns></returns>
-		private int SpawnMonsters(int amount)
 		{
 			var isRootCrystal = _monsterData.Id >= RootCrystalMinId && _monsterData.Id <= RootCrystalMaxId;
 			List<Position> batchPositions = null;
@@ -213,7 +201,7 @@ namespace Melia.Zone.World.Spawning
 			for (var i = 0; i < amount; ++i)
 			{
 				if (!_spawnAreas.TryGetRandomLocation(out var map, out var pos))
-					break;
+					return;
 
 				if (map.IsDormant)
 					continue;
@@ -251,16 +239,8 @@ namespace Melia.Zone.World.Spawning
 				this.HandleRareMonsterLogic(monster, map);
 				this.ApplySpawnBuffs(monster, map);
 
-				// Now add the monster to the map (which may be queued).
-				// A rejected monster must not be counted, or the spawner
-				// stays permanently above its flex amount and never
-				// spawns again.
-				if (!map.AddMonster(monster))
-				{
-					monster.Died -= this.OnMonsterDied;
-					continue;
-				}
-
+				// Now add the monster to the map (which may be queued)
+				map.AddMonster(monster);
 				map.Data.SpawnedMonsterIds.Add(_monsterData.Id);
 
 				this.Spawned?.Invoke(this, new SpawnEventArgs(this, monster));
@@ -271,8 +251,6 @@ namespace Melia.Zone.World.Spawning
 			}
 
 			this.Amount += spawned;
-
-			return spawned;
 		}
 
 		/// <summary>
@@ -372,7 +350,7 @@ namespace Melia.Zone.World.Spawning
 				if (monster.IsBuffActive(entry.BuffId))
 					continue;
 
-				if (GameRandom.Get().NextDouble() * 100 >= entry.Chance)
+				if (RandomProvider.Get().NextDouble() * 100 >= entry.Chance)
 					continue;
 
 				monster.Map = map;
@@ -424,7 +402,7 @@ namespace Melia.Zone.World.Spawning
 			this.Amount--;
 			_flexMeter += FlexMeterIncreasePerDeath;
 
-			var delay = GameRandom.Get().Between(this.MinRespawnDelay, this.MaxRespawnDelay);
+			var delay = RandomProvider.Get().Between(this.MinRespawnDelay, this.MaxRespawnDelay);
 
 			lock (_respawnDelays)
 				_respawnDelays.Add(delay);
@@ -433,20 +411,14 @@ namespace Melia.Zone.World.Spawning
 		/// <summary>
 		/// Notifies the spawner that monsters were removed due to map
 		/// dormancy. Decrements the amount so the spawner knows it
-		/// needs to respawn them. Existing respawn delays and the flex
-		/// amount are preserved to respect boss timers and other
+		/// needs to respawn them. Existing respawn delays and flex
+		/// state are preserved to respect boss timers and other
 		/// long-delay spawners.
 		/// </summary>
 		/// <param name="removedCount"></param>
 		public void NotifyDormancy(int removedCount)
 		{
-			// Only subtract what this map removed. Zeroing the amount
-			// would make the spawner forget mobs it still has alive on
-			// the other maps of its spawn area collection.
-			this.Amount = Math.Max(0, this.Amount - removedCount);
-
-			_initialSpawnDone = false;
-			_flexSpawnDelay = this.InitialDelay;
+			this.InitializePopulation();
 		}
 
 		/// <summary>
@@ -455,7 +427,7 @@ namespace Melia.Zone.World.Spawning
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
-			if (!this.ValidateSpawnPointCollection(elapsed))
+			if (!this.ValidateSpawnPointCollection())
 				return;
 
 			this.RespawnMonsters(elapsed);
@@ -469,32 +441,21 @@ namespace Melia.Zone.World.Spawning
 		/// to be used.
 		/// </summary>
 		/// <returns></returns>
-		private bool ValidateSpawnPointCollection(TimeSpan elapsed)
+		private bool ValidateSpawnPointCollection()
 		{
 			if (_spawnAreas != null)
 				return true;
 
-			// Retry periodically instead of failing permanently, so a
-			// spawner that ticked before its areas were registered
-			// still recovers.
-			_spawnPointsRetryDelay -= elapsed;
-			if (_spawnPointsRetryDelay > TimeSpan.Zero)
+			if (_spawnPointsLoadFailed)
 				return false;
-
-			_spawnPointsRetryDelay = SpawnPointsRetryInterval;
 
 			if (!ZoneServer.Instance.World.TryGetSpawnAreas(this.SpawnPointsIdent, out _spawnAreas))
 			{
-				if (!_spawnPointsLoadFailed)
-				{
-					Log.Warning($"MonsterSpawner: Spawn areas '{this.SpawnPointsIdent}' for '{_monsterData.ClassName}' spawner not found.");
-					_spawnPointsLoadFailed = true;
-				}
+				Log.Warning($"MonsterSpawner: Spawn areas '{this.SpawnPointsIdent}' for '{_monsterData.ClassName}' spawner not found.");
 
+				_spawnPointsLoadFailed = true;
 				return false;
 			}
-
-			_spawnPointsLoadFailed = false;
 
 			return true;
 		}
@@ -547,18 +508,7 @@ namespace Melia.Zone.World.Spawning
 			if (spawnAmount <= 0)
 				return;
 
-			// Requeue the delays whose spawn didn't land, so a dormant
-			// map can't silently consume them and leave the spawner
-			// short once it wakes back up.
-			var failedCount = spawnAmount - this.SpawnMonsters(spawnAmount);
-			if (failedCount <= 0)
-				return;
-
-			lock (_respawnDelays)
-			{
-				for (var i = 0; i < failedCount; ++i)
-					_respawnDelays.Add(FlexSpawnInterval);
-			}
+			this.Spawn(spawnAmount);
 		}
 
 		/// <summary>
@@ -587,10 +537,10 @@ namespace Melia.Zone.World.Spawning
 				if (!_initialSpawnDone)
 					spawnAmount = potentialSpawnAmount;
 
-				// Only consider the initial spawn done once the full
-				// amount landed, so a partial burst retries in bulk
-				// instead of trickling in one per interval.
-				if (this.SpawnMonsters(spawnAmount) >= spawnAmount)
+				var amountBefore = this.Amount;
+				this.Spawn(spawnAmount);
+
+				if (!_initialSpawnDone && this.Amount > amountBefore)
 					_initialSpawnDone = true;
 			}
 		}

@@ -74,21 +74,6 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
-		/// Returns how much of the map the character's account has explored,
-		/// in percent.
-		/// </summary>
-		/// <param name="mapClassName">The class name of the map to check.</param>
-		/// <returns></returns>
-		public float GetMapExplorationPercentage(string mapClassName)
-		{
-			if (!ZoneServer.Instance.Data.MapDb.TryFind(mapClassName, out var mapData))
-				return 0;
-
-			var revealedMap = this.Connection.Account.GetRevealedMaps().FirstOrDefault(a => a.MapId == mapData.Id);
-			return revealedMap?.Percentage ?? 0;
-		}
-
-		/// <summary>
 		/// Returns whether the character has already received the exploration
 		/// reward for the specified map.
 		/// </summary>

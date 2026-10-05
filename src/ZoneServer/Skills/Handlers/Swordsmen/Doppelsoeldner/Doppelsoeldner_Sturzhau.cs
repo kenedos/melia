@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -17,19 +17,27 @@ using static Melia.Zone.Skills.SkillUseFunctions;
 namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 {
 	/// <summary>
-	/// Handler for the Doppelsoeldner skill Sturtzhau.
+	/// Handler for the Doppelsoeldner Sturzhau skill.
+	/// Ignores a flat amount of DEF or MDEF based on the caster's maximum HP.
 	/// </summary>
 	[SkillHandler(SkillId.Doppelsoeldner_Sturzhau)]
 	public class Doppelsoeldner_Sturzhau : IGroundSkillHandler
 	{
+		private const int MinimumSkillLevel = 1;
+		private const int MaximumSkillLevel = 10;
+		private const float MinimumMaxHpRate = 0.05f;
+		private const float MaximumMaxHpRate = 0.10f;
+
 		/// <summary>
-		/// Handles skill, damaging targets.
+		/// Handles the skill cast.
 		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		/// <param name="originPos"></param>
-		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(
+			Skill skill,
+			ICombatEntity caster,
+			Position originPos,
+			Position farPos,
+			ICombatEntity target
+		)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -40,73 +48,169 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 0);
-			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+			var splashParameters = skill.GetSplashParameters(
+				caster,
+				originPos,
+				farPos,
+				length: 45,
+				width: 30,
+				angle: 0
+			);
 
-			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
+			var splashArea = skill.GetSplashArea(
+				SplashType.Square,
+				splashParameters
+			);
+
+			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
+			Send.ZC_SKILL_MELEE_GROUND(
+				caster,
+				skill,
+				farPos,
+				ForceId.GetNew(),
+				null
+			);
 
 			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
-		/// Executes the actual attack after a delay.
+		/// Executes both attacks of Sturzhau.
 		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		/// <param name="splashArea"></param>
-		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
+		private async Task Attack(
+			Skill skill,
+			ICombatEntity caster,
+			ISplashArea splashArea
+		)
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(200);
-			var aniTime = TimeSpan.FromMilliseconds(50);
-			var delayBetweenHits = TimeSpan.FromMilliseconds(50);
+			var animationTime = TimeSpan.FromMilliseconds(50);
+			var delayBetweenAttacks = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
 			await skill.Wait(hitDelay);
 
+			this.AttackTargets(
+				skill,
+				caster,
+				splashArea,
+				animationTime,
+				skillHitDelay
+			);
+
+			await skill.Wait(delayBetweenAttacks);
+
+			this.AttackTargets(
+				skill,
+				caster,
+				splashArea,
+				animationTime,
+				skillHitDelay
+			);
+		}
+
+		/// <summary>
+		/// Attacks every valid target currently inside the skill area.
+		/// </summary>
+		private void AttackTargets(
+			Skill skill,
+			ICombatEntity caster,
+			ISplashArea splashArea,
+			TimeSpan animationTime,
+			TimeSpan skillHitDelay
+		)
+		{
+			var targets = caster.Map.GetAttackableEnemiesIn(
+				caster,
+				splashArea
+			);
+
 			var hits = new List<SkillHitInfo>();
-			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
 				var modifier = SkillModifier.MultiHit(3);
-				modifier.DefensePenetrationRate += 0.15f;
 
-				if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-					modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
+				modifier.DefensePenetrationRate =
+					this.GetDefensePenetrationRate(
+						skill,
+						caster,
+						target
+					);
 
-				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
-				target.TakeDamage(skillHitResult.Damage, caster);
+				var skillHitResult = SCR_SkillHit(
+					caster,
+					target,
+					skill,
+					modifier
+				);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
+				target.TakeDamage(
+					skillHitResult.Damage,
+					caster
+				);
+
+				var skillHit = new SkillHitInfo(
+					caster,
+					target,
+					skill,
+					skillHitResult,
+					animationTime,
+					skillHitDelay
+				);
+
 				skillHit.HitEffect = HitEffect.Impact;
 				hits.Add(skillHit);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);
+		}
 
-			hits.Clear();
-			await skill.Wait(delayBetweenHits);
+		/// <summary>
+		/// Converts the flat defense penetration based on maximum HP into
+		/// the equivalent percentage of the target's relevant defense.
+		/// </summary>
+		private float GetDefensePenetrationRate(
+			Skill skill,
+			ICombatEntity caster,
+			ICombatEntity target
+		)
+		{
+			var skillLevel = Math.Clamp(
+				skill.Level,
+				MinimumSkillLevel,
+				MaximumSkillLevel
+			);
 
-			targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+			var levelProgress =
+				(skillLevel - MinimumSkillLevel) /
+				(float)(MaximumSkillLevel - MinimumSkillLevel);
 
-			foreach (var target in targets.LimitBySDR(caster, skill))
-			{
-				var modifier = SkillModifier.MultiHit(3);
-				modifier.DefensePenetrationRate += 0.15f;
+			var maximumHpRate =
+				MinimumMaxHpRate +
+				(MaximumMaxHpRate - MinimumMaxHpRate) *
+				levelProgress;
 
-				if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-					modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
+			var maximumHp = caster.Properties.GetFloat(
+				PropertyName.MHP
+			);
 
-				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
-				target.TakeDamage(skillHitResult.Damage, caster);
+			var ignoredDefenseAmount =
+				maximumHp * maximumHpRate;
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
-				skillHit.HitEffect = HitEffect.Impact;
-				hits.Add(skillHit);
-			}
+			var targetDefense =
+				skill.Data.AttackType == SkillAttackType.Magic
+					? target.Properties.GetFloat(PropertyName.MDEF)
+					: target.Properties.GetFloat(PropertyName.DEF);
 
-			Send.ZC_SKILL_HIT_INFO(caster, hits);
+			if (targetDefense <= 0)
+				return 0f;
+
+			return Math.Clamp(
+				ignoredDefenseAmount / targetDefense,
+				0f,
+				1f
+			);
 		}
 	}
 }

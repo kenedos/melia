@@ -84,7 +84,6 @@ namespace Melia.Shared.Network.Helpers
 	{
 		int Handle { get; }
 		Position Position { get; }
-		byte Pose { get; }
 		float MSPD { get; }
 		float MovingShot { get; }
 		long Exp { get; }

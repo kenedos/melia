@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.SplashAreas;
@@ -22,13 +23,6 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 	[SkillHandler(SkillId.Doppelsoeldner_Zwerchhau)]
 	public class Doppelsoeldner_Zwerchhau : IGroundSkillHandler
 	{
-		/// <summary>
-		/// Handles skill, damaging targets.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		/// <param name="originPos"></param>
-		/// <param name="farPos"></param>
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -49,12 +43,6 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
-		/// <summary>
-		/// Executes the actual attack after a delay.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		/// <param name="splashArea"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(170);
@@ -64,43 +52,65 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 			await skill.Wait(hitDelay);
 
 			var hits = new List<SkillHitInfo>();
-
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hitSomething = false;
+			var vintActive = caster.IsAbilityActive(AbilityId.Doppelsoeldner38);
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
 				var modifier = SkillModifier.MultiHit(3);
-
-				if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-					modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
-				skillHit.HitEffect = HitEffect.Impact;
-
-				if (caster.IsAbilityActive(AbilityId.Doppelsoeldner38) && target.IsKnockdownable())
+				// Vint pulls each successfully hit target towards the caster. The
+				// attack is represented by one SkillHitInfo with MultiHit(3), so
+				// the displacement is applied only once per target.
+				if (vintActive
+					&& skillHitResult.Damage > 0
+					&& !target.IsDead
+					&& target.IsKnockdownable())
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster, target, KnockBackType.KnockDown, 180, 60, KnockDirection.TowardsCaster);
+					skillHit.KnockBackInfo = new KnockBackInfo(
+						caster,
+						target,
+						KnockBackType.KnockDown,
+						50,
+						10,
+						KnockDirection.TowardsCaster
+					);
 					skillHit.HitInfo.KnockBackType = KnockBackType.KnockDown;
 					target.ApplyKnockdown(caster, skill, skillHit);
 				}
+				else
+				{
+					skillHit.HitEffect = HitEffect.Impact;
+				}
 
 				hits.Add(skillHit);
-
 				hitSomething = true;
 			}
 
 			if (caster.IsAbilityActive(AbilityId.Doppelsoeldner26) && hitSomething)
 			{
 				var duration = TimeSpan.FromSeconds(3);
-				caster.StartBuff(BuffId.Zucken_Buff, skill.Level, 0, duration, caster, SkillId.Doppelsoeldner_Zucken);
+				caster.StartBuff(BuffId.Zucken_Buff, skill.Level, 0, duration, caster);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);
+		}
+
+		/// <summary>
+		/// Reduces Zwerchhau's maximum overheat to one while Zwerchhau: Vint is active.
+		/// </summary>
+		[SkillOverheatOverride(SkillId.Doppelsoeldner_Zwerchhau)]
+		public float GetOverheatMaxCount(Skill skill)
+		{
+			return skill.Owner.IsAbilityActive(AbilityId.Doppelsoeldner38)
+				? 1
+				: skill.Data.OverheatCount;
 		}
 	}
 }

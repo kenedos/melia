@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Versioning;
 using Melia.Zone.Buffs;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Extensions;
+using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
-using Melia.Zone.Items.Effects;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.CombatEntities.Components
 {
@@ -88,7 +87,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			Send.ZC_BUFF_ADD(this.Entity, buff);
 
 			this.BuffStarted?.Invoke(this.Entity, buff);
-			this.NotifyBuffsOnDebuffApplied(buff);
 		}
 
 		/// <summary>
@@ -280,7 +278,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (removableBuffs.Count == 0)
 				return 0;
 
-			var buff = removableBuffs.PickRandom();
+			var buff = removableBuffs.Random();
 			this.Remove(buff);
 
 			return buff.Id;
@@ -301,7 +299,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (removableDeBuffs.Count == 0)
 				return 0;
 
-			var buff = removableDeBuffs.PickRandom();
+			var buff = removableDeBuffs.Random();
 			this.Remove(buff);
 
 			return buff.Id;
@@ -378,7 +376,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		}
 
 		/// <summary>
-		/// Returns a list of all buffs.
+		/// Returns a list with all buffs.
 		/// </summary>
 		/// <returns></returns>
 		public List<Buff> GetList()
@@ -400,32 +398,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					if (predicate(buff))
 						return true;
 				return false;
-			}
-		}
-
-		/// <summary>
-		/// Adds the selected element of all buffs that match the
-		/// predicate to the given list.
-		/// </summary>
-		/// <remarks>
-		/// Use static lamda expressions to avoid unnecessary allocations.
-		/// </remarks>
-		/// <typeparam name="TResult"></typeparam>
-		/// <param name="list"></param>
-		/// <param name="predicate"></param>
-		/// <param name="selector"></param>
-		public void GetList<TResult>(ICollection<TResult> list, Func<Buff, bool> predicate, Func<Buff, TResult> selector)
-		{
-			lock (_buffs)
-			{
-				foreach (var buff in _buffs.Values)
-				{
-					if (predicate(buff))
-					{
-						var item = selector(buff);
-						list.Add(item);
-					}
-				}
 			}
 		}
 
@@ -626,10 +598,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (!ZoneServer.Instance.Data.BuffDb.TryFind(a => a.Id == buffId, out var buffData))
 				throw new ArgumentException($"Buff Id '{buffId}' not found.");
 
-			// A buff death would strip, such as a stun from the killing hit, can't land on a corpse.
-			if (buffData.RemoveOnDeath && this.Entity.IsDead)
-				return null;
-
 			Buff buff;
 			bool isNew;
 			bool overbuffChanged = false;
@@ -702,24 +670,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 			this.BuffStarted?.Invoke(this.Entity, buff);
 
-			if (isNew)
-				this.NotifyBuffsOnDebuffApplied(buff);
-
 			return buff;
-		}
-
-		/// <summary>
-		/// Notifies the entity's other active buffs that a debuff was
-		/// applied to it.
-		/// </summary>
-		/// <param name="debuff"></param>
-		private void NotifyBuffsOnDebuffApplied(Buff debuff)
-		{
-			if (debuff.Data.Type != BuffType.Debuff)
-				return;
-
-			foreach (var buff in this.GetAll(a => a != debuff && a.Handler is IBuffOnDebuffAppliedHandler))
-				((IBuffOnDebuffAppliedHandler)buff.Handler).OnDebuffApplied(buff, debuff);
 		}
 
 		/// <summary>
@@ -743,55 +694,44 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (!isDebuff)
 				return false;
 
-			if (this.TryGet(BuffId.Skill_MomentaryImmune_Buff, out var momentaryImmuneBuff))
-			{
-				this.NotifyBuffOnDebuffResisted(momentaryImmuneBuff, buffId, caster);
+			if (this.Has(BuffId.Skill_MomentaryImmune_Buff))
 				return true;
-			}
 
-			if (buffData.Removable && this.TryGet(BuffId.Rampage_Buff, out var rampageBuff))
-			{
-				this.NotifyBuffOnDebuffResisted(rampageBuff, buffId, caster);
+			if (this.Has(BuffId.Rampage_Buff) && buffData.Removable)
 				return true;
-			}
 
-			if (this.TryGet(BuffId.Cure_Buff, out var cureBuff))
-			{
-				this.NotifyBuffOnDebuffResisted(cureBuff, buffId, caster);
+			if (this.Has(BuffId.Cure_Buff))
 				return true;
-			}
 
-			if (this.TryGet(BuffId.Prophecy_Buff, out var prophecyBuff))
-			{
-				this.NotifyBuffOnDebuffResisted(prophecyBuff, buffId, caster);
-				return true;
-			}
-
-			// Cannot apply debuffs to monsters when they have shield,
+			// Cannot apply debuffs to bosses when they have shield,
 			// but allow damage-over-time buffs through
-			if (this.Entity is Mob mob && mob.Shield > 0)
+			if (this.Entity is Mob mob && mob.Rank == MonsterRank.Boss && mob.Shield > 0)
 			{
 				var handler = ZoneServer.Instance.BuffHandlers.GetHandler(buffId);
-				if (handler is not DamageOverTimeBuffHandler)
+				var isDamageOverTime = handler is IDamageOverTimeBuffHandler;
+
+				var allowedBossDebuff =
+					isDamageOverTime ||
+					buffId == BuffId.NecromancerPoison_Debuff ||
+					buffId == BuffId.GatherCorpse_Debuff ||
+					buffId == BuffId.HeavyBleeding ||
+					buffId == BuffId.Fire ||
+					buffId == BuffId.BleedingPierce_Debuff;
+
+				if (!allowedBossDebuff)
 					return true;
 			}
 
 			if (this.TryGet(BuffId.Cyclone_Buff_ImmuneAbil, out var cycloneImmuneBuff)
-				&& GameRandom.Get().Next(100) < cycloneImmuneBuff.NumArg1 * 15)
-			{
-				this.NotifyBuffOnDebuffResisted(cycloneImmuneBuff, buffId, caster);
+				&& RandomProvider.Get().Next(100) < cycloneImmuneBuff.NumArg1 * 15)
 				return true;
-			}
 
 			if (this.TryGet(BuffId.Ausirine_Buff, out var ausirineBuff))
 			{
 				var skillLevel = ausirineBuff.NumArg1;
 				var resistanceChance = 30 + (3 * skillLevel);
-				if (GameRandom.Get().Next(100) < resistanceChance)
-				{
-					this.NotifyBuffOnDebuffResisted(ausirineBuff, buffId, caster);
+				if (RandomProvider.Get().Next(100) < resistanceChance)
 					return true;
-				}
 			}
 
 			// Check card/item debuff resistance
@@ -800,26 +740,13 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				var resistRate = ItemHookRegistry.Instance.GetDebuffResistance(character, buffId);
 				if (resistRate > 0f)
 				{
-					var roll = GameRandom.Get().NextDouble();
+					var roll = RandomProvider.Get().NextDouble();
 					if (roll < resistRate)
 						return true;
 				}
 			}
 
 			return false;
-		}
-
-		/// <summary>
-		/// Notifies the given buff that it made the entity resist an
-		/// incoming debuff.
-		/// </summary>
-		/// <param name="buff"></param>
-		/// <param name="buffId"></param>
-		/// <param name="caster"></param>
-		private void NotifyBuffOnDebuffResisted(Buff buff, BuffId buffId, IActor caster)
-		{
-			if (buff.Handler is IBuffOnDebuffResistedHandler handler)
-				handler.OnDebuffResisted(buff, buffId, caster);
 		}
 
 		/// <summary>
@@ -860,7 +787,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		{
 			_updateBuffer.Clear();
 			_removeBuffer.Clear();
-			var now = GameClock.LocalNow;
+			var now = DateTime.Now;
 
 			lock (_buffs)
 			{

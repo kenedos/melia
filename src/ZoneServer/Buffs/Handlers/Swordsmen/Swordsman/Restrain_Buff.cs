@@ -1,6 +1,5 @@
 ﻿using System;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
@@ -79,7 +78,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsmen.Swordsman
 				return;
 
 			var stunChance = buff.NumArg2;
-			var applyBuff = GameRandom.Get().Next(100) < stunChance;
+			var applyBuff = RandomProvider.Get().Next(100) < stunChance;
 
 			if (applyBuff)
 				target.StartBuff(BuffId.Stun, skill.Level, 0, StunDuration, attacker);

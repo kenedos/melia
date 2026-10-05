@@ -1,0 +1,355 @@
+﻿//--- Melia Script ----------------------------------------------------------
+// Equip Items
+//--- Description -----------------------------------------------------------
+// Item scripts that handle on-equip and on-unequip effects including
+// buff application, skill level bonuses, and property modifications.
+//---------------------------------------------------------------------------
+
+using System;
+using System.Linq;
+using Melia.Shared.Data.Database;
+using Melia.Shared.Game.Const;
+using Melia.Zone;
+using Melia.Zone.Network;
+using Melia.Zone.Scripting;
+using Melia.Zone.Skills;
+using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Items;
+using Yggdrasil.Logging;
+
+public class ItemEquipScript : GeneralScript
+{
+
+	[ScriptableFunction]
+	public ItemEquipResult SCP_ON_EQUIP_ITEM(Character character, Item item, EquipSlot equipSlot)
+	{
+		var strArg = item.Data.Script?.StrArg ?? "";
+
+		if (ZoneServer.Instance.Data.BuffDb.TryFind(strArg, out var buffData))
+			character.StartBuff(buffData.Id, TimeSpan.Zero);
+		else if (ZoneServer.Instance.Data.HairTypeDb.TryFindByClassName(strArg, out var hairData))
+		{
+			// For wigs (Hair slot), only send the hair style if visibility is on
+			if (equipSlot == EquipSlot.Hair && (character.VisibleEquip & VisibleEquip.Wig) == 0)
+				return ItemEquipResult.Okay;
+			Send.ZC_NORMAL.UpdateCharacterLook(character, item.Id, equipSlot, hairData.Index);
+		}
+		else if (ZoneServer.Instance.Data.HeadTypeDb.TryFind(character.Gender, strArg, out var headData))
+		{
+			// For wigs (Hair slot), only send the head style if visibility is on
+			if (equipSlot == EquipSlot.Hair && (character.VisibleEquip & VisibleEquip.Wig) == 0)
+				return ItemEquipResult.Okay;
+			Send.ZC_NORMAL.UpdateCharacterLook(character, item.Id, equipSlot, headData.Index);
+		}
+
+		// Apply item-specific equip effects
+		this.ApplyEquipEffects(character, item);
+
+		// Grant transform-costume skill if this item is in CostumeTransformDb
+		this.TryGrantCostumeTransformSkill(character, item);
+
+		return ItemEquipResult.Okay;
+	}
+
+	/// <summary>
+	/// If the item is a transform costume, grants the associated skill (e.g.
+	/// "MagicalGirl_MagicalBoyNox") so the player can cast the transform buff.
+	/// No-op for non-transform items or when the skill is already present.
+	/// </summary>
+	private void TryGrantCostumeTransformSkill(Character character, Item item)
+	{
+		if (!CostumeTransformDb.TryFindByBase(item.Data.ClassName, out var xform))
+			return;
+
+		if (!ZoneServer.Instance.Data.SkillDb.TryFind(xform.SkillName, out var skillData))
+		{
+			Log.Warning("Costume '{0}' references unknown skill '{1}'.", item.Data.ClassName, xform.SkillName);
+			return;
+		}
+
+		if (character.Skills.Get(skillData.Id) != null)
+			return;
+
+		var skill = new Skill(character, skillData.Id, 1, true);
+		character.Skills.Add(skill);
+	}
+
+	/// <summary>
+	/// If the item is a transform costume, removes the associated skill — but
+	/// only if no other equipped item still maps to the same skill (the
+	/// male/female variants often share a skill).
+	/// </summary>
+	private void TryRemoveCostumeTransformSkill(Character character, Item item)
+	{
+		if (!CostumeTransformDb.TryFindByBase(item.Data.ClassName, out var xform))
+			return;
+
+		// The transform buff (e.g. "TosRangerFormChange_Red_Buff") isn't caught
+		// by the generic strArg->buff lookup in SCP_ON_UNEQUIP_ITEM because the
+		// item's strArg points at the skill make name, not the buff. Remove it
+		// explicitly here so the character reverts to the base look on unequip.
+		if (ZoneServer.Instance.Data.BuffDb.TryFind(xform.BuffName, out var buffData))
+			character.Buffs.Remove(buffData.Id);
+
+		if (!ZoneServer.Instance.Data.SkillDb.TryFind(xform.SkillName, out var skillData))
+			return;
+
+		// Another equipped costume may share the same skill; if so, keep it.
+		foreach (var equip in character.Inventory.GetEquip().Values)
+		{
+			if (equip == null || equip == item || equip.Data == null)
+				continue;
+
+			if (CostumeTransformDb.TryFindByBase(equip.Data.ClassName, out var other)
+				&& string.Equals(other.SkillName, xform.SkillName, StringComparison.OrdinalIgnoreCase))
+			{
+				return;
+			}
+		}
+
+		if (character.Skills.Get(skillData.Id) != null)
+			character.Skills.Remove(skillData.Id);
+	}
+
+	[ScriptableFunction]
+	public ItemUnequipResult SCP_ON_UNEQUIP_ITEM(Character character, Item item, EquipSlot equipSlot)
+	{
+		var strArg = item.Data.Script?.StrArg ?? "";
+
+		if (ZoneServer.Instance.Data.BuffDb.TryFind(strArg, out var buffData))
+			character.Buffs.Remove(buffData.Id);
+		else if (ZoneServer.Instance.Data.HairTypeDb.TryFindByClassName(strArg, out var hairData))
+			Send.ZC_NORMAL.UpdateCharacterLook(character, item.Id, equipSlot, 0);
+		else if (ZoneServer.Instance.Data.HeadTypeDb.TryFind(character.Gender, strArg, out var headData))
+			Send.ZC_NORMAL.UpdateCharacterLook(character, item.Id, equipSlot, 0);
+
+		// Remove item-specific equip effects
+		this.RemoveEquipEffects(character, item);
+
+		// Revoke transform-costume skill if this item is in CostumeTransformDb
+		this.TryRemoveCostumeTransformSkill(character, item);
+
+		return ItemUnequipResult.Okay;
+	}
+
+	/// <summary>
+	/// Gives gem's skill to the character
+	/// </summary>
+	/// <remarks>
+	/// This function is specific to skill gems.
+	/// </remarks>
+	/// <param name="character"></param>
+	/// <param name="item"></param>
+	/// <param name="equipSlot"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public ItemEquipResult SCR_GEM_EQUIP(Character character, Item item, EquipSlot equipSlot)
+	{
+		if (item.Data.Group != ItemGroup.Gem || item.Data.EquipExpGroup != EquipExpGroup.Gem_Skill)
+			return ItemEquipResult.Okay;
+
+		var skillClassName = item.Data.EquipSkill;
+		var skillLevel = item.Data.Script.NumArg1;
+
+		if (!ZoneServer.Instance.Data.SkillDb.TryFind(skillClassName, out var skillData))
+		{
+			Log.Warning($"Character '{character.Name}' equipped Gem Id '{item.Id}' with no available skill in database: '{skillClassName}'");
+			return ItemEquipResult.Okay;
+		}
+
+		// Checks if character can learn skill
+		// Use the highest job level among all jobs the character has
+		// Character must have a job of the same class (e.g., Wizard class for Cryomancer skills)
+		var allJobs = character.Jobs.GetList();
+		var highestJobLevel = allJobs.Max(j => j.Level);
+		var characterJobClasses = allJobs.Select(j => j.Id.ToClass()).Distinct().ToList();
+		var entries = ZoneServer.Instance.Data.SkillTreeDb.FindJobs(skillData.Id, highestJobLevel);
+
+		var canLearnSkill = false;
+		foreach (var entry in entries)
+		{
+			if (characterJobClasses.Contains(entry.JobId.ToClass()))
+			{
+				canLearnSkill = true;
+				break;
+			}
+		}
+
+		if (!canLearnSkill)
+			return ItemEquipResult.Okay;
+
+		// Checks if character already has skill
+		if (character.TryGetSkill(skillData.Id, out var skill))
+		{
+			skill.Properties.Modify(PropertyName.GemLevel_BM, skillLevel);
+			skill.Properties.InvalidateAll();
+		}
+		else
+		{
+			skill = new Skill(character, skillData.Id, 0, true);
+			skill.Properties.Modify(PropertyName.GemLevel_BM, skillLevel);
+			skill.Properties.InvalidateAll();
+			character.Skills.Add(skill);
+		}
+		Send.ZC_NORMAL.SkillProperties(character.Connection, 0, skill);
+		Send.ZC_COMMON_SKILL_LIST(character);
+		Send.ZC_NORMAL.SetSkillsProperties(character.Connection);
+		Send.ZC_NORMAL.UpdateSkillUI(character);
+
+		skill.RecalculateDependentBuffs();
+
+		return ItemEquipResult.Okay;
+	}
+
+	/// <summary>
+	/// Magic amulet item use script. Called when trying to "use" an amulet
+	/// directly instead of dragging it onto equipment.
+	/// </summary>
+	/// <remarks>
+	/// The actual socketing is handled by CZ_ITEM_USE_TO_ITEM packet handler.
+	/// This function exists to prevent "Missing script function" messages.
+	/// </remarks>
+	/// <param name="character"></param>
+	/// <param name="item"></param>
+	/// <param name="strArg"></param>
+	/// <param name="numArg1"></param>
+	/// <param name="numArg2"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public ItemUseResult SCR_MAGICAMULET_EQUIP(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		// Magic amulets should be dragged onto equipment, not used directly.
+		// The actual socketing is handled by CZ_ITEM_USE_TO_ITEM packet.
+		character.SystemMessage("DragAmuletToEquip");
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Remove gem's skill from character.
+	/// </summary>
+	/// <remarks>
+	/// This function is specific to skill gems.
+	/// </remarks>
+	/// <param name="character"></param>
+	/// <param name="item"></param>
+	/// <param name="equipSlot"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public ItemUnequipResult SCR_GEM_UNEQUIP(Character character, Item item, EquipSlot equipSlot)
+	{
+		if (item.Data.Group != ItemGroup.Gem || item.Data.EquipExpGroup != EquipExpGroup.Gem_Skill)
+			return ItemUnequipResult.Okay;
+
+		var skillClassName = item.Data.EquipSkill;
+		var skillLevel = item.Data.Script.NumArg1;
+
+		if (!ZoneServer.Instance.Data.SkillDb.TryFind(skillClassName, out var skillData))
+		{
+			Log.Warning($"Character '{character.Name}' unequipped Gem Id '{item.Id}' with no available skill in database: '{skillClassName}'");
+			return ItemUnequipResult.Okay;
+		}
+		if (!character.TryGetSkill(skillData.Id, out var skill))
+		{
+			return ItemUnequipResult.Okay;
+		}
+
+		var currentGemBM = (int)skill.Properties.GetFloat(PropertyName.GemLevel_BM, 0);
+		var amountToRemove = Math.Min(skillLevel, currentGemBM);
+		if (amountToRemove > 0)
+			skill.Properties.Modify(PropertyName.GemLevel_BM, -amountToRemove);
+		skill.Properties.InvalidateAll();
+
+		skill.RecalculateDependentBuffs();
+
+		if (skill.Level == 0 && skill.LevelByDB == 0)
+			character.Skills.Remove(skill.Id);
+
+		Send.ZC_NORMAL.SkillProperties(character.Connection, 0, skill);
+		Send.ZC_COMMON_SKILL_LIST(character);
+		Send.ZC_NORMAL.SetSkillsProperties(character.Connection);
+
+		return ItemUnequipResult.Okay;
+	}
+
+	//===================================================================
+	// Item-specific equip/unequip effects
+	//===================================================================
+
+	/// <summary>
+	/// Applies item-specific effects when an item is equipped.
+	/// Handles SPCI_SKILLUP, SPCI_JOB_ALL_SKILLUP, and
+	/// SPCI_EQUIP_ADD_EXPROP_NUM from client SpcItem triggers.
+	/// </summary>
+	private void ApplyEquipEffects(Character character, Item item)
+	{
+		// Apply registry-based effects (ExProp, PropMod, Buff)
+		ItemEquipEffects.ApplyEffects(character, item.Id);
+
+		// NECK04_103: +40% HP recovery as magic crit attack, base HP recovery to 0
+		if (item.Data.ClassName == "NECK04_103")
+		{
+			var rhp = character.Properties.GetFloat(PropertyName.RHP);
+			var bonus = (float)Math.Floor(rhp * 0.4f);
+			character.Variables.Temp.SetFloat("Melia.NECK04_103.CrtMAtk", bonus);
+			character.Variables.Temp.SetFloat("Melia.NECK04_103.Rhp", rhp);
+			character.Properties.Modify(PropertyName.CRTMATK_BM, bonus);
+			character.Properties.Modify(PropertyName.RHP_BM, -rhp);
+		}
+
+		// Refresh skill UI if this item provides skill level bonuses
+		if (ItemEquipEffects.HasSkillEffects(item.Id))
+			RefreshSkillLevels(character);
+	}
+
+	/// <summary>
+	/// Removes item-specific effects when an item is unequipped.
+	/// Reverses all effects applied by ApplyEquipEffects.
+	/// </summary>
+	private void RemoveEquipEffects(Character character, Item item)
+	{
+		// Remove registry-based effects (ExProp, PropMod, Buff)
+		ItemEquipEffects.RemoveEffects(character, item.Id);
+
+		// NECK04_103: reverse the HP recovery conversion
+		if (item.Data.ClassName == "NECK04_103")
+		{
+			var bonus = character.Variables.Temp.GetFloat("Melia.NECK04_103.CrtMAtk");
+			var rhp = character.Variables.Temp.GetFloat("Melia.NECK04_103.Rhp");
+			character.Properties.Modify(PropertyName.CRTMATK_BM, -bonus);
+			character.Properties.Modify(PropertyName.RHP_BM, rhp);
+			character.Variables.Temp.Remove("Melia.NECK04_103.CrtMAtk");
+			character.Variables.Temp.Remove("Melia.NECK04_103.Rhp");
+		}
+
+		// Refresh skill UI if this item provides skill level bonuses
+		if (ItemEquipEffects.HasSkillEffects(item.Id))
+			RefreshSkillLevels(character);
+	}
+
+	//===================================================================
+	// Helper: Refresh skill UI after equip changes
+	//===================================================================
+
+	/// <summary>
+	/// Invalidates all skill properties and sends UI updates to the client.
+	/// Called after equipping/unequipping items that affect skill levels.
+	/// The actual level bonuses are auto-calculated by ItemEquipEffects
+	/// in SCR_Get_SkillLv.
+	/// </summary>
+	private static void RefreshSkillLevels(Character character)
+	{
+		foreach (var skill in character.Skills.GetList())
+		{
+			skill.Properties.InvalidateAll();
+			skill.RecalculateDependentBuffs();
+		}
+
+		if (character.Connection != null)
+		{
+			Send.ZC_NORMAL.SetSkillsProperties(character.Connection);
+			Send.ZC_NORMAL.UpdateSkillUI(character);
+		}
+	}
+
+}

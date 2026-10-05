@@ -18,6 +18,9 @@ namespace Melia.Shared.Data.Database
 		public Dictionary<int, int> RewardItems { get; set; } = new();
 		public Dictionary<string, int> RewardProperties { get; set; } = new();
 		public Dictionary<string, int> RewardAccountProperties { get; set; } = new();
+		public Dictionary<string, int> LegacyRewardProperties { get; set; } = new();
+		public Dictionary<string, int> LegacyRewardAccountProperties { get; set; } = new();
+		public int RewardMigrationVersion { get; set; }
 	}
 
 	/// <summary>
@@ -55,7 +58,6 @@ namespace Melia.Shared.Data.Database
 			data.Id = entry.ReadInt("classId");
 			data.ClassName = entry.ReadString("className");
 			data.Name = entry.ReadString("name");
-			data.Name = entry.ReadString("name");
 			data.RedeemMax = entry.ReadInt("redeemMax", 0);
 
 			var requiredItems = entry["requiredItems"].ToObject<Dictionary<string, int>>();
@@ -63,6 +65,9 @@ namespace Melia.Shared.Data.Database
 
 			if (entry.ContainsKey("rewardProperties")) data.RewardProperties = entry["rewardProperties"].ToObject<Dictionary<string, int>>();
 			if (entry.ContainsKey("rewardAccountProperties")) data.RewardAccountProperties = entry["rewardAccountProperties"].ToObject<Dictionary<string, int>>();
+			if (entry.ContainsKey("legacyRewardProperties")) data.LegacyRewardProperties = entry["legacyRewardProperties"].ToObject<Dictionary<string, int>>();
+			if (entry.ContainsKey("legacyRewardAccountProperties")) data.LegacyRewardAccountProperties = entry["legacyRewardAccountProperties"].ToObject<Dictionary<string, int>>();
+			data.RewardMigrationVersion = entry.ReadInt("rewardMigrationVersion", 0);
 
 			foreach (var propertyName in data.RewardProperties.Keys)
 			{
@@ -74,6 +79,18 @@ namespace Melia.Shared.Data.Database
 			{
 				if (_propertiesDb.Find(a => a.Namespace == "Account" && a.Name == propertyName) == null)
 					throw new DatabaseWarningException(null, $"Unknown account reward property name '{propertyName}' in collection '{data.ClassName}'.");
+			}
+
+			foreach (var propertyName in data.LegacyRewardProperties.Keys)
+			{
+				if (_propertiesDb.Find(a => a.Namespace == "PC" && a.Name == propertyName) == null)
+					throw new DatabaseWarningException(null, $"Unknown legacy reward property name '{propertyName}' in collection '{data.ClassName}'.");
+			}
+
+			foreach (var propertyName in data.LegacyRewardAccountProperties.Keys)
+			{
+				if (_propertiesDb.Find(a => a.Namespace == "Account" && a.Name == propertyName) == null)
+					throw new DatabaseWarningException(null, $"Unknown legacy account reward property name '{propertyName}' in collection '{data.ClassName}'.");
 			}
 
 			foreach (var requiredItem in requiredItems)

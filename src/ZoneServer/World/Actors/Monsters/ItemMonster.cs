@@ -2,7 +2,6 @@
 using Melia.Shared.Game.Const;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Items;
-using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.Monsters
 {
@@ -97,9 +96,6 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <returns></returns>
 		public bool CanBePickedUpBy(IActor actor)
 		{
-			if (actor is Character filteringCharacter && LootFilter.BlocksPickUp(filteringCharacter, this.Item))
-				return false;
-
 			var isOriginalOwner = false;
 			if (actor is Character character && this.Item.OriginalOwnerCharacterId != 0)
 			{

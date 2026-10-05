@@ -7,7 +7,6 @@ using System.Threading;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Maps;
@@ -176,7 +175,7 @@ namespace Melia.Zone.World.Spawning
 				}
 
 				// Select random minigame
-				var minigameScript = _availableMinigames[GameRandom.Get().Next(_availableMinigames.Count)];
+				var minigameScript = _availableMinigames[RandomProvider.Get().Next(_availableMinigames.Count)];
 
 				// Create minigame instance
 				var instance = minigameScript.CreateInstance(map, position, direction);
@@ -215,7 +214,7 @@ namespace Melia.Zone.World.Spawning
 
 		private (bool Success, MinigameSpawnPointData? SpawnPoint) TryGetAvailableSpawnPoint()
 		{
-			var shuffledPoints = _spawnPoints.OrderBy(x => GameRandom.Get().Next()).ToArray();
+			var shuffledPoints = _spawnPoints.OrderBy(x => RandomProvider.Get().Next()).ToArray();
 
 			if (shuffledPoints.Length == 0)
 			{
@@ -224,7 +223,7 @@ namespace Melia.Zone.World.Spawning
 
 			for (var attempt = 0; attempt < MAX_SPAWN_ATTEMPTS; attempt++)
 			{
-				var spawnPoint = shuffledPoints[GameRandom.Get().Next(shuffledPoints.Length)];
+				var spawnPoint = shuffledPoints[RandomProvider.Get().Next(shuffledPoints.Length)];
 				if (this.IsPositionAvailable(spawnPoint.MapClassName, spawnPoint.Position))
 				{
 					return (true, spawnPoint);

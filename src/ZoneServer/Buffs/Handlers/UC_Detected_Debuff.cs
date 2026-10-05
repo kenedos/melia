@@ -16,8 +16,6 @@ namespace Melia.Zone.Buffs.Handlers
 
 			if (target.TryGetBuffByKeyword(BuffTag.Cloaking, out var cloakBuff))
 				target.RemoveBuff(cloakBuff.Id);
-
-			ConditionalCloaking.Break(target);
 		}
 	}
 }

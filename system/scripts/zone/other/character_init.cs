@@ -4,14 +4,13 @@
 // Grants default items, skills, and abilities to newly created characters.
 //---------------------------------------------------------------------------
 
-using System;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
 using Melia.Zone;
+using Melia.Zone.Events;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
-using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Items;
 
@@ -20,15 +19,7 @@ public class CharacterInitializationScript : GeneralScript
 	[On("PlayerLoggedIn")]
 	public void OnPlayerLoggedIn(object sender, PlayerEventArgs args)
 	{
-		var vars = args.Character.Variables;
-		var everLoggedIn = vars.Perm.GetBool("Melia.EverLoggedIn", false);
-
-		if (!everLoggedIn)
-		{
-			InitCharacter(args.Character);
-			vars.Perm.SetBool("Melia.EverLoggedIn", true);
-		}
-
+		InitCharacter(args.Character);
 		UpdateCharacter(args.Character);
 		UpdateAccount(args.Character);
 	}
@@ -42,36 +33,44 @@ public class CharacterInitializationScript : GeneralScript
 		if (!unlockByDefault)
 			return;
 
-		var etcProps = character.Etc.Properties;
-		etcProps.SetFloat(PropertyName.HiddenJob_Char1_13, 300);
-		etcProps.SetFloat(PropertyName.HiddenJob_Char1_20, 300); // Nak Muay
-		etcProps.SetFloat(PropertyName.HiddenJob_Char2_17, 300); // Runecaster
-		etcProps.SetFloat(PropertyName.HiddenJob_Char3_13, 300); // Appraiser
-		etcProps.SetFloat(PropertyName.HiddenJob_Char4_18, 300); // Miko
-		etcProps.SetFloat(PropertyName.HiddenJob_Char5_6, 300); // Shinobi
-
 		var props = character.Connection.Account.Properties;
-		props.SetFloat(PropertyName.UnlockQuest_Char1_23, 1); // Luchador
-		props.SetFloat(PropertyName.UnlockQuest_Char1_24, 1); // Shenji
-		props.SetFloat(PropertyName.UnlockQuest_Char1_25, 1); // Winged Hussar
-		props.SetFloat(PropertyName.UnlockQuest_Char1_26, 1); // Vanquisher
-		props.SetFloat(PropertyName.UnlockQuest_Char2_24, 1); // Keraunos
-		props.SetFloat(PropertyName.UnlockQuest_Char2_25, 1); // Illusionist
-		props.SetFloat(PropertyName.UnlockQuest_Char2_26, 1); // Vulture [W]
-		props.SetFloat(PropertyName.UnlockQuest_Char3_22, 1); // Hwarang
-		props.SetFloat(PropertyName.UnlockQuest_Char3_23, 1); // Engineer
-		props.SetFloat(PropertyName.UnlockQuest_Char3_24, 1); // Godeye
-		props.SetFloat(PropertyName.UnlockQuest_Char3_25, 1); // Vulture [A]
-		props.SetFloat(PropertyName.UnlockQuest_Char4_22, 1); // Lama
-		props.SetFloat(PropertyName.UnlockQuest_Char4_23, 1); // Pontifex
-		props.SetFloat(PropertyName.UnlockQuest_Char5_18, 1); // Jaguar
-		props.SetFloat(PropertyName.UnlockQuest_Char5_19, 1); // Desperado
-
-		props.SetFloat(PropertyName.UnlockQuest_Char2_160, 1); // ? 
+		props.SetFloat("UnlockQuest_Char1_25", 1); // Winged Hussar
+		props.SetFloat("UnlockQuest_Char1_26", 1); // Vanquisher
+		props.SetFloat("UnlockQuest_Char2_25", 1); // Illusionist
+		props.SetFloat("UnlockQuest_Char3_24", 1); // Godeye
+		props.SetFloat("UnlockQuest_Char4_23", 1); // Pontifex
+		props.SetFloat("UnlockQuest_Char5_19", 1); // Desperado
+		props.SetFloat("UnlockQuest_Char2_26", 1); // Vulture [W]
+		props.SetFloat("UnlockQuest_Char3_25", 1); // Vulture [A]
+		props.SetFloat("UnlockQuest_Char5_20", 1); // Vulture [T]
+		props.SetFloat("UnlockQuest_Char1_27", 1); // Sledger [S]
+		props.SetFloat("UnlockQuest_Char4_24", 1); // Sledger [C]
+		props.SetFloat("UnlockQuest_Char1_28", 1); // Bonemancer [S]
+		props.SetFloat("UnlockQuest_Char2_27", 1); // Bonemancer [W]
+		props.SetFloat("UnlockQuest_Char3_26", 1); // Bonemancer [A]
+		props.SetFloat("UnlockQuest_Char4_25", 1); // Bonemancer [C]
+		props.SetFloat("UnlockQuest_Char3_27", 1); // Blitz Hunter [A]
+		props.SetFloat("UnlockQuest_Char5_21", 1); // Blitz Hunter [T]
+		props.SetFloat("UnlockQuest_Char2_28", 1); // Aether Blader [W]
+		props.SetFloat("UnlockQuest_Char4_26", 1); // Aether Blader [C]
+		props.SetFloat("UnlockQuest_Char5_22", 1); // Aether Blader [T]
+		props.SetFloat("UnlockQuest_Char2_29", 1); // Hermit [W]
+		props.SetFloat("UnlockQuest_Char4_27", 1); // Hermit [C]
+		props.SetFloat("UnlockQuest_Char3_28", 1); // Hermit [A]
+		props.SetFloat("UnlockQuest_Char5_23", 1); // Grimmark [T]
+		props.SetFloat("UnlockQuest_Char1_29", 1); // Grimmark [S]
+		props.SetFloat("UnlockQuest_Char3_29", 1); // Grimmark [A]
+		props.SetFloat("UnlockQuest_Char2_30", 1); // Kneller [W]
+		props.SetFloat("UnlockQuest_Char4_28", 1); // Kneller [C]
+		props.SetFloat("UnlockQuest_Char5_24", 1); // Kneller [T]
+		props.SetFloat("UnlockQuest_Char1_30", 1); // Eskrimer
 	}
 
 	private static void InitCharacter(Character character)
 	{
+		if (!character.Variables.Perm.ActivateOnce("Melia.EverLoggedIn"))
+			return;
+
 		InitCommon(character);
 
 		switch (character.JobId)
@@ -88,7 +87,7 @@ public class CharacterInitializationScript : GeneralScript
 	{
 		if (character.JobClass == JobClass.Cleric)
 		{
-			// Based on the client data, Warrior Guard is not normally part of
+			// Based on the client data, Warrior Guard is not officialy part of
 			// a cleric's skillset, but they get it on the latest version of the
 			// game and are able to use it. In older logs there was no sign of
 			// clerics getting Guard, however, so we'll make it optional.
@@ -115,13 +114,24 @@ public class CharacterInitializationScript : GeneralScript
 		LearnAbility(character, AbilityId.Iron);
 		LearnAbility(character, AbilityId.SwapWeapon);
 
-		GiveItem(character, ItemId.Drug_HP1, 50);
-		GiveItem(character, ItemId.Drug_SP1, 50);
-		GiveItem(character, ItemId.Drug_STA1_Q, 50);
-		// GiveItem(character, ItemId.Escape_Orb, 1);
-		// GiveItem(character, ItemId.EscapeStone_Klaipeda, 1);
-		GiveItem(character, ItemId.Misc_CampfireKit, 20);
-		GiveItem(character, ItemId.Mic, 1);
+		GiveItem(character, ItemId.Drug_HP1_Q, 20);
+		GiveItem(character, ItemId.Drug_SP1_Q, 20);
+		GiveItem(character, ItemId.Drug_STA1_Q, 20);
+		GiveItem(character, ItemId.Escape_Orb, 1);
+		GiveItem(character, ItemId.EscapeStone_Klaipeda, 1);
+
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
+		{
+			EquipItem(character, EquipSlot.Top, ItemId.TOP01_101);
+			EquipItem(character, EquipSlot.Pants, ItemId.LEG01_101);
+		}
+		else
+		{
+			EquipItem(character, EquipSlot.Top, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_TOP);
+			EquipItem(character, EquipSlot.Pants, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_LEG);
+			EquipItem(character, EquipSlot.Shoes, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_FOOT);
+			EquipItem(character, EquipSlot.Gloves, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_HAND);
+		}
 	}
 
 	private static void InitSwordsman(Character character)
@@ -136,26 +146,14 @@ public class CharacterInitializationScript : GeneralScript
 		LearnAbility(character, AbilityId.Staff);
 		LearnAbility(character, AbilityId.Mace);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			EquipItem(character, EquipSlot.RightHand, ItemId.SWD01_101);
-			EquipItem(character, EquipSlot.LeftHand, ItemId.SHD01_101);
-
-			// Leather Set
-			EquipItem(character, EquipSlot.Top, ItemId.TOP01_101);
-			EquipItem(character, EquipSlot.Pants, ItemId.LEG01_101);
-			EquipItem(character, EquipSlot.Gloves, ItemId.HAND01_101);
-			EquipItem(character, EquipSlot.Shoes, ItemId.FOOT01_101);
 		}
 		else
 		{
 			GiveItem(character, ItemId.Select_Growth_Sword_Weapon, 4);
 			GiveItem(character, ItemId.Select_Growth_Sword_SubWeapon, 4);
-
-			EquipItem(character, EquipSlot.Top, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_TOP);
-			EquipItem(character, EquipSlot.Pants, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_LEG);
-			EquipItem(character, EquipSlot.Shoes, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_FOOT);
-			EquipItem(character, EquipSlot.Gloves, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_HAND);
 		}
 	}
 
@@ -171,26 +169,14 @@ public class CharacterInitializationScript : GeneralScript
 		LearnAbility(character, AbilityId.Mace);
 		LearnAbility(character, AbilityId.THStaff);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			EquipItem(character, EquipSlot.RightHand, ItemId.STF01_101);
-			EquipItem(character, EquipSlot.LeftHand, ItemId.SHD01_101);
-
-			// Cotton Set
-			EquipItem(character, EquipSlot.Top, ItemId.TOP01_133);
-			EquipItem(character, EquipSlot.Pants, ItemId.LEG01_133);
-			EquipItem(character, EquipSlot.Gloves, ItemId.HAND01_133);
-			EquipItem(character, EquipSlot.Shoes, ItemId.FOOT01_133);
 		}
 		else
 		{
 			GiveItem(character, ItemId.Select_Growth_Wizard_Weapon, 4);
 			GiveItem(character, ItemId.Select_Growth_Wizard_SubWeapon, 4);
-
-			EquipItem(character, EquipSlot.Top, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_TOP);
-			EquipItem(character, EquipSlot.Pants, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_LEG);
-			EquipItem(character, EquipSlot.Shoes, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_FOOT);
-			EquipItem(character, EquipSlot.Gloves, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_HAND);
 		}
 	}
 
@@ -199,7 +185,6 @@ public class CharacterInitializationScript : GeneralScript
 		LearnSkill(character, SkillId.Bow_Attack);
 		LearnSkill(character, SkillId.CrossBow_Attack);
 		LearnSkill(character, SkillId.Common_DaggerAries);
-		LearnSkill(character, SkillId.Warrior_Guard);
 		LearnSkill(character, SkillId.Pistol_Attack);
 		LearnSkill(character, SkillId.Musket_Attack);
 		LearnSkill(character, SkillId.Sword_Attack);
@@ -208,25 +193,14 @@ public class CharacterInitializationScript : GeneralScript
 		LearnAbility(character, AbilityId.THBow);
 		LearnAbility(character, AbilityId.Bow);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			EquipItem(character, EquipSlot.RightHand, ItemId.TBW01_101);
-
-			// Leather Set
-			EquipItem(character, EquipSlot.Top, ItemId.TOP01_101);
-			EquipItem(character, EquipSlot.Pants, ItemId.LEG01_101);
-			EquipItem(character, EquipSlot.Gloves, ItemId.HAND01_101);
-			EquipItem(character, EquipSlot.Shoes, ItemId.FOOT01_101);
 		}
 		else
 		{
 			GiveItem(character, ItemId.Select_Growth_Archer_Weapon, 4);
 			GiveItem(character, ItemId.Select_Growth_Archer_SubWeapon, 4);
-
-			EquipItem(character, EquipSlot.Top, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_TOP);
-			EquipItem(character, EquipSlot.Pants, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_LEG);
-			EquipItem(character, EquipSlot.Shoes, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_FOOT);
-			EquipItem(character, EquipSlot.Gloves, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_HAND);
 		}
 	}
 
@@ -242,26 +216,14 @@ public class CharacterInitializationScript : GeneralScript
 		LearnAbility(character, AbilityId.THMace);
 		LearnAbility(character, AbilityId.Cleric36);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			EquipItem(character, EquipSlot.RightHand, ItemId.MAC01_101);
-			EquipItem(character, EquipSlot.LeftHand, ItemId.SHD01_101);
-
-			// Cotton Set
-			EquipItem(character, EquipSlot.Top, ItemId.TOP01_133);
-			EquipItem(character, EquipSlot.Pants, ItemId.LEG01_133);
-			EquipItem(character, EquipSlot.Gloves, ItemId.HAND01_133);
-			EquipItem(character, EquipSlot.Shoes, ItemId.FOOT01_133);
 		}
 		else
 		{
 			GiveItem(character, ItemId.Select_Growth_Cleric_Weapon, 4);
 			GiveItem(character, ItemId.Select_Growth_Cleric_SubWeapon, 4);
-
-			EquipItem(character, EquipSlot.Top, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_TOP);
-			EquipItem(character, EquipSlot.Pants, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_LEG);
-			EquipItem(character, EquipSlot.Shoes, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_FOOT);
-			EquipItem(character, EquipSlot.Gloves, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_HAND);
 		}
 	}
 
@@ -278,7 +240,7 @@ public class CharacterInitializationScript : GeneralScript
 
 		LearnAbility(character, AbilityId.Sword);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			// It's difficult to find information on what kind of
 			// equipment Scout got by default before growth items,
@@ -287,24 +249,12 @@ public class CharacterInitializationScript : GeneralScript
 			// pistol for now.
 
 			EquipItem(character, EquipSlot.RightHand, ItemId.DAG01_113);
-			EquipItem(character, EquipSlot.LeftHand, ItemId.SWD01_101);
 			GiveItem(character, ItemId.PST01_111, 1);
-
-			// Leather Set
-			EquipItem(character, EquipSlot.Top, ItemId.TOP01_101);
-			EquipItem(character, EquipSlot.Pants, ItemId.LEG01_101);
-			EquipItem(character, EquipSlot.Gloves, ItemId.HAND01_101);
-			EquipItem(character, EquipSlot.Shoes, ItemId.FOOT01_101);
 		}
 		else
 		{
 			GiveItem(character, ItemId.Select_Growth_Scout_Weapon, 4);
 			GiveItem(character, ItemId.Select_Growth_Scout_SubWeapon, 4);
-
-			EquipItem(character, EquipSlot.Top, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_TOP);
-			EquipItem(character, EquipSlot.Pants, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_LEG);
-			EquipItem(character, EquipSlot.Shoes, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_FOOT);
-			EquipItem(character, EquipSlot.Gloves, ItemId.GROWTH_REINFORCE_TIER1_LEATHER_HAND);
 		}
 	}
 

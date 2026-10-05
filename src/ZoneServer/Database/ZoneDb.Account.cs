@@ -29,6 +29,7 @@ namespace Melia.Zone.Database
 					account.Id = reader.GetInt64("accountId");
 					account.Name = reader.GetStringSafe("name");
 					account.TeamName = reader.GetStringSafe("teamName");
+					account.TeamExp = reader.GetInt32("teamExp");
 					account.Authority = reader.GetInt32("authority");
 					account.PermissionLevel = (PermissionLevel)reader.GetByte("type");
 					account.Settings.Parse(reader.GetStringSafe("settings"));

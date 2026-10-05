@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
@@ -143,7 +142,7 @@ namespace Melia.Zone.Scripting
 			guard.Vars.Set("Laima.Guards.NextChatAt", now + GuardChatCooldown);
 
 			var pool = (guard.CombatState?.AttackState ?? false) ? GuardCombatLines : GuardIdleLines;
-			var line = pool[GameRandom.Get().Next(pool.Length)];
+			var line = pool[RandomProvider.Get().Next(pool.Length)];
 			guard.Say(line);
 		}
 
@@ -159,10 +158,17 @@ namespace Melia.Zone.Scripting
 		///
 		/// The monster id passed in supplies the visual model and base data;
 		/// only models that have walk/run AND attack animations work
-		/// correctly. The full verified list (and the script that regenerates
-		/// it from the client extract) lives in
-		/// melia/doc/scripting/combat_npc_models.md — consult it before
-		/// picking a model.
+		/// correctly. Verified IDs:
+		///
+		///   20059  - orsha_soldier_f         (Orsha Soldier, female)
+		///   20060  - orsha_soldier_m         (Orsha Soldier, male)
+		///   147410 - npc_soldier_female_01   (Female Guard variant 1)
+		///   147415 - npc_soldier_female_02   (Female Guard variant 2)
+		///   147416 - npc_soldier_female_03   (Female Guard variant 3)
+		///
+		/// Models confirmed to have idle-only animations (do NOT use):
+		/// soldier_axe, orsha_soldier_f (anim folder is empty in client),
+		/// most monster_* soldiers (they're enemies, not guards).
 		/// </remarks>
 		/// <param name="monsterClassId">Monster id used for visuals/base data.</param>
 		/// <param name="name">Display name. Pass null to keep the data name.</param>
@@ -218,37 +224,21 @@ namespace Melia.Zone.Scripting
 			mob.Position = pos;
 			mob.SpawnPosition = pos;
 			mob.Direction = dir;
+			mob.Faction = FactionType.Our_Forces;
+			mob.Tendency = TendencyType.Aggressive;
 
 			if (!string.IsNullOrEmpty(name))
 				mob.Name = name;
 
-			MakeCombatNpc(mob);
+			mob.Vars.SetBool("Laima.Guards.IsGuard", true);
+
 			mob.Components.Add(new MovementComponent(mob));
+			mob.Components.Add(new AiComponent(mob, "Guard"));
+
 			mob.ApplyOverrides(GenerateGuardStats(level));
 
 			mapObj.AddMonster(mob);
 			return mob;
-		}
-
-		/// <summary>
-		/// Turns the given monster into a combat NPC that fights alongside
-		/// players, giving it the faction, tendency and AI every one of them
-		/// shares.
-		/// </summary>
-		/// <remarks>
-		/// The movement component is left to the caller, as a cutscene actor
-		/// only gets one once the cutscene hands it over to the fight. An owner
-		/// makes the NPC's kills count for them.
-		/// </remarks>
-		/// <param name="mob"></param>
-		/// <param name="owner"></param>
-		public static void MakeCombatNpc(Mob mob, ICombatEntity owner = null)
-		{
-			mob.Faction = FactionType.Our_Forces;
-			mob.Tendency = TendencyType.Aggressive;
-			mob.Vars.SetBool("Laima.Guards.IsGuard", true);
-
-			mob.Components.Add(new AiComponent(mob, "Guard", owner));
 		}
 
 		/// <summary>

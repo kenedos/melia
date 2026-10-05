@@ -88,19 +88,6 @@ namespace Melia.Zone.Skills.Combat
 		}
 
 		/// <summary>
-		/// Gets or sets the index of the hit frame this hit belongs to,
-		/// which the client's force effects use to pick the hits they
-		/// fly at.
-		/// </summary>
-		public byte HitFrameIndex { get; set; }
-
-		/// <summary>
-		/// Gets or sets the index of this hit's target within its hit
-		/// frame.
-		/// </summary>
-		public byte TargetIndex { get; set; }
-
-		/// <summary>
 		/// Gets or sets the number of hits that are displayed. The damage
 		/// is split evenly between the hits.
 		/// </summary>
@@ -110,17 +97,6 @@ namespace Melia.Zone.Skills.Combat
 		/// Variable Info Count
 		/// </summary>
 		public byte VarInfoCount { get; set; } = 2;
-
-		/// <summary>
-		/// Gets or sets packets embedded in this hit, which the client
-		/// executes once the hit lands. Leave empty for none.
-		/// </summary>
-		/// <remarks>
-		/// The game carries a ZC_SYNC_EXEC here to fire the effects a
-		/// preceding sync block queued up. Whole framed packets go in,
-		/// concatenated, headers and all.
-		/// </remarks>
-		public byte[] AdditionalPacket { get; set; }
 
 		/// <summary>
 		/// Gets or sets the knock back information. Leave empty for none.
@@ -170,9 +146,10 @@ namespace Melia.Zone.Skills.Combat
 			this.HitEffect = result.Effect;
 			this.HitCount = result.HitCount;
 
-			if (skill.Data.UseType == SkillUseType.Force)
+			if (skill.Data.HitType == SkillHitType.Force)
 				this.ForceId = Melia.Zone.Skills.Combat.ForceId.GetNew();
 
+			this.RunAttackHitInfoCreatedHooks();
 			this.RunHitInfoCreatedHooks();
 		}
 
@@ -196,7 +173,24 @@ namespace Melia.Zone.Skills.Combat
 			this.HitEffect = result.Effect;
 			this.HitCount = result.HitCount;
 
+			this.RunAttackHitInfoCreatedHooks();
 			this.RunHitInfoCreatedHooks();
+		}
+
+		/// <summary>
+		/// Runs offensive hit hooks on the attacker's active buffs.
+		/// </summary>
+		private void RunAttackHitInfoCreatedHooks()
+		{
+			var buffs = this.Attacker.Components.Get<BuffComponent>()?.GetList();
+			if (buffs == null)
+				return;
+
+			foreach (var buff in buffs)
+			{
+				if (buff.Handler is IBuffOnAttackHitInfoCreatedHandler handler)
+					handler.OnAttackHitInfoCreated(buff, this);
+			}
 		}
 
 		/// <summary>

@@ -37,7 +37,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 			target = caster;
 
 			var duration = this.GetBuffDuration(skill);
-			target.StartBuff(BuffId.Fade_Buff, skill.Level, 0, duration, caster, skill.Id);
+			target.StartBuff(BuffId.Fade_Buff, skill.Level, 0, duration, caster);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 		}

@@ -123,17 +123,6 @@ namespace Melia.Zone.World.Actors.Pads
 		public bool IsDead => this.Trigger.MaxUseCount <= 0;
 
 		/// <summary>
-		/// Gets or sets whether the pad suppresses magic pads created by
-		/// its creator's enemies inside its area.
-		/// </summary>
-		public bool BlocksMagicPads { get; set; }
-
-		/// <summary>
-		/// Returns whether the pad was created by a magic skill.
-		/// </summary>
-		public bool IsMagic => this.Skill?.Data.AttackType == SkillAttackType.Magic || this.Skill?.Data.ClassType == SkillClassType.Magic;
-
-		/// <summary>
 		/// Gets or sets an entity for the pad to follow. When set, the
 		/// pad's position is updated to the target's position each tick,
 		/// with a forward translation based on movement speed to
@@ -197,7 +186,7 @@ namespace Melia.Zone.World.Actors.Pads
 		/// <remarks>
 		/// We currently allow null names for pads, in which case no
 		/// handler will be registered, but this might change in the
-		/// future. If at all possible, the game's name of the pad
+		/// future. If at all possible, the official name of the pad
 		/// should be used.
 		/// </remarks>
 		/// <param name="name">The name of the pad, as defined in the client and the PadName enum.</param>

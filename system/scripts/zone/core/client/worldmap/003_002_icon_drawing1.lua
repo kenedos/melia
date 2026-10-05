@@ -18,20 +18,10 @@ function M_CREATE_MAP_ICON(parent, ctrlName, icon, mapProp, mapWidth, mapHeight,
 	imgIcon:SetEnableStretch(1)
 	imgIcon:SetEnable(1)
 	imgIcon:EnableChangeMouseCursor(1)
-	imgIcon:MakeTopBetweenChild()
-
-	local ours = ctrlName ~= nil and string.find(ctrlName, "^_M_") ~= nil
-	local nativeQuestIcon = not ours and string.find(imageName, "^minimap_[123]_") ~= nil
-
-	if nativeQuestIcon then
-		imgIcon:ShowWindow(0)
-	else
-		imgIcon:ShowWindow(1)
-	end
-
+	
 	if icon.Tooltip then
 		imgIcon:SetTextTooltip("{@st59}" .. icon.Tooltip .. "{/}");
 	end
-
+	
 	return imgIcon
 end

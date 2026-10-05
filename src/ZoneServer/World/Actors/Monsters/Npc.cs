@@ -8,7 +8,6 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Skills;
-using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Pads;
 using Yggdrasil.Geometry;
@@ -70,16 +69,6 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Gets the NPC's role identifier.
 		/// </summary>
 		public string GetRole() => _role ?? "";
-
-		/// <summary>
-		/// Gets or sets a condition deciding, per character, whether the NPC
-		/// exists for them at all, or null if it exists for everyone.
-		/// </summary>
-		/// <remarks>
-		/// For the NPCs the world shows only at a certain point in a quest
-		/// chain, such as a captive who is not there until he is rescued.
-		/// </remarks>
-		public Func<Character, bool> VisibleTo { get; set; }
 
 		/// <summary>
 		/// Gets or sets whether this NPC can move.
@@ -394,7 +383,6 @@ namespace Melia.Zone.World.Actors.Monsters
 			Send.ZC_SKILL_CAST_CANCEL(this);
 			Send.ZC_SKILL_DISABLE(this);
 			Send.ZC_DEAD(this);
-			this.IsDeathAnnounced = true;
 
 			this.Properties.SetFloat(PropertyName.HP, 0);
 			this.Components.Get<MovementComponent>()?.Stop();

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
-using Yggdrasil.Logging;
 using Yggdrasil.Util;
 
 namespace Melia.Zone.World.Quests.Modifiers
@@ -15,8 +13,6 @@ namespace Melia.Zone.World.Quests.Modifiers
 	/// </summary>
 	public class ItemDropModifier : QuestModifier
 	{
-		private const string PityVarName = "Melia.Quests.DropMisses.";
-
 		/// <summary>
 		/// Returns the item id that a monster drops.
 		/// </summary>
@@ -32,17 +28,6 @@ namespace Melia.Zone.World.Quests.Modifiers
 		/// objective.
 		/// </summary>
 		public HashSet<int> MonsterIds { get; }
-
-		/// <summary>
-		/// Returns the number of kills without a drop after which the drop
-		/// is guaranteed, or 0 if there is no such pity counter.
-		/// </summary>
-		public int FixedCount { get; set; }
-
-		/// <summary>
-		/// Returns the amount of the item that drops at once.
-		/// </summary>
-		public int Amount { get; set; } = 1;
 
 		public ItemDropModifier(int itemId, float dropChance, params int[] monsterIds)
 		{
@@ -62,8 +47,6 @@ namespace Melia.Zone.World.Quests.Modifiers
 				var monster = monsterIds[i];
 				if (ZoneServer.Instance.Data.MonsterDb.TryFind(monster, out var data))
 					this.MonsterIds.Add(data.Id);
-				else
-					Log.Warning("ItemDropModifier: Monster '{0}' not found, item {1} will not drop from it.", monster, itemId);
 			}
 		}
 
@@ -93,30 +76,21 @@ namespace Melia.Zone.World.Quests.Modifiers
 			if (args.Target is not Mob monster)
 				return;
 
-			var character = monster.GetKillBeneficiary(args.Attacker);
-			if (character == null)
+			if (args.Attacker is not Character character)
 				return;
 
-			character.Quests.UpdateModifiers<ItemDropModifier>((quest, modifier) =>
+			character.Quests.UpdateModifiers<ItemDropModifier>((quest, modifier, progress) =>
 			{
-				if (!modifier.IsTarget(monster))
-					return;
-
-				var dropped = GameRandom.Get().NextDouble() < modifier.DropChance;
-
-				if (modifier.FixedCount > 0)
+				if (modifier.IsTarget(monster))
 				{
-					var varName = PityVarName + modifier.ItemId;
-					var misses = quest.Vars.GetInt(varName, 0);
-
-					if (!dropped && ++misses >= modifier.FixedCount)
-						dropped = true;
-
-					quest.Vars.SetInt(varName, dropped ? 0 : misses);
+					// Check drop chance
+				var rnd = RandomProvider.Get();
+				if (rnd.NextDouble() < modifier.DropChance)
+				{
+					// Add item directly to player's inventory
+					character.Inventory.Add(modifier.ItemId, 1, InventoryAddType.PickUp);
 				}
-
-				if (dropped)
-					character.Inventory.Add(modifier.ItemId, modifier.Amount, InventoryAddType.PickUp);
+				}
 			});
 		}
 

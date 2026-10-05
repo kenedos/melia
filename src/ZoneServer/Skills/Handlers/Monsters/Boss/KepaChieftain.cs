@@ -4,7 +4,6 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
@@ -12,7 +11,6 @@ using Melia.Zone.World.Actors;
 using Yggdrasil.Util;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using Melia.Zone.Skills.Helpers;
-using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -180,7 +178,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target?.Handle ?? 0, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target?.Handle ?? 0, originPos, originPos.GetDirection(farPos), Position.Zero);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -189,7 +187,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 56f, angle: 17f), 50f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 50, angle: 10f);
+			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1500;
 			var aniTime = 1700;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
@@ -238,7 +237,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private string GetRandomMob()
 		{
-			var random = GameRandom.Get().Next(4);
+			var random = RandomProvider.Get().Next(4);
 			var mob = "raider";
 			switch (random)
 			{

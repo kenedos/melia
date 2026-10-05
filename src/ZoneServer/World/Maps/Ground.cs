@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using g4;
 using Melia.Shared.Data.Database;
-using Melia.Shared.Util;
 using Melia.Shared.World;
+using Melia.Zone.World.Maps.NavMesh;
 using Yggdrasil.Geometry;
+using Yggdrasil.Util;
 
 namespace Melia.Zone.World.Maps
 {
@@ -15,66 +17,50 @@ namespace Melia.Zone.World.Maps
 	public class Ground
 	{
 		private const float RayOriginHeight = 30000;
-		private const int MinGridCellSize = 8;
-		private const int MaxGridDimension = 512;
-		private const float BarycentricEpsilon = 0.0001f;
-
-		private const float ClearanceQueryRange = 50f;
-		private const float ClearanceQueryMaxRange = 4096f;
 
 		private GroundData _data;
 		private DMesh3 _mesh;
 		private DMeshAABBTree3 _spatial;
 		private Polygon2d[] _cells;
 		private LineF[] _outlines;
+		private Polygon2d[] _navGraphPolygons;
+		private NavGraphNode[] _graphNodes;
 
+		// Spatial indexing for performance
+		private QuadTree<int> _cellQuadTree;
 		private QuadTree<int> _outlineQuadTree;
-
-		private int _left, _right, _bottom, _top;
-
-		private int _gridCellSize;
-		private int _gridWidth;
-		private int _gridHeight;
-		private float _gridMinX;
-		private float _gridMinZ;
-
-		private int[] _triangleGridStarts;
-		private int[] _triangleGridItems;
-		private int[] _cellGridStarts;
-		private int[] _cellGridItems;
-
-		private SampleTriangle[] _sampleTriangles;
-		private float[] _sampleAreas;
-		private float _sampleTotalArea;
-
-		[ThreadStatic]
-		private static List<int> OutlineQueryBuffer;
-
-		[ThreadStatic]
-		private static List<int> ClearanceQueryBuffer;
+		private Dictionary<Vector2d, HashSet<int>> _vertexToPolygonMap;
 
 		/// <summary>Returns the width of the ground in world units.</summary>
-		public int SizeX => _right - _left;
+		public int SizeX => _data?.Width ?? 0;
 
 		/// <summary>Returns the depth of the ground in world units.</summary>
-		public int SizeZ => _top - _bottom;
+		public int SizeZ => _data?.Height ?? 0;
 
 		/// <summary>Returns the left (minimum X) boundary of the ground.</summary>
-		public int Left => _left;
+		public int Left => _data?.Left ?? 0;
 
 		/// <summary>Returns the right (maximum X) boundary of the ground.</summary>
-		public int Right => _right;
+		public int Right => _data?.Right ?? 0;
 
 		/// <summary>Returns the bottom (minimum Z) boundary of the ground.</summary>
-		public int Bottom => _bottom;
+		public int Bottom => _data?.Bottom ?? 0;
 
 		/// <summary>Returns the top (maximum Z) boundary of the ground.</summary>
-		public int Top => _top;
+		public int Top => _data?.Top ?? 0;
+
+		/// <summary>Returns the navigation graph nodes built from the ground cells.</summary>
+		public NavGraphNode[] GraphNodes => _graphNodes;
 
 		/// <summary>
 		/// Returns the data that was used to create the ground.
 		/// </summary>
 		public GroundData Data => _data;
+
+		/// <summary>
+		/// Returns the raw array of walkable cell polygons.
+		/// </summary>
+		public Polygon2d[] GetCellPolygons() => _cells;
 
 		/// <summary>
 		/// Loads the ground data and builds internal spatial structures.
@@ -86,8 +72,6 @@ namespace Melia.Zone.World.Maps
 
 			if (!this.HasData()) return;
 
-			this.CacheBounds();
-
 			// Load these in parallel since they're independent
 			var meshTask = Task.Run(() => this.LoadGroundMesh());
 			var cellsTask = Task.Run(() => this.LoadCells());
@@ -96,7 +80,23 @@ namespace Melia.Zone.World.Maps
 			await Task.WhenAll(meshTask, cellsTask);
 			await outlinesTask;
 
+			// Build spatial indices for performance
 			this.BuildSpatialIndices();
+
+			await this.GenerateNavGraphPolygonsAsync();
+			await this.BuildNavGraphFromPolygonsAsync();
+			if (false)
+			{
+				// Load or generate the navigation graph polygons from cache.
+				if (!await this.TryLoadNavGraphPolygonsAsync())
+				{
+					await this.GenerateNavGraphPolygonsAsync();
+					await this.SaveNavGraphPolygonsAsync();
+				}
+
+				// Build the runtime graph representation from the loaded/generated polygons.
+				await this.BuildNavGraphFromPolygonsAsync();
+			}
 		}
 
 		/// <summary>
@@ -108,326 +108,291 @@ namespace Melia.Zone.World.Maps
 		}
 
 		/// <summary>
-		/// Caches the ground's extents, which the data itself recomputes by
-		/// scanning every vertex on each access.
-		/// </summary>
-		private void CacheBounds()
-		{
-			var vertices = _data.Vertices;
-
-			var minX = vertices[0].X;
-			var maxX = vertices[0].X;
-			var minZ = vertices[0].Y;
-			var maxZ = vertices[0].Y;
-
-			for (var i = 1; i < vertices.Length; i++)
-			{
-				var vertex = vertices[i];
-
-				if (vertex.X < minX) minX = vertex.X;
-				if (vertex.X > maxX) maxX = vertex.X;
-				if (vertex.Y < minZ) minZ = vertex.Y;
-				if (vertex.Y > maxZ) maxZ = vertex.Y;
-			}
-
-			_left = (int)minX;
-			_right = (int)maxX;
-			_bottom = (int)minZ;
-			_top = (int)maxZ;
-		}
-
-		/// <summary>
-		/// Builds the lookup grids and the outline index.
+		/// Builds spatial indices for faster lookups
 		/// </summary>
 		private void BuildSpatialIndices()
 		{
-			this.SetUpGrid();
-			this.BuildTriangleGrid();
-			this.BuildCellGrid();
-			this.BuildCellSampling();
-			this.BuildOutlineIndex();
-		}
-
-		/// <summary>
-		/// Determines the resolution and dimensions of the lookup grids.
-		/// </summary>
-		private void SetUpGrid()
-		{
-			_gridMinX = _left;
-			_gridMinZ = _bottom;
-
-			var sizeX = Math.Max(1, _right - _left);
-			var sizeZ = Math.Max(1, _top - _bottom);
-			var maxSize = Math.Max(sizeX, sizeZ);
-
-			_gridCellSize = Math.Max(MinGridCellSize, (int)Math.Ceiling(maxSize / (float)MaxGridDimension));
-			_gridWidth = sizeX / _gridCellSize + 1;
-			_gridHeight = sizeZ / _gridCellSize + 1;
-		}
-
-		/// <summary>
-		/// Buckets the mesh triangles into the lookup grid by their 2D bounds.
-		/// </summary>
-		private void BuildTriangleGrid()
-		{
-			var triangles = _data.Triangles;
-			if (triangles == null || triangles.Length == 0)
-				return;
-
-			var bounds = new float[triangles.Length * 4];
-
-			for (var i = 0; i < triangles.Length; i++)
+			if (_cells?.Length > 0)
 			{
-				var vertices = triangles[i].Vertices;
-				var minX = vertices[0].X;
-				var maxX = vertices[0].X;
-				var minZ = vertices[0].Y;
-				var maxZ = vertices[0].Y;
+				// Calculate bounds from non-null cells
+				var hasBounds = false;
+				double minX = 0, minY = 0, maxX = 0, maxY = 0;
 
-				for (var j = 1; j < 3; j++)
+				for (var i = 0; i < _cells.Length; i++)
 				{
-					if (vertices[j].X < minX) minX = vertices[j].X;
-					if (vertices[j].X > maxX) maxX = vertices[j].X;
-					if (vertices[j].Y < minZ) minZ = vertices[j].Y;
-					if (vertices[j].Y > maxZ) maxZ = vertices[j].Y;
-				}
+					if (_cells[i] == null)
+						continue;
 
-				bounds[i * 4 + 0] = minX;
-				bounds[i * 4 + 1] = minZ;
-				bounds[i * 4 + 2] = maxX;
-				bounds[i * 4 + 3] = maxZ;
-			}
-
-			this.BuildIndexGrid(bounds, triangles.Length, out _triangleGridStarts, out _triangleGridItems);
-		}
-
-		/// <summary>
-		/// Buckets the walkable cell polygons into the lookup grid by their
-		/// 2D bounds.
-		/// </summary>
-		private void BuildCellGrid()
-		{
-			if (_cells == null || _cells.Length == 0)
-				return;
-
-			var bounds = new float[_cells.Length * 4];
-
-			for (var i = 0; i < _cells.Length; i++)
-			{
-				if (_cells[i] == null)
-				{
-					bounds[i * 4] = float.NaN;
-					continue;
-				}
-
-				var cellBounds = _cells[i].Bounds;
-
-				bounds[i * 4 + 0] = (float)cellBounds.Min.x;
-				bounds[i * 4 + 1] = (float)cellBounds.Min.y;
-				bounds[i * 4 + 2] = (float)cellBounds.Max.x;
-				bounds[i * 4 + 3] = (float)cellBounds.Max.y;
-			}
-
-			this.BuildIndexGrid(bounds, _cells.Length, out _cellGridStarts, out _cellGridItems);
-		}
-
-		/// <summary>
-		/// Builds a grid index in compressed sparse row form, bucketing every
-		/// item into each grid cell its 2D bounds overlap.
-		/// </summary>
-		/// <param name="bounds">Four floats per item, min X, min Z, max X, max Z. A NaN min X skips the item.</param>
-		/// <param name="itemCount"></param>
-		/// <param name="starts"></param>
-		/// <param name="items"></param>
-		private void BuildIndexGrid(float[] bounds, int itemCount, out int[] starts, out int[] items)
-		{
-			var gridCellCount = _gridWidth * _gridHeight;
-			var offsets = new int[gridCellCount + 1];
-
-			for (var i = 0; i < itemCount; i++)
-			{
-				if (!this.TryGetGridRange(bounds, i, out var minCellX, out var minCellZ, out var maxCellX, out var maxCellZ))
-					continue;
-
-				for (var gz = minCellZ; gz <= maxCellZ; gz++)
-				{
-					for (var gx = minCellX; gx <= maxCellX; gx++)
-						offsets[gz * _gridWidth + gx + 1]++;
-				}
-			}
-
-			for (var i = 0; i < gridCellCount; i++)
-				offsets[i + 1] += offsets[i];
-
-			var cursors = new int[gridCellCount];
-			var entries = new int[offsets[gridCellCount]];
-
-			for (var i = 0; i < itemCount; i++)
-			{
-				if (!this.TryGetGridRange(bounds, i, out var minCellX, out var minCellZ, out var maxCellX, out var maxCellZ))
-					continue;
-
-				for (var gz = minCellZ; gz <= maxCellZ; gz++)
-				{
-					for (var gx = minCellX; gx <= maxCellX; gx++)
+					var b = _cells[i].Bounds;
+					if (!hasBounds)
 					{
-						var gridCell = gz * _gridWidth + gx;
-						entries[offsets[gridCell] + cursors[gridCell]++] = i;
+						minX = b.Min.x; minY = b.Min.y;
+						maxX = b.Max.x; maxY = b.Max.y;
+						hasBounds = true;
+					}
+					else
+					{
+						if (b.Min.x < minX) minX = b.Min.x;
+						if (b.Min.y < minY) minY = b.Min.y;
+						if (b.Max.x > maxX) maxX = b.Max.x;
+						if (b.Max.y > maxY) maxY = b.Max.y;
+					}
+				}
+
+				var bounds = hasBounds ? new AxisAlignedBox2d(minX, minY, maxX, maxY) : new AxisAlignedBox2d(0, 0, 1000, 1000);
+				_cellQuadTree = new QuadTree<int>(bounds, maxDepth: 6, maxObjectsPerNode: 10);
+
+				for (var i = 0; i < _cells.Length; i++)
+				{
+					if (_cells[i] != null)
+						_cellQuadTree.Insert(i, _cells[i].Bounds);
+				}
+			}
+
+			if (_outlines?.Length > 0)
+			{
+				// Calculate bounds from outlines
+				var first = _outlines[0];
+				double oMinX = Math.Min(first.Point1.X, first.Point2.X);
+				double oMinY = Math.Min(first.Point1.Y, first.Point2.Y);
+				double oMaxX = Math.Max(first.Point1.X, first.Point2.X);
+				double oMaxY = Math.Max(first.Point1.Y, first.Point2.Y);
+
+				for (var i = 1; i < _outlines.Length; i++)
+				{
+					var o = _outlines[i];
+					var lMinX = Math.Min(o.Point1.X, o.Point2.X);
+					var lMinY = Math.Min(o.Point1.Y, o.Point2.Y);
+					var lMaxX = Math.Max(o.Point1.X, o.Point2.X);
+					var lMaxY = Math.Max(o.Point1.Y, o.Point2.Y);
+
+					if (lMinX < oMinX) oMinX = lMinX;
+					if (lMinY < oMinY) oMinY = lMinY;
+					if (lMaxX > oMaxX) oMaxX = lMaxX;
+					if (lMaxY > oMaxY) oMaxY = lMaxY;
+				}
+
+				var bounds = new AxisAlignedBox2d(oMinX, oMinY, oMaxX, oMaxY);
+				_outlineQuadTree = new QuadTree<int>(bounds, maxDepth: 6, maxObjectsPerNode: 10);
+
+				for (var i = 0; i < _outlines.Length; i++)
+				{
+					var lineBounds = new AxisAlignedBox2d(
+						Math.Min(_outlines[i].Point1.X, _outlines[i].Point2.X),
+						Math.Min(_outlines[i].Point1.Y, _outlines[i].Point2.Y),
+						Math.Max(_outlines[i].Point1.X, _outlines[i].Point2.X),
+						Math.Max(_outlines[i].Point1.Y, _outlines[i].Point2.Y));
+					_outlineQuadTree.Insert(i, lineBounds);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Builds the in-memory navigation graph nodes and their adjacency from the polygon data.
+		/// Uses parallel processing and optimized neighbor detection.
+		/// </summary>
+		private async Task BuildNavGraphFromPolygonsAsync()
+		{
+			var nodes = new NavGraphNode[_navGraphPolygons.Length];
+
+			// Initialize nodes in parallel
+			await Task.Run(() =>
+				Parallel.For(0, _navGraphPolygons.Length, i =>
+					nodes[i] = new NavGraphNode(i, _navGraphPolygons[i])
+				)
+			);
+
+			// Build vertex-to-polygon mapping for faster neighbor detection
+			await Task.Run(() => this.BuildVertexToPolygonMapping());
+
+			// Find neighbors using the vertex mapping (much faster than brute force)
+			await Task.Run(() =>
+			{
+				var lockObj = new object();
+				Parallel.For(0, nodes.Length, i =>
+				{
+					var nodeA = nodes[i];
+					var neighbors = this.FindNeighborsUsingVertexMap(i, nodeA.Polygon);
+
+					lock (lockObj)
+					{
+						foreach (var neighborIdx in neighbors)
+						{
+							if (neighborIdx > i) // Avoid duplicate work
+							{
+								var nodeB = nodes[neighborIdx];
+								nodeA.Neighbors.Add(neighborIdx);
+								nodeB.Neighbors.Add(i);
+							}
+						}
+					}
+				});
+			});
+
+			_graphNodes = nodes;
+		}
+
+		/// <summary>
+		/// Builds a mapping from vertices to polygon indices for faster neighbor detection
+		/// </summary>
+		private void BuildVertexToPolygonMapping()
+		{
+			_vertexToPolygonMap = new Dictionary<Vector2d, HashSet<int>>();
+
+			for (int i = 0; i < _navGraphPolygons.Length; i++)
+			{
+				var polygon = _navGraphPolygons[i];
+				foreach (var vertex in polygon.Vertices)
+				{
+					if (!_vertexToPolygonMap.ContainsKey(vertex))
+						_vertexToPolygonMap[vertex] = new HashSet<int>();
+					_vertexToPolygonMap[vertex].Add(i);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Finds neighbors using the vertex mapping (O(V) instead of O(N²))
+		/// </summary>
+		private HashSet<int> FindNeighborsUsingVertexMap(int polygonIndex, Polygon2d polygon)
+		{
+			var neighbors = new HashSet<int>();
+
+			foreach (var vertex in polygon.Vertices)
+			{
+				if (_vertexToPolygonMap.TryGetValue(vertex, out var polygonsAtVertex))
+				{
+					foreach (var neighborIndex in polygonsAtVertex)
+					{
+						if (neighborIndex != polygonIndex)
+							neighbors.Add(neighborIndex);
 					}
 				}
 			}
 
-			starts = offsets;
-			items = entries;
+			return neighbors;
 		}
 
 		/// <summary>
-		/// Returns the inclusive range of grid cells the item's bounds cover
-		/// via out. Returns false if the item is skipped.
+		/// Finds the index of the navigation graph polygon that contains the given 2D position.
+		/// Uses spatial indexing for better performance.
 		/// </summary>
-		/// <param name="bounds"></param>
-		/// <param name="index"></param>
-		/// <param name="minCellX"></param>
-		/// <param name="minCellZ"></param>
-		/// <param name="maxCellX"></param>
-		/// <param name="maxCellZ"></param>
-		/// <returns></returns>
-		private bool TryGetGridRange(float[] bounds, int index, out int minCellX, out int minCellZ, out int maxCellX, out int maxCellZ)
+		/// <param name="pos">The position to check.</param>
+		/// <returns>The index of the containing polygon, or -1 if not found.</returns>
+		public int FindContainingPolygon(Vector2d pos)
 		{
-			minCellX = minCellZ = maxCellX = maxCellZ = 0;
-
-			var minX = bounds[index * 4 + 0];
-			if (float.IsNaN(minX))
-				return false;
-
-			minCellX = Math.Clamp((int)((minX - _gridMinX) / _gridCellSize), 0, _gridWidth - 1);
-			minCellZ = Math.Clamp((int)((bounds[index * 4 + 1] - _gridMinZ) / _gridCellSize), 0, _gridHeight - 1);
-			maxCellX = Math.Clamp((int)((bounds[index * 4 + 2] - _gridMinX) / _gridCellSize), 0, _gridWidth - 1);
-			maxCellZ = Math.Clamp((int)((bounds[index * 4 + 3] - _gridMinZ) / _gridCellSize), 0, _gridHeight - 1);
-
-			return true;
-		}
-
-		/// <summary>
-		/// Returns the index of the grid cell containing the given 2D
-		/// position via out. Returns false if the position is off the grid.
-		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="z"></param>
-		/// <param name="gridCell"></param>
-		/// <returns></returns>
-		private bool TryGetGridCell(float x, float z, out int gridCell)
-		{
-			gridCell = -1;
-
-			if (_gridWidth <= 0)
-				return false;
-
-			var offsetX = (x - _gridMinX) / _gridCellSize;
-			var offsetZ = (z - _gridMinZ) / _gridCellSize;
-
-			if (offsetX < 0 || offsetZ < 0)
-				return false;
-
-			var cellX = (int)offsetX;
-			var cellZ = (int)offsetZ;
-
-			if (cellX >= _gridWidth || cellZ >= _gridHeight)
-				return false;
-
-			gridCell = cellZ * _gridWidth + cellX;
-			return true;
-		}
-
-		/// <summary>
-		/// Triangulates the walkable cells and builds the cumulative area
-		/// table used to sample random positions.
-		/// </summary>
-		private void BuildCellSampling()
-		{
-			if (_data.Cells == null)
-				return;
-
-			var triangles = new List<SampleTriangle>();
-			var areas = new List<float>();
-			var total = 0f;
-
-			foreach (var cell in _data.Cells)
+			if (_cellQuadTree != null)
 			{
-				if (cell?.Indices == null || cell.Indices.Length < 3)
-					continue;
-
-				for (var i = 1; i < cell.Indices.Length - 1; i++)
+				// Use spatial index to narrow down candidates
+				var candidates = _cellQuadTree.Query(new AxisAlignedBox2d(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1));
+				foreach (var candidateIdx in candidates)
 				{
-					var triangle = new SampleTriangle(cell.Indices[0], cell.Indices[i], cell.Indices[i + 1]);
-					var area = this.GetTriangleArea(triangle);
+					if (_graphNodes[candidateIdx].Polygon.Contains(pos))
+						return candidateIdx;
+				}
+				return -1;
+			}
 
-					if (area <= 0)
-						continue;
+			// Fallback to linear search
+			for (var i = 0; i < _graphNodes.Length; i++)
+			{
+				if (_graphNodes[i].Polygon.Contains(pos))
+					return i;
+			}
+			return -1;
+		}
 
-					total += area;
-
-					triangles.Add(triangle);
-					areas.Add(total);
+		private bool PolygonsAreNeighbors(Polygon2d a, Polygon2d b)
+		{
+			foreach (var vb in b.Vertices)
+			{
+				foreach (var va in a.Vertices)
+				{
+					if (va == vb)
+						return true;
 				}
 			}
 
-			_sampleTriangles = triangles.ToArray();
-			_sampleAreas = areas.ToArray();
-			_sampleTotalArea = total;
+			return false;
 		}
 
 		/// <summary>
-		/// Returns the 2D area of the given triangle.
+		/// Tries to load the navgraph polygon data from a cached file asynchronously.
 		/// </summary>
-		/// <param name="triangle"></param>
-		/// <returns></returns>
-		private float GetTriangleArea(SampleTriangle triangle)
+		private async Task<bool> TryLoadNavGraphPolygonsAsync()
 		{
-			var a = _data.Vertices[triangle.V0];
-			var b = _data.Vertices[triangle.V1];
-			var c = _data.Vertices[triangle.V2];
+			var filePath = this.GetNavGraphFilePath(_data.MapName);
+			if (!File.Exists(filePath))
+				return false;
 
-			return Math.Abs((b.X - a.X) * (c.Y - a.Y) - (c.X - a.X) * (b.Y - a.Y)) * 0.5f;
+			try
+			{
+				return await Task.Run(() =>
+				{
+					using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+					ZoneServer.Instance.Data.NavGraphDb.Load(fs);
+					if (ZoneServer.Instance.Data.NavGraphDb.TryFind(_data.MapName, out var navData))
+					{
+						_navGraphPolygons = NavGraphBuilder.ConvertToPolygons(navData);
+						return true;
+					}
+					return false;
+				});
+			}
+			catch (Exception ex)
+			{
+				// Log or handle read error. Proceeding will cause it to be regenerated.
+				return false;
+			}
+		}
+
+		private string GetNavGraphFilePath(string mapName)
+		{
+			return Path.Combine("Cache", "NavGraphs", $"{mapName}.navgraph");
 		}
 
 		/// <summary>
-		/// Builds the quad tree used to test lines against the ground's
-		/// outer boundary.
+		/// Generates the navgraph polygons from the ground's cell data asynchronously.
 		/// </summary>
-		private void BuildOutlineIndex()
+		private async Task GenerateNavGraphPolygonsAsync()
 		{
-			if (_outlines == null || _outlines.Length == 0)
-				return;
-
-			var first = _outlines[0];
-			double minX = Math.Min(first.Point1.X, first.Point2.X);
-			double minY = Math.Min(first.Point1.Y, first.Point2.Y);
-			double maxX = Math.Max(first.Point1.X, first.Point2.X);
-			double maxY = Math.Max(first.Point1.Y, first.Point2.Y);
-
-			for (var i = 1; i < _outlines.Length; i++)
+			await Task.Run(() =>
 			{
-				var outline = _outlines[i];
+				var count = 0;
+				for (var i = 0; i < _cells.Length; i++)
+				{
+					if (_cells[i] != null)
+						count++;
+				}
 
-				minX = Math.Min(minX, Math.Min(outline.Point1.X, outline.Point2.X));
-				minY = Math.Min(minY, Math.Min(outline.Point1.Y, outline.Point2.Y));
-				maxX = Math.Max(maxX, Math.Max(outline.Point1.X, outline.Point2.X));
-				maxY = Math.Max(maxY, Math.Max(outline.Point1.Y, outline.Point2.Y));
-			}
+				var result = new Polygon2d[count];
+				var idx = 0;
+				for (var i = 0; i < _cells.Length; i++)
+				{
+					if (_cells[i] != null)
+						result[idx++] = _cells[i];
+				}
 
-			_outlineQuadTree = new QuadTree<int>(new AxisAlignedBox2d(minX, minY, maxX, maxY), maxDepth: 6, maxObjectsPerNode: 10);
+				_navGraphPolygons = result;
+			});
+		}
 
-			for (var i = 0; i < _outlines.Length; i++)
+		/// <summary>
+		/// Saves the current navgraph polygon data to a cache file asynchronously.
+		/// </summary>
+		private async Task SaveNavGraphPolygonsAsync()
+		{
+			await Task.Run(() =>
 			{
-				var lineBounds = new AxisAlignedBox2d(
-					Math.Min(_outlines[i].Point1.X, _outlines[i].Point2.X),
-					Math.Min(_outlines[i].Point1.Y, _outlines[i].Point2.Y),
-					Math.Max(_outlines[i].Point1.X, _outlines[i].Point2.X),
-					Math.Max(_outlines[i].Point1.Y, _outlines[i].Point2.Y));
+				var navData = NavGraphBuilder.ConvertFromPolygons(_data.MapName, _navGraphPolygons);
+				ZoneServer.Instance.Data.NavGraphDb.Entries[_data.MapName] = navData;
 
-				_outlineQuadTree.Insert(i, lineBounds);
-			}
+				var filePath = this.GetNavGraphFilePath(_data.MapName);
+				Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+
+				using var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+				ZoneServer.Instance.Data.NavGraphDb.Save(fs);
+			});
 		}
 
 		/// <summary>
@@ -527,45 +492,6 @@ namespace Melia.Zone.World.Maps
 		public bool TryGetHeightAt(Position pos, out float height)
 		{
 			height = float.NaN;
-
-			if (_triangleGridStarts == null)
-				return this.TryGetHeightFromMesh(pos, out height);
-
-			if (!this.TryGetGridCell(pos.X, pos.Z, out var gridCell))
-				return false;
-
-			var found = false;
-			var highest = 0f;
-
-			for (var i = _triangleGridStarts[gridCell]; i < _triangleGridStarts[gridCell + 1]; i++)
-			{
-				if (!TryGetTriangleHeight(_data.Triangles[_triangleGridItems[i]], pos.X, pos.Z, out var triangleHeight))
-					continue;
-
-				if (!found || triangleHeight > highest)
-				{
-					highest = triangleHeight;
-					found = true;
-				}
-			}
-
-			if (!found)
-				return false;
-
-			height = highest;
-			return true;
-		}
-
-		/// <summary>
-		/// Returns the ground height at the given position by casting a ray
-		/// down onto the mesh via out. Returns false if the ray missed.
-		/// </summary>
-		/// <param name="pos"></param>
-		/// <param name="height"></param>
-		/// <returns></returns>
-		private bool TryGetHeightFromMesh(Position pos, out float height)
-		{
-			height = float.NaN;
 			if (_spatial == null) return false;
 
 			var origin = new Vector3d(pos.X, RayOriginHeight, pos.Z);
@@ -576,38 +502,6 @@ namespace Melia.Zone.World.Maps
 
 			var intersection = MeshQueries.TriangleIntersection(_mesh, hitId, ray);
 			height = (float)(origin.y - intersection.RayParameter);
-			return true;
-		}
-
-		/// <summary>
-		/// Returns the interpolated height of the triangle at the given 2D
-		/// position via out. Returns false if the position lies outside it.
-		/// </summary>
-		/// <param name="triangle"></param>
-		/// <param name="x"></param>
-		/// <param name="z"></param>
-		/// <param name="height"></param>
-		/// <returns></returns>
-		private static bool TryGetTriangleHeight(VertexListData triangle, float x, float z, out float height)
-		{
-			height = float.NaN;
-
-			var a = triangle.Vertices[0];
-			var b = triangle.Vertices[1];
-			var c = triangle.Vertices[2];
-
-			var denominator = (b.Y - c.Y) * (a.X - c.X) + (c.X - b.X) * (a.Y - c.Y);
-			if (Math.Abs(denominator) < 1e-6f)
-				return false;
-
-			var weightA = ((b.Y - c.Y) * (x - c.X) + (c.X - b.X) * (z - c.Y)) / denominator;
-			var weightB = ((c.Y - a.Y) * (x - c.X) + (a.X - c.X) * (z - c.Y)) / denominator;
-			var weightC = 1f - weightA - weightB;
-
-			if (weightA < -BarycentricEpsilon || weightB < -BarycentricEpsilon || weightC < -BarycentricEpsilon)
-				return false;
-
-			height = weightA * a.Z + weightB * b.Z + weightC * c.Z;
 			return true;
 		}
 
@@ -627,6 +521,7 @@ namespace Melia.Zone.World.Maps
 		/// <summary>
 		/// Returns the cell index for the given position via out. Returns
 		/// false if no cell exists at the position.
+		/// Uses spatial indexing for better performance.
 		/// </summary>
 		/// <param name="pos"></param>
 		/// <param name="cellIndex"></param>
@@ -638,21 +533,19 @@ namespace Melia.Zone.World.Maps
 
 			var vecPos = new Vector2d(pos.X, pos.Z);
 
-			if (_cellGridStarts != null)
+			if (_cellQuadTree != null)
 			{
-				if (!this.TryGetGridCell(pos.X, pos.Z, out var gridCell))
-					return false;
-
-				for (var i = _cellGridStarts[gridCell]; i < _cellGridStarts[gridCell + 1]; i++)
+				// Use spatial index to narrow down candidates
+				var candidates = _cellQuadTree.Query(new AxisAlignedBox2d(vecPos.x - 1, vecPos.y - 1, vecPos.x + 1, vecPos.y + 1));
+				foreach (var candidateIdx in candidates)
 				{
-					var candidateIndex = _cellGridItems[i];
-					if (_cells[candidateIndex].Contains(vecPos))
+					var cell = _cells[candidateIdx];
+					if (cell != null && cell.Contains(vecPos))
 					{
-						cellIndex = candidateIndex;
+						cellIndex = candidateIdx;
 						return true;
 					}
 				}
-
 				return false;
 			}
 
@@ -671,37 +564,6 @@ namespace Melia.Zone.World.Maps
 		}
 
 		/// <summary>
-		/// Adds the indices of every cell whose bounds cover the given
-		/// position to the given list, which is cleared first.
-		/// </summary>
-		/// <param name="pos"></param>
-		/// <param name="results"></param>
-		public void GetCellCandidates(Position pos, List<int> results)
-		{
-			results.Clear();
-
-			if (_cells == null)
-				return;
-
-			if (_cellGridStarts == null)
-			{
-				for (var i = 0; i < _cells.Length; ++i)
-				{
-					if (_cells[i] != null)
-						results.Add(i);
-				}
-
-				return;
-			}
-
-			if (!this.TryGetGridCell(pos.X, pos.Z, out var gridCell))
-				return;
-
-			for (var i = _cellGridStarts[gridCell]; i < _cellGridStarts[gridCell + 1]; i++)
-				results.Add(_cellGridItems[i]);
-		}
-
-		/// <summary>
 		/// Returns a random position on the walkable ground via out.
 		/// Returns false if no valid position could be found.
 		/// </summary>
@@ -709,42 +571,52 @@ namespace Melia.Zone.World.Maps
 		public bool TryGetRandomPosition(out Position pos)
 		{
 			pos = Position.Zero;
+			if (_cells == null) return false;
 
-			if (_sampleTriangles == null || _sampleTriangles.Length == 0)
-				return false;
-
-			var target = (float)(GameRandom.Get().NextDouble() * _sampleTotalArea);
-
-			var index = Array.BinarySearch(_sampleAreas, target);
-			if (index < 0) index = ~index;
-			if (index >= _sampleTriangles.Length) index = _sampleTriangles.Length - 1;
-
-			var triangle = _sampleTriangles[index];
-			var a = _data.Vertices[triangle.V0];
-			var b = _data.Vertices[triangle.V1];
-			var c = _data.Vertices[triangle.V2];
-
-			var weightB = (float)GameRandom.Get().NextDouble();
-			var weightC = (float)GameRandom.Get().NextDouble();
-
-			if (weightB + weightC > 1)
+			var validCount = 0;
+			for (var i = 0; i < _cells.Length; i++)
 			{
-				weightB = 1 - weightB;
-				weightC = 1 - weightC;
+				if (_cells[i] != null)
+					validCount++;
 			}
 
-			var x = a.X + weightB * (b.X - a.X) + weightC * (c.X - a.X);
-			var z = a.Y + weightB * (b.Y - a.Y) + weightC * (c.Y - a.Y);
+			if (validCount == 0) return false;
 
-			var candidatePos = new Position(x, 0, z);
+			var rnd = RandomProvider.Get();
+			var targetIdx = rnd.Next(validCount);
+			Polygon2d rndCell = null;
+			var seen = 0;
+			for (var i = 0; i < _cells.Length; i++)
+			{
+				if (_cells[i] != null)
+				{
+					if (seen == targetIdx)
+					{
+						rndCell = _cells[i];
+						break;
+					}
+					seen++;
+				}
+			}
 
-			// The cells and the mesh disagree along the very edges, where the
-			// cell's own plane is the better answer.
-			if (!this.TryGetHeightAt(candidatePos, out var height))
-				height = a.Z + weightB * (b.Z - a.Z) + weightC * (c.Z - a.Z);
+			var bounds = rndCell.Bounds;
+			for (var i = 0; i < 50; ++i)
+			{
+				var x = rnd.Next((int)bounds.Min.x + 1, (int)bounds.Max.x);
+				var z = rnd.Next((int)bounds.Min.y + 1, (int)bounds.Max.y);
+				var candidatePos = new Position(x, 0, z);
 
-			pos = candidatePos.WithHeight(height);
-			return true;
+				if (!rndCell.Contains(new Vector2d(x, z)))
+					continue;
+
+				if (!this.TryGetHeightAt(candidatePos, out var height))
+					continue;
+
+				pos = candidatePos.WithHeight(height);
+				return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -815,6 +687,12 @@ namespace Melia.Zone.World.Maps
 			return lastValidPos;
 		}
 
+		/// <summary>
+		/// Checks if a circle is on valid ground (not on a hole or too-steep slope).
+		/// </summary>
+		/// <param name="center"></param>
+		/// <param name="radius"></param>
+		/// <returns></returns>
 		private static readonly (float dx, float dz)[] PerimeterUnitOffsets =
 		[
 			(1, 0), (-1, 0), (0, 1), (0, -1),
@@ -822,12 +700,6 @@ namespace Melia.Zone.World.Maps
 			(0.707f, -0.707f), (-0.707f, -0.707f)
 		];
 
-		/// <summary>
-		/// Checks if a circle is on valid ground (not on a hole or too-steep slope).
-		/// </summary>
-		/// <param name="center"></param>
-		/// <param name="radius"></param>
-		/// <returns></returns>
 		public bool IsValidCirclePosition(Position center, float radius)
 		{
 			const float maxTerrainVarianceMultiplier = 1.5f;
@@ -866,19 +738,17 @@ namespace Melia.Zone.World.Maps
 
 			if (_outlineQuadTree != null)
 			{
-				var candidates = OutlineQueryBuffer ??= new List<int>();
+				// Use spatial index to narrow down candidates
 				var lineBounds = new AxisAlignedBox2d(
 					Math.Min(pos1.X, pos2.X), Math.Min(pos1.Z, pos2.Z),
 					Math.Max(pos1.X, pos2.X), Math.Max(pos1.Z, pos2.Z));
-
-				_outlineQuadTree.Query(lineBounds, candidates);
+				var candidates = _outlineQuadTree.Query(lineBounds);
 
 				foreach (var candidateIdx in candidates)
 				{
 					if (pathLine.Intersects(_outlines[candidateIdx], out _))
 						return true;
 				}
-
 				return false;
 			}
 
@@ -890,86 +760,6 @@ namespace Melia.Zone.World.Maps
 			}
 
 			return false;
-		}
-
-		/// <summary>
-		/// Returns the distance from the given position to the nearest
-		/// ground boundary via out. Returns false if the position isn't
-		/// on valid ground or no boundary could be found.
-		/// </summary>
-		/// <param name="pos"></param>
-		/// <param name="clearance"></param>
-		/// <returns></returns>
-		public bool TryGetClearance(Position pos, out float clearance)
-		{
-			clearance = 0;
-
-			if (_outlines == null || _outlines.Length == 0)
-				return false;
-
-			if (!this.IsValidPosition(pos))
-				return false;
-
-			if (_outlineQuadTree == null)
-			{
-				var nearest = float.MaxValue;
-				for (var i = 0; i < _outlines.Length; i++)
-					nearest = Math.Min(nearest, DistanceToOutline(pos, _outlines[i]));
-
-				clearance = nearest;
-				return true;
-			}
-
-			var candidates = ClearanceQueryBuffer ??= new List<int>();
-
-			for (var range = ClearanceQueryRange; range <= ClearanceQueryMaxRange; range *= 2)
-			{
-				candidates.Clear();
-				_outlineQuadTree.Query(new AxisAlignedBox2d(pos.X - range, pos.Z - range, pos.X + range, pos.Z + range), candidates);
-
-				var nearest = float.MaxValue;
-				foreach (var candidateIdx in candidates)
-					nearest = Math.Min(nearest, DistanceToOutline(pos, _outlines[candidateIdx]));
-
-				// A boundary further away than the queried box can't be
-				// trusted, a closer one might sit just outside of it.
-				if (nearest <= range)
-				{
-					clearance = nearest;
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Returns the distance from the position to the outline segment.
-		/// </summary>
-		/// <param name="pos"></param>
-		/// <param name="outline"></param>
-		/// <returns></returns>
-		private static float DistanceToOutline(Position pos, LineF outline)
-		{
-			var startX = outline.Point1.X;
-			var startZ = outline.Point1.Y;
-			var deltaX = outline.Point2.X - startX;
-			var deltaZ = outline.Point2.Y - startZ;
-
-			var lengthSquared = deltaX * deltaX + deltaZ * deltaZ;
-			var offsetX = pos.X - startX;
-			var offsetZ = pos.Z - startZ;
-
-			if (lengthSquared <= float.Epsilon)
-				return (float)Math.Sqrt(offsetX * offsetX + offsetZ * offsetZ);
-
-			var projection = (offsetX * deltaX + offsetZ * deltaZ) / lengthSquared;
-			projection = Math.Max(0, Math.Min(1, projection));
-
-			var closestX = pos.X - (startX + deltaX * projection);
-			var closestZ = pos.Z - (startZ + deltaZ * projection);
-
-			return (float)Math.Sqrt(closestX * closestX + closestZ * closestZ);
 		}
 
 		/// <summary>
@@ -1076,14 +866,6 @@ namespace Melia.Zone.World.Maps
 			// If the first thing the ray hits is farther away than the target, the line of sight is clear.
 			return intersection.RayParameter >= totalDistance;
 		}
-
-		/// <summary>
-		/// A triangle of a walkable cell, used to sample random positions.
-		/// </summary>
-		/// <param name="V0"></param>
-		/// <param name="V1"></param>
-		/// <param name="V2"></param>
-		private readonly record struct SampleTriangle(int V0, int V1, int V2);
 	}
 
 	/// <summary>
@@ -1135,21 +917,11 @@ namespace Melia.Zone.World.Maps
 		public List<T> Query(AxisAlignedBox2d queryBounds)
 		{
 			var result = new List<T>();
-			this.Query(queryBounds, result);
+			Query(queryBounds, result);
 			return result;
 		}
 
-		/// <summary>
-		/// Adds all items whose bounding boxes intersect the given query
-		/// bounds to the given list, which is cleared first.
-		/// </summary>
-		public void Query(AxisAlignedBox2d queryBounds, List<T> result)
-		{
-			result.Clear();
-			this.QueryInto(queryBounds, result);
-		}
-
-		private void QueryInto(AxisAlignedBox2d queryBounds, List<T> result)
+		private void Query(AxisAlignedBox2d queryBounds, List<T> result)
 		{
 			if (!_bounds.Intersects(queryBounds))
 				return;
@@ -1163,7 +935,7 @@ namespace Melia.Zone.World.Maps
 			if (_children[0] != null)
 			{
 				foreach (var child in _children)
-					child.QueryInto(queryBounds, result);
+					child.Query(queryBounds, result);
 			}
 		}
 

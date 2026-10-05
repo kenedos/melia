@@ -4,34 +4,17 @@
 // Handles "Custom Command" requests from the client.
 //---------------------------------------------------------------------------
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Transactions;
-using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
-using Melia.Shared.ObjectProperties;
-using Melia.Shared.Util;
 using Melia.Zone;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
-using Melia.Zone.World.Actors.CombatEntities.Components;
-using Melia.Zone.World.Actors.Monsters;
-using Melia.Zone.World.Quests;
 using Yggdrasil.Logging;
 
 public class CustomCommandFunctionsScript : GeneralScript
 {
-	[ScriptableFunction]
-	public CustomCommandResult SCR_MARKET_UI_OPEN(Character character, int numArg1, int numArg2, int numArg3)
-	{
-		return CustomCommandResult.Okay;
-	}
-
 	[ScriptableFunction]
 	public CustomCommandResult SCR_LAST_INFOSET_OPEN(Character character, int numArg1, int numArg2, int numArg3)
 	{
@@ -82,34 +65,8 @@ public class CustomCommandFunctionsScript : GeneralScript
 	{
 		character.VisibleEquip ^= VisibleEquip.Wig;
 
-		var wigVisible = (character.VisibleEquip & VisibleEquip.Wig) != 0;
-		var hairItem = character.Inventory.GetEquip(EquipSlot.Hair);
-
-		// Send appearance update to others and self
 		Send.ZC_UPDATED_PCAPPEARANCE(character);
 		Send.ZC_NORMAL.WigVisibilityUpdate(character);
-
-		// Send UpdateCharacterLook to show/hide the wig hair style
-		if (hairItem != null && hairItem.Id != 12101) // 12101 is default "no hair costume"
-		{
-			var strArg = hairItem.Data?.Script?.StrArg ?? "";
-			if (!string.IsNullOrEmpty(strArg))
-			{
-				if (wigVisible)
-				{
-					// Wig visible - show wig hair style
-					if (ZoneServer.Instance.Data.HairTypeDb.TryFindByClassName(strArg, out var hairData))
-						Send.ZC_NORMAL.UpdateCharacterLook(character, hairItem.Id, EquipSlot.Hair, hairData.Index);
-					else if (ZoneServer.Instance.Data.HeadTypeDb.TryFind(character.Gender, strArg, out var headData))
-						Send.ZC_NORMAL.UpdateCharacterLook(character, hairItem.Id, EquipSlot.Hair, headData.Index);
-				}
-				else
-				{
-					// Wig hidden - show default hair (index 0)
-					Send.ZC_NORMAL.UpdateCharacterLook(character, hairItem.Id, EquipSlot.Hair, 0);
-				}
-			}
-		}
 
 		return CustomCommandResult.Okay;
 	}
@@ -121,180 +78,6 @@ public class CustomCommandFunctionsScript : GeneralScript
 
 		Send.ZC_UPDATED_PCAPPEARANCE(character);
 		Send.ZC_NORMAL.SubWeaponVisibilityUpdate(character);
-
-		return CustomCommandResult.Okay;
-	}
-
-	[ScriptableFunction]
-	public CustomCommandResult SCR_PET_ACTIVATE(Character character, int numArg1, int numArg2, int numArg3)
-	{
-		var companions = character.Companions.GetList();
-		if (companions.Count == 0)
-			return CustomCommandResult.Fail;
-
-		// numArg2 contains the companion's job ID (e.g. 3014 for hawk, 0 for ground pet)
-		var jobId = numArg2;
-		Companion companion;
-		if (!character.Companions.TryGetCompanion(a => a.CompanionData.JobId == jobId, out companion))
-			return CustomCommandResult.Fail;
-
-		var nextActivateSec = companion.Vars.Get<DateTime>("NextActivateTime", DateTime.MinValue);
-		if (DateTime.Now < nextActivateSec)
-			return CustomCommandResult.Okay;
-
-		var ownerFaction = character.Faction;
-		if (ownerFaction == FactionType.Peaceful && (character.Map.IsPVP || ZoneServer.Instance.World.IsPVP))
-		{
-			var etc = character.Etc.Properties;
-			if (etc[PropertyName.Team_Mission] == 0)
-			{
-				//companion.ChangeFaction(FactionType.Peaceful);
-				//SetHideCheckScript(companion, "HIDE_FROM_PVP_PLAYERS");
-				companion.StartBuff(BuffId.GuildBattle_Observe, TimeSpan.Zero, companion);
-			}
-		}
-
-		companion.Vars.Set("NextActivateTime", DateTime.Now + TimeSpan.FromSeconds(5 - 1));
-
-		if (companion.IsActivated)
-		{
-			if (companion.IsRiding)
-			{
-				character.SystemMessage("DownFromPetFirst");
-				return CustomCommandResult.Okay;
-			}
-			companion.SetCompanionState(false);
-		}
-		else
-		{
-			companion.SetCompanionState(true);
-		}
-
-		return CustomCommandResult.Okay;
-	}
-
-	[ScriptableFunction]
-	public CustomCommandResult SCR_COMPANION_GIVE_FEED(Character character, int numArg1, int numArg2, int numArg3)
-	{
-		var companionHandle = numArg1;
-		var itemInvIndex = numArg2;
-
-		if (!character.Companions.TryGetCompanion(a => a.Handle == companionHandle, out var companion))
-		{
-			return CustomCommandResult.Fail;
-		}
-
-		if (companion.IsDead)
-		{
-			return CustomCommandResult.Fail;
-		}
-
-		if (!character.Inventory.TryGetItemByIndex(itemInvIndex, out var item))
-		{
-			return CustomCommandResult.Fail;
-		}
-
-		if (!item.Data.HasScript || item.Data.Script.Function != "PET_FOOD_USE")
-		{
-			return CustomCommandResult.Fail;
-		}
-
-		if (item.IsLocked)
-		{
-			return CustomCommandResult.Fail;
-		}
-
-		var cooldowns = character.Components.Get<CooldownComponent>();
-		if (cooldowns.IsOnCooldown(item.Data.CooldownId))
-		{
-			return CustomCommandResult.Okay;
-		}
-
-		var staminaAmount = (int)item.Data.Script.NumArg1;
-		var foodType = (CompanionFoodType)(int)item.Data.Script.NumArg2;
-		var animationName = item.Data.Script.StrArg;
-
-		companion.Feed(staminaAmount, foodType, animationName);
-
-		if (item.Data.HasCooldown)
-		{
-			var cooldownTime = item.Data.CooldownTime;
-			cooldownTime *= ZoneServer.Instance.Conf.World.ItemCooldownRate;
-
-			if (cooldownTime > TimeSpan.Zero)
-				cooldowns.Start(item.Data.CooldownId, cooldownTime);
-		}
-
-		character.Inventory.Remove(item, 1, InventoryItemRemoveMsg.Used);
-
-		return CustomCommandResult.Okay;
-	}
-
-	[ScriptableFunction]
-	public CustomCommandResult SCR_COMPANION_STROKE(Character character, int numArg1, int numArg2, int numArg3)
-	{
-		// Prefer bird companion if it's on the player's shoulder,
-		// otherwise fall back to ground companion
-		var bird = character.Companions.ActiveBirdCompanion;
-		if (!character.TryGetActiveGroundCompanion(out var companion) && bird == null)
-			return CustomCommandResult.Fail;
-
-		if (bird != null && bird.IsLandedOnShoulder)
-			companion = bird;
-
-		Send.ZC_ENABLE_CONTROL(character.Connection, "PlaySumAni", false);
-
-		//bool saniRet = PlaySumAni(self, compa, "pet", 80);
-		//WaitSumAniEnd(self);
-
-		Send.ZC_NORMAL.AttackCancelBow(character);
-
-		Send.ZC_ENABLE_CONTROL(character.Connection, "PlaySumAni", true);
-
-		if (!character.TryGetCompanionProperty(companion, "FriendPointTime", out var friendPointTime, "None"))
-			friendPointTime = "None";
-
-		var nextAbleTime = DateTime.MinValue;
-		if (friendPointTime != "None")
-			friendPointTime.TryGetPropertyStringToDateTime(out nextAbleTime);
-		var sysTime = DateTime.Now;
-
-		if (sysTime > nextAbleTime)
-		{
-			var nextSec = 20 * 60;
-			nextAbleTime = DateTime.Now.AddSeconds(nextSec);
-			var strNextTime = nextAbleTime.ToPropertyDateTimeString();
-			if (strNextTime == null)
-			{
-				strNextTime = "None";
-			}
-
-			character.TryGetCompanionProperty(companion, "FriendPoint", out var friendPointStr, "0");
-			var friendPoint = int.Parse(friendPointStr);
-			var nextPoint = friendPoint + 10;
-			character.TryGetCompanionProperty(companion, "FriendLevel", out var friendLevelStr, "1");
-			var friendLevel = int.Parse(friendLevelStr);
-
-			var nextLevel = ZoneServer.Instance.Data.ExpDb.GetLevel(ExpType.Pet, nextPoint);
-			var changeLv = 0;
-			if (nextLevel != friendLevel)
-				changeLv = nextLevel;
-
-			companion.AttachEffect("F_sys_heart", 2, EffectLocation.Top);
-
-			character.SetCompanionProperty(companion, "FriendPointTime", strNextTime);
-			character.SetCompanionProperty(companion, "FriendPoint", nextPoint);
-			if (changeLv != 0)
-			{
-				character.SetCompanionProperty(companion, "FriendLevel", changeLv);
-				companion.AttachEffect("F_pc_level_up", 3, EffectLocation.Middle);
-			}
-
-			Task.Delay(2000).ContinueWith(_ =>
-			{
-				companion.DetachEffect("F_sys_heart");
-			});
-		}
 
 		return CustomCommandResult.Okay;
 	}
@@ -317,56 +100,10 @@ public class CustomCommandFunctionsScript : GeneralScript
 			return CustomCommandResult.Fail;
 		}
 
-		if (jobData.Rank >= 99)
-		{
-			Log.Warning("CZ_CUSTOM_COMMAND: User '{0}' requested job '{1}' isn't allowed via UI.", username, jobId);
-			return CustomCommandResult.Fail;
-		}
-
 		if (character.Job.Level < character.Job.MaxLevel)
 		{
 			Log.Warning("CZ_CUSTOM_COMMAND: User '{0}' requested job change before reaching their current job's max level of {1}.", username, character.Job.MaxLevel);
 			return CustomCommandResult.Fail;
-		}
-
-		// The rank ladder is the budget, not the number of jobs: every
-		// advancement spends one rank, whether it's a new job or another
-		// circle of one already held.
-		var maxRank = ZoneServer.Instance.Conf.World.JobMaxRank;
-
-		if (character.Jobs.GetCurrentRank() >= maxRank)
-		{
-			Log.Warning("CZ_CUSTOM_COMMAND: User '{0}' requested job change to job '{1}' at or above the max rank of {2}.", username, jobId, maxRank);
-			return CustomCommandResult.Fail;
-		}
-
-		// Advancing to the next class circle of a job the character already
-		// has, rather than picking a new job. It doesn't have to be the job
-		// being played. Base jobs have no circles, so they fall through to
-		// the regular advancement path.
-		if (ZoneServer.Instance.Conf.World.ClassCircleSystem && character.Jobs.TryGet(jobId, out var heldJob) && character.Jobs.GetJobRank(jobId) > 1)
-		{
-			if (heldJob.Circle >= JobCircle.Third)
-			{
-				Log.Warning("CZ_CUSTOM_COMMAND: User '{0}' requested circle advancement past the max circle for '{1}'.", username, jobId);
-				return CustomCommandResult.Fail;
-			}
-
-			// The advanced job becomes the one being played, the same way
-			// picking a new job does.
-			if (character.JobId != jobId)
-			{
-				character.JobId = jobId;
-				character.Properties.SetFloat(PropertyName.Job, (int)jobId);
-				Send.ZC_OBJECT_PROPERTY(character, PropertyName.JobName);
-				character.AddonMessage(AddonMessage.JOB_UPDATE);
-				character.InvalidateProperties();
-			}
-
-			var nextCircle = (JobCircle)(heldJob.Circle + 1);
-			character.Jobs.ChangeCircle(jobId, nextCircle);
-
-			return CustomCommandResult.Okay;
 		}
 
 		if (character.JobClass != jobData.JobClassId)
@@ -381,27 +118,24 @@ public class CustomCommandFunctionsScript : GeneralScript
 			return CustomCommandResult.Fail;
 		}
 
-		if (ZoneServer.Instance.Conf.World.UseJobQuests)
+		if (character.Jobs.GetCurrentRank() >= ZoneServer.Instance.Conf.World.JobMaxRank)
 		{
-			if (!character.Variables.Perm.GetBool("JobAdvancement", false))
-			{
-				// For now if quest doesn't exist just change job.
-				// At some point we'll add other job quests.
-				var questId = new QuestId("Laima.JobQuest", (int)jobId);
-				if (QuestScript.Exists(questId))
-					character.Quests.Start(questId);
-				else
-					character.ChangeJob(jobId);
-			}
-			else
-			{
-				character.WorldMessage("You already have an job advancement quest in progress. Please finish or abandon the quest.");
-			}
+			Log.Warning("CZ_CUSTOM_COMMAND: User '{0}' requested job change at or above the max rank of 4.", username, jobId);
+			return CustomCommandResult.Fail;
 		}
-		else
-		{
-			character.ChangeJob(jobId);
-		}
+
+		var newJob = new Job(character, jobId, skillPoints: 1);
+
+		character.JobId = jobId;
+		character.Jobs.Add(newJob);
+
+		Send.ZC_PC(character, PcUpdateType.Job, (int)newJob.Id, newJob.Level);
+		Send.ZC_NORMAL.PlayEffect(character, "F_pc_class_change");
+
+		// Should the event happen regardless of how the job
+		// change happened? Should this code be cleaned up to
+		// use one simple function to accomplish all this? TBD.
+		ZoneServer.Instance.ServerEvents.PlayerAdvancedJob.Raise(new PlayerEventArgs(character));
 
 		return CustomCommandResult.Okay;
 	}

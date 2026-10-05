@@ -1,5 +1,3 @@
-#pragma warning disable IDE1006 // Naming Styles
-
 namespace Melia.Shared.Game.Const
 {
 	/// <summary>
@@ -218,11 +216,6 @@ namespace Melia.Shared.Game.Const
 		public const string Clown_FatalRoulette_Abil = "Clown_FatalRoulette_Abil";
 		public const string Clown_Knife = "Clown_Knife";
 		public const string Colimencia_circlewave = "Colimencia_circlewave";
-		public const string Commodore_AnchorStrike = "Commodore_AnchorStrike";
-		public const string Commodore_AnnihilationBombardment = "Commodore_AnnihilationBombardment";
-		public const string Commodore_ArmorPiercingShot = "Commodore_ArmorPiercingShot";
-		public const string Commodore_TargetingSight = "Commodore_TargetingSight";
-		public const string Commodore_TargetingSight_Sound = "Commodore_TargetingSight_Sound";
 		public const string Corsair_Bombardments = "Corsair_Bombardments";
 		public const string Corsair_JollyRoger = "Corsair_JollyRoger";
 		public const string counterspell_abil_pad = "counterspell_abil_pad";
@@ -301,6 +294,7 @@ namespace Melia.Shared.Game.Const
 		public const string Enchanter_Empowering = "Enchanter_Empowering";
 		public const string Enchanter_EnchantAura = "Enchanter_EnchantAura";
 		public const string Enchanter_EnchantLightning = "Enchanter_EnchantLightning";
+		public const string Enchanter_EnchantGlove = "Enchanter_EnchantGlove";
 		public const string Enervation_Pad = "Enervation_Pad";
 		public const string Engineer_ArrowTurret_Circle = "Engineer_ArrowTurret_Circle";
 		public const string Engineer_ArrowTurret_Default = "Engineer_ArrowTurret_Default";
@@ -1038,5 +1032,3 @@ namespace Melia.Shared.Game.Const
 		public const string zombie_wall = "zombie_wall";
 	}
 }
-
-#pragma warning restore IDE1006 // Naming Styles

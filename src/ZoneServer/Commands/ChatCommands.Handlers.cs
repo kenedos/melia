@@ -17,7 +17,6 @@ using Melia.Shared.Util;
 using Melia.Shared.World;
 using Melia.Zone;
 using Melia.Zone.Network;
-using Melia.Zone.Network.Helpers;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Scripting.Extensions.Keywords;
@@ -35,7 +34,6 @@ using Melia.Zone.World.Dungeons;
 // using Melia.Zone.World.Houses; // Removed: Houses namespace deleted
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
-using Melia.Zone.World.Quests;
 using Melia.Zone.World.Spawning;
 using Yggdrasil.Extensions;
 using Yggdrasil.Geometry.Shapes;
@@ -70,7 +68,6 @@ namespace Melia.Zone.Commands
 			this.Add("buyabilpoint", "<amount>", "", this.HandleBuyAbilPoint);
 			this.Add("guildexpup", "", "", this.HandleGuildExpUp);
 			this.Add("intewarp", "<warp id> 0", "", this.HandleInteWarp);
-			this.Add("intewarpByItem", "<warp id> 0 <item world id>", "", this.HandleInteWarpByItem);
 			this.Add("intewarpByToken", "<destination>", "", this.HandleTokenWarp);
 			this.Add("mic", "<message>", "", this.HandleMic);
 			this.Add("hairgacha", "<type>", "", this.HandleHairGacha);
@@ -98,7 +95,6 @@ namespace Melia.Zone.Commands
 			this.Add("sageDelPos", "", "", this.HandleSageDeletePosition);
 			this.Add("sageOpenPortal", "", "", this.HandleSageOpenPortal);
 			this.Add("hmunclusSkl", "", "", this.HandleHomunculusSkill);
-			this.Add("lastuiopenpos", "<frame name>", "", this.HandleLastUiOpenPos);
 
 			// Custom Client Commands
 			this.Add("buyshop", "", "", this.HandleBuyShop);
@@ -129,7 +125,6 @@ namespace Melia.Zone.Commands
 
 			// VIP
 			this.Add("autoloot", "", "Toggles autolooting.", this.HandleAutoloot);
-			this.Add("lootfilter", "<grade|off>", "Sets the minimum item grade to pick up.", this.HandleLootFilter);
 			this.Add("rangepreview", "", "Toggles skill range preview.", this.HandleRangePreview);
 			this.Add("togglebell", "", "Toggles the day/night cycle bell sound.", this.HandleToggleBell);
 
@@ -141,6 +136,7 @@ namespace Melia.Zone.Commands
 			this.Add("identify", "", "Identifies all unidentified items in inventory.", this.HandleIdentify);
 			this.Add("appraise", "", "Identifies all unidentified items in inventory.", this.HandleIdentify);
 			this.Add("refine", "<slot> <amount>", "Refines equipment. Slot 0 = all equipped items.", this.HandleRefine);
+			this.Add("transcendtest", "<slot> [stage=+1]", "Tests transcendence on equipped item.", this.HandleTranscendTest);
 			this.Add("itemprop", "<objectid> <property> <value>", "Sets an item property by ObjectId. Example: /itemprop 12345 PR 4", this.HandleItemProp);
 			this.Add("silver", "<modifier>", "Spawns silver.", this.HandleSilver);
 			this.Add("droptest", "<item id|name> [count=1] [radius=50]", "Drops items on the ground for pickup testing.", this.HandleDropTest);
@@ -162,7 +158,6 @@ namespace Melia.Zone.Commands
 			this.Add("recallmap", "[map id/name]", "Warps all characters on given map back.", this.HandleRecallMap);
 			this.Add("recallall", "", "Warps all characters on the server back.", this.HandleRecallAll);
 			this.Add("heal", "[hp] [sp] [stamina]", "Heals the character's HP, SP, and Stamina.", this.HandleHeal);
-			this.Add("repair", "", "Repairs all equipped items to full durability.", this.HandleRepair);
 			this.Add("alive", "", "Revives the character if dead, or kills it if alive.", this.HandleAlive);
 			this.Add("clearinv", "", "Removes all items from inventory.", this.HandleClearInventory);
 			this.Add("addjob", "<job id|name> [circle]", "Adds a job to character by ID or name.", this.HandleAddJob);
@@ -179,23 +174,22 @@ namespace Melia.Zone.Commands
 			this.Add("resetskills", "", "Resets character's skills, returning all spent points.", this.HandleSkillReset);
 			this.Add("resetabilities", "", "Resets character's learned abilities, refunding spent ability points.", this.HandleAbilityReset);
 			this.Add("broadcast", "<message>", "Broadcasts text message to all players.", this.HandleBroadcast);
+			this.Add("worldboss", "[spawn|status|clear|kill]", "Controls the World Boss system.", this.HandleWorldBoss);
 			this.Add("b", "<message>", "Alias for broadcast.", this.HandleBroadcast);
 			this.Add("kick", "<team name>", "Kicks the player with the given team name if they're online.", this.HandleKick);
-			this.Add("runscp", "<script> <handle>", "GM command for various purpose.", this.HandleRunScript);
-			this.Add("killmon", "<handle>", "GM command for killing a monster.", this.HandleKillMonster);
+			this.Add("runscp", "<script> <handle>", "Official GM Command for various purpose.", this.HandleRunScript);
+			this.Add("killmon", "<handle>", "Official GM Command for killing a monster.", this.HandleKillMonster);
 			this.Add("fixcam", "", "Fixes the character's camera in place.", this.HandleFixCamera);
 			this.Add("daytime", "[timeOfDay=day|night|dawn|dusk]", "Sets the current day time.", this.HandleDayTime);
 			this.Add("storage", "", "Opens personal storage.", this.HandlePersonalStorage);
 			this.Add("teamstorage", "", "Opens team storage.", this.HandleTeamStorage);
 			this.Add("medals", "<modifier>", "Modifies the amount of medals/TP.", this.HandleMedals);
-			this.Add("killmonsters", "<handle>", "GM command for killing all monster on the map.", this.HandleKillMonsters);
+			this.Add("killmonsters", "<handle>", "Official GM Command for killing all monster on the map.", this.HandleKillMonsters);
 			this.Add("items", "", "Spawns all the items.", this.HandleGetAllItems);
 			this.Add("dungeon", "<id>", "", this.HandleDungeonMatchMaking);
-			this.Add("equipset", "[set name] [grade=Legend] [refine=15]", "Gives equipment matching set name, with grade/refine in any order. No args = Savinose Dysnai.", this.HandleEquipSet);
-			this.Add("allabilities", "[level]", "Learns all abilities for character's jobs at the given level, or their max level if omitted.", this.HandleMaxAbilities);
+			this.Add("equipset", "[set name] [grade=Legend] [refine=15]", "Gives equipment matching set name. No args = Savinose Dysnai.", this.HandleEquipSet);
+			this.Add("allabilities", "", "Learns all abilities for character's jobs at max level.", this.HandleMaxAbilities);
 			this.Add("allskills", "", "Learns all skills for character's jobs at max level.", this.HandleAllSkills);
-			this.Add("tutorial", "<class name>", "Opens a tutorial window by its class name, even if it was seen before.", this.HandleTutorial);
-			this.Add("resettutorials", "", "Resets all tutorials seen on the account, so they show up again.", this.HandleResetTutorials);
 
 			// Dev
 			this.Add("test", "", "", this.HandleTest);
@@ -209,7 +203,6 @@ namespace Melia.Zone.Commands
 			this.Add("feature", "<feature name> <enabled>", "Toggles a feature.", this.HandleFeature);
 			this.Add("resetcd", "", "Resets all skill cooldowns.", this.HandleResetSkillCooldown);
 			this.Add("nosave", "[enabled]", "Toggles whether the character will be saved on logout.", this.HandleNoSave);
-			this.Add("mobskillannounce", "[enabled]", "Toggles the chat announcements of monster skills.", this.HandleMobSkillAnnounce);
 			this.Add("callmonster", "", "Instructs nearest monster to move to character.", this.HandleCallMonster);
 			this.Add("sendmonster", "<x> [y] <z>", "Instructs nearest monster to walk to given position.", this.HandleSendMonster);
 			this.Add("savelocation", "<location memo>", "Saves a location to locations.txt in temp folder.", this.HandleSaveLocation);
@@ -224,8 +217,6 @@ namespace Melia.Zone.Commands
 			this.Add("resetteamstorage", "", "Resets team storage properties (expansions) to default.", this.HandleResetTeamStorage);
 			this.Add("cubeinfo", "<group|item_class>", "Shows contents of a cube/gacha by group name or item class.", this.HandleCubeInfo);
 			this.Add("cubelist", "[filter]", "Lists all available cube/gacha groups.", this.HandleCubeList);
-			this.Add("patrolnodes", "[range=1500]", "Shows the patrol nodes around you.", this.HandlePatrolNodes);
-			this.Add("patrolinfo", "", "Writes the patrol state of this map to patrolinfo.txt in the temp folder.", this.HandlePatrolInfo);
 
 			// Test ZC_NORMAL Packets.
 			this.Add("timeactiontarget", "<player> <anim> <secs> [msg]", "Shows a time action bar to another player.", this.HandleTimeActionOnlyTarget);
@@ -244,7 +235,7 @@ namespace Melia.Zone.Commands
 			this.Add("addeffect", "<effect_name> [scale]", "Adds a persistent effect to the target.", this.HandleAddEffect);
 			this.Add("removeeffectbyname", "<effect_name>", "Removes a persistent effect from the target.", this.HandleRemoveEffectByName);
 
-			// Client GM commands
+			// Official GM Commands
 			this.Add("safe", "<state>", "Toggles whether the character is invincible or not.", this.HandleSafe);
 			this.Add("run", "<script name> <options>", "Runs a script on the server for specific behavior.", this.HandleRun);
 
@@ -256,7 +247,6 @@ namespace Melia.Zone.Commands
 			this.AddAlias("jump", "setpos");
 			this.AddAlias("resetstats", "statsreset");
 			this.AddAlias("resetabilities", "resetattributes");
-			this.AddAlias("allabilities", "allattributes");
 			this.AddAlias("savelocation", "sl");
 			this.AddAlias("killmonsters", "killmons");
 			this.AddAlias("resetquest", "resetquests");
@@ -265,7 +255,78 @@ namespace Melia.Zone.Commands
 			this.AddAlias("resetdungeon", "resetdungeons");
 			this.AddAlias("cardgem", "card");
 			this.AddAlias("cardgem", "gem");
-			this.AddAlias("repair", "repairall");
+		}
+
+		private CommandResult HandleWorldBoss(Character sender, Character target, string message, string command, Arguments args)
+		{
+			if (args.Count == 0)
+			{
+				sender.ServerMessage("Usage: //worldboss spawn|status|clear|kill");
+				return CommandResult.Okay;
+			}
+
+			var action = args.Get(0).ToLowerInvariant();
+			var manager = ZoneServer.Instance.WorldBosses;
+
+			switch (action)
+			{
+				case "spawn":
+					if (manager.HasActiveBoss)
+					{
+						sender.ServerMessage("A World Boss is already active: " + manager.GetActiveBossInfo());
+						return CommandResult.Okay;
+					}
+
+					if (!manager.SpawnWorldBoss())
+					{
+						sender.ServerMessage("World Boss spawn failed. Check the ZoneServer log for details.");
+						return CommandResult.Okay;
+					}
+
+					sender.ServerMessage("World Boss spawned successfully.");
+					return CommandResult.Okay;
+
+				case "status":
+					if (!manager.HasActiveBoss)
+					{
+						sender.ServerMessage("There is no active World Boss.");
+						return CommandResult.Okay;
+					}
+
+					sender.ServerMessage("Active World Boss: " + manager.GetActiveBossInfo());
+					return CommandResult.Okay;
+
+				case "clear":
+					if (!manager.HasActiveBoss)
+					{
+						sender.ServerMessage("There is no active World Boss.");
+						return CommandResult.Okay;
+					}
+
+					manager.ClearActiveBoss();
+					sender.ServerMessage("World Boss state cleared.");
+					return CommandResult.Okay;
+
+				case "kill":
+					if (!manager.HasActiveBoss && manager.ActiveBoss == null)
+					{
+						sender.ServerMessage("There is no active World Boss.");
+						return CommandResult.Okay;
+					}
+
+					if (!manager.KillActiveBoss(true))
+					{
+						sender.ServerMessage("World Boss removal failed.");
+						return CommandResult.Okay;
+					}
+
+					sender.ServerMessage("World Boss killed and its state was cleared successfully.");
+					return CommandResult.Okay;
+
+				default:
+					sender.ServerMessage("Usage: /worldboss spawn|status|clear|kill");
+					return CommandResult.Okay;
+			}
 		}
 
 		private CommandResult HandleDungeonMatchMaking(Character sender, Character target, string message, string commandName, Arguments args)
@@ -444,7 +505,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client command for running scripts.
+		/// Official command for running scripts.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -485,7 +546,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client command for invincibility.
+		/// Official command for invincibility.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -1283,7 +1344,7 @@ namespace Melia.Zone.Commands
 			if (randomGrade)
 			{
 				var grades = new[] { ItemGrade.Magic, ItemGrade.Rare, ItemGrade.Unique, ItemGrade.Legend };
-				grade = grades[GameRandom.Get().Next(grades.Length)];
+				grade = grades[RandomProvider.Get().Next(grades.Length)];
 			}
 
 			// Create and add item(s)
@@ -1441,14 +1502,15 @@ namespace Melia.Zone.Commands
 
 			var map = target.Map;
 			var position = target.Position;
+			var rnd = RandomProvider.Get();
 
 			for (var i = 0; i < count; i++)
 			{
 				var item = new Item(itemId, 1);
 
 				// Calculate random drop position within radius
-				var angle = GameRandom.Get().NextDouble() * Math.PI * 2;
-				var distance = (float)(GameRandom.Get().NextDouble() * radius);
+				var angle = rnd.NextDouble() * Math.PI * 2;
+				var distance = (float)(rnd.NextDouble() * radius);
 				var direction = new Direction((float)Math.Cos(angle), (float)Math.Sin(angle));
 
 				item.Drop(map, position, direction, distance, target.AccountObjectId, target.Layer);
@@ -1521,6 +1583,7 @@ namespace Melia.Zone.Commands
 			if (args.TryGet("tendency", out var tendencyArg) && tendencyArg.ToLower() == "aggressive")
 				tendency = TendencyType.Aggressive;
 
+			var rnd = new Random(Environment.TickCount);
 			for (var i = 0; i < amount; ++i)
 			{
 				var monster = new Mob(monsterData.Id);
@@ -1534,8 +1597,8 @@ namespace Melia.Zone.Commands
 				}
 				else
 				{
-					pos = target.Position.GetRandomInRange2D(amount * 4, GameRandom.Get());
-					dir = new Direction(GameRandom.Get().Next(0, 360));
+					pos = target.Position.GetRandomInRange2D(amount * 4, rnd);
+					dir = new Direction(rnd.Next(0, 360));
 				}
 
 				if (!target.Map.Ground.TryGetNearestValidPosition(pos, out var validPos))
@@ -2838,37 +2901,6 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Repairs all of the target's equipped items to full durability.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="command"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandleRepair(Character sender, Character target, string message, string command, Arguments args)
-		{
-			var repaired = 0;
-
-			foreach (var equip in target.Inventory.GetEquip().Values)
-			{
-				if (equip is DummyEquipItem || equip.MaxDurability <= 0 || equip.Durability >= equip.MaxDurability)
-					continue;
-
-				equip.ModifyDurability(target);
-				repaired++;
-			}
-
-			target.InvalidateProperties();
-
-			sender.ServerMessage(Localization.Get("Repaired {0} equipped item(s)."), repaired);
-			if (sender != target)
-				target.ServerMessage(Localization.Get("Your equipment was repaired by {0}."), sender.TeamName);
-
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
 		/// Heals the target hp and optionally sp/stamina.
 		/// If no argument is given, heals fully.
 		/// Can also heal negative values.
@@ -3035,7 +3067,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to get a Member Info For Act?
+		/// Official slash command to get a Member Info For Act?
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3077,7 +3109,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to change a party name
+		/// Official slash command to change a party name
 		/// </summary>
 		/// <example>
 		/// /partyname 0 0 1 Fun Party
@@ -3120,7 +3152,7 @@ namespace Melia.Zone.Commands
 
 
 		/// <summary>
-		/// Client slash command to invite to a party
+		/// Official slash command to invite to a party
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3159,7 +3191,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to invite a character to a party
+		/// Official slash command to invite a character to a party
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3206,7 +3238,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to expel a member from a party
+		/// Official slash command to expel a member from a party
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3327,7 +3359,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to run script before leaving a guild
+		/// Official slash command to run script before leaving a guild
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3357,7 +3389,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to leave a guild
+		/// Official slash command to leave a guild
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3384,7 +3416,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to hire a pet
+		/// Official slash command to hire a pet
 		/// </summary>
 		/// <example>/pethire 3 Pet</example>
 		/// <param name="sender"></param>
@@ -3492,7 +3524,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to raise pet stats
+		/// Official slash command to raise pet stats
 		/// </summary>
 		/// <example>/petstat 528525790635969 MHP 1</example>
 		/// <param name="sender"></param>
@@ -3549,7 +3581,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to read collections?
+		/// Official slash command to read collections?
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3591,7 +3623,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to return to quest giver.
+		/// Official slash command to return to quest giver.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3610,36 +3642,12 @@ namespace Melia.Zone.Commands
 				return CommandResult.Okay;
 			}
 
-			if (sender.WasWarpInterrupted())
-			{
-				return CommandResult.Okay;
-			}
-
 			if (int.TryParse(args.Get(0), out var questId) && ZoneServer.Instance.Data.QuestDb.TryFind(questId, out var quest))
 			{
-				if (!sender.Quests.IsActive(questId))
-				{
-					if (!sender.Quests.Has(questId)
-						&& QuestScript.TryGet(new QuestId(questId), out var questScript)
-						&& questScript.Data.PossibleWarp
-						&& sender.Quests.MeetsPrerequisites(questScript.QuestId)
-						&& QuestComponent.TryGetStartDestination(questScript.Data, out var startMapClassName, out var startPosition))
-					{
-						sender.Warp(startMapClassName, startPosition);
-					}
-
-					return CommandResult.Okay;
-				}
-
-				if (string.IsNullOrEmpty(quest.EndNPC)
+				if (!sender.Quests.IsActive(questId) ||
+					string.IsNullOrEmpty(quest.EndNPC)
 					|| !ZoneServer.Instance.World.NPCs.TryGetValue($"{quest.EndNPC}_{quest.EndMap}", out var npc))
 				{
-					if (sender.Quests.TryGetById(questId, out var activeQuest)
-						&& QuestComponent.TryGetPhaseDestination(activeQuest, out var mapClassName, out var position))
-					{
-						sender.Warp(mapClassName, position);
-					}
-
 					return CommandResult.Okay;
 				}
 
@@ -3665,26 +3673,13 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		private CommandResult HandleAddJob(Character sender, Character target, string message, string command, Arguments args)
 		{
-			if (args.IndexedCount == 0)
+			if (args.Count == 0)
 				return CommandResult.InvalidArgument;
-
-			// The job name may consist of multiple words, so everything but
-			// an optional trailing circle number is part of it.
-			var nameArgCount = args.IndexedCount;
-			var circleArg = (string)null;
-
-			if (nameArgCount >= 2 && int.TryParse(args.Get(nameArgCount - 1), out _))
-			{
-				circleArg = args.Get(nameArgCount - 1);
-				nameArgCount--;
-			}
-
-			var jobIdent = string.Join(" ", Enumerable.Range(0, nameArgCount).Select(i => args.Get(i)));
 
 			JobId jobId;
 
 			// Try to parse as integer (job ID)
-			if (int.TryParse(jobIdent, out var iJobId))
+			if (int.TryParse(args.Get(0), out var iJobId))
 			{
 				jobId = (JobId)iJobId;
 				if (!ZoneServer.Instance.Data.JobDb.Contains(jobId))
@@ -3696,48 +3691,30 @@ namespace Melia.Zone.Commands
 			// Otherwise, try to find by name or class name
 			else
 			{
-				if (!ZoneServer.Instance.Data.JobDb.TryFind(jobIdent, out var jobData))
+				var jobName = args.Get(0);
+				if (!ZoneServer.Instance.Data.JobDb.TryFind(jobName, out var jobData))
 				{
-					sender.ServerMessage(Localization.Get("Job '{0}' not found. Use job ID or job name/class name."), jobIdent);
+					sender.ServerMessage(Localization.Get("Job '{0}' not found. Use job ID or job name/class name."), jobName);
 					return CommandResult.Okay;
 				}
 				jobId = jobData.Id;
 			}
 
-			var job = target.Jobs.Get(jobId);
-			JobCircle circle;
+			var circle = JobCircle.First;
 
-			if (circleArg != null)
+			if (args.Count >= 2)
 			{
-				if (!int.TryParse(circleArg, out var iCircle) || iCircle < (int)JobCircle.First || !Enum.IsDefined(typeof(JobCircle), (short)iCircle))
+				if (!int.TryParse(args.Get(1), out var iCircle) || iCircle < (int)JobCircle.First || !Enum.IsDefined(typeof(JobCircle), iCircle))
 					return CommandResult.InvalidArgument;
 
 				circle = (JobCircle)iCircle;
-
-				if (job != null && job.Circle >= circle)
-				{
-					sender.ServerMessage(Localization.Get("The job exists already, at an equal or higher circle."));
-					return CommandResult.Okay;
-				}
 			}
-			else
+
+			var job = target.Jobs.Get(jobId);
+			if (job != null && job.Circle >= circle)
 			{
-				// No circle given: advance to the job's next circle, or
-				// grant it fresh at circle 1 if the character doesn't
-				// have it yet.
-				if (job == null)
-				{
-					circle = JobCircle.First;
-				}
-				else if (job.Circle >= JobCircle.Third)
-				{
-					sender.ServerMessage(Localization.Get("The job is already at its maximum circle."));
-					return CommandResult.Okay;
-				}
-				else
-				{
-					circle = (JobCircle)(job.Circle + 1);
-				}
+				sender.ServerMessage(Localization.Get("The job exists already, at an equal or higher circle."));
+				return CommandResult.Okay;
 			}
 
 			if (job == null)
@@ -3746,20 +3723,6 @@ namespace Melia.Zone.Commands
 			}
 			else
 				target.Jobs.ChangeCircle(jobId, circle);
-
-			// ChangeJob/ChangeCircle only ever grant the single skill point
-			// for reaching the new circle, so a direct jump skips the points
-			// that would've been earned leveling through the circles in
-			// between. Top the total up to what a character reaching this
-			// circle normally would have.
-			if (ZoneServer.Instance.Conf.World.ClassCircleSystem)
-			{
-				var newJob = target.Jobs.Get(jobId);
-				var expectedSkillPoints = (int)circle * newJob.MaxLevel;
-
-				if (newJob.SkillPoints < expectedSkillPoints)
-					newJob.SetSkillPoints(expectedSkillPoints);
-			}
 
 			sender.ServerMessage(Localization.Get("Job '{0}' was added at circle '{1}'."), jobId, (int)circle);
 			if (sender != target)
@@ -4185,59 +4148,6 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Opens a tutorial window on the target's client.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="command"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandleTutorial(Character sender, Character target, string message, string command, Arguments args)
-		{
-			if (args.Count != 1)
-				return CommandResult.InvalidArgument;
-
-			var className = args.Get(0);
-
-			if (ZoneServer.Instance.Data.HelpDb.Find(className) == null)
-			{
-				sender.ServerMessage(Localization.Get("Tutorial '{0}' not found."), className);
-				return CommandResult.Okay;
-			}
-
-			target.ShowHelp(className, true);
-
-			sender.ServerMessage(Localization.Get("Opened tutorial '{0}'."), className);
-
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
-		/// Resets all tutorials seen on the target's account.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="command"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandleResetTutorials(Character sender, Character target, string message, string command, Arguments args)
-		{
-			ZoneServer.Instance.Database.ResetHelp(target.AccountDbId);
-			target.Tutorials.Reset();
-
-			Send.ZC_HELP_LIST(target);
-
-			if (sender != target)
-				sender.ServerMessage(Localization.Get("Reset all tutorials seen on {0}'s account."), target.TeamName);
-
-			target.ServerMessage(Localization.Get("All tutorials seen on your account were reset."));
-
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
 		/// Kill all monsters on the map which is on the same layer as the target
 		/// </summary>
 		/// <param name="sender"></param>
@@ -4308,42 +4218,6 @@ namespace Melia.Zone.Commands
 				target.ServerMessage(Localization.Get("Autoloot is now inactive."));
 			else
 				target.ServerMessage(Localization.Get("Autoloot is now active for items up to a drop chance of {0}%."), autoloot);
-
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
-		/// Sets the minimum item grade the character picks up.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="command"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandleLootFilter(Character sender, Character target, string message, string command, Arguments args)
-		{
-			if (args.Count == 0)
-			{
-				var currentGrade = LootFilter.GetFilterGrade(sender);
-
-				if (currentGrade == ItemGrade.None)
-					target.ServerMessage(Localization.Get("Loot filter is inactive."));
-				else
-					target.ServerMessage(Localization.Get("Loot filter is picking up items of grade {0} and above."), currentGrade.ToString());
-
-				return CommandResult.Okay;
-			}
-
-			if (!LootFilter.TryParseFilterGrade(args.Get(0), out var grade))
-				return CommandResult.InvalidArgument;
-
-			LootFilter.SetFilterGrade(sender, grade);
-
-			if (grade == ItemGrade.None)
-				target.ServerMessage(Localization.Get("Loot filter is now inactive."));
-			else
-				target.ServerMessage(Localization.Get("Loot filter is now picking up items of grade {0} and above."), grade.ToString());
 
 			return CommandResult.Okay;
 		}
@@ -4653,19 +4527,8 @@ namespace Melia.Zone.Commands
 				var percent = 100f / maxExp * exp;
 
 				sb.AppendLine(" {0}", job.Id);
-				sb.AppendLine("   Rank: {0}, Level: {1}, MaxLevel: {2}, Circle: {3}, SkillPoints: {4}", target.Jobs.GetJobRank(job.Id), job.Level, job.MaxLevel, job.Circle, job.SkillPoints);
+				sb.AppendLine("   Rank: {0}, Level: {0}, SkillPoints: {0}", job.Rank, job.Level, job.SkillPoints);
 				sb.AppendLine("   Exp: {0} / {1} ({2:0.0}%)", exp, maxExp, percent);
-				sb.AppendLine("   Sent to client: DisplayExp {0}", job.DisplayExp);
-			}
-
-			var history = target.Jobs.GetHistory();
-
-			sb.AppendLine(Localization.Get(" Rank Breakdown ({0} spent of {1})"), target.Jobs.GetCurrentRank(), ZoneServer.Instance.Conf.World.JobMaxRank);
-
-			foreach (var entry in history)
-			{
-				sb.AppendLine("   Rank {0}: {1}, Level: {2}, TotalExp: {3}", entry.Rank, entry.Job.Id, entry.Level, entry.TotalExp);
-				sb.AppendLine("        Curve: {0} ~ {1}", entry.LevelStartExp, entry.LevelEndExp);
 			}
 
 			return CommandResult.Okay;
@@ -4686,25 +4549,6 @@ namespace Melia.Zone.Commands
 			{
 				if (skill.IsOnCooldown)
 					skill.StartCooldown(TimeSpan.Zero);
-			}
-
-			// The scroll cooldown belongs to no learned skill, so it's
-			// cleared by its group instead.
-			var scrollCooldownData = ZoneServer.Instance.Data.CooldownDb.Find(Skill.ScrollCooldownGroupName);
-			if (scrollCooldownData != null && target.Components.TryGet<CooldownComponent>(out var cooldowns))
-			{
-				cooldowns.Remove(scrollCooldownData.Id);
-				cooldowns.SetOverheatCounter(scrollCooldownData.Id, 0);
-				cooldowns.SetOverheatTimeRemaining(scrollCooldownData.Id, TimeSpan.Zero);
-			}
-
-			foreach (var cooldown in target.GetCooldowns())
-			{
-				if (ZoneServer.Instance.Data.CooldownDb.TryFind(cooldown.Id, out var cooldownData)
-					&& cooldownData.ClassName.StartsWith(Skill.ScrollChargeCooldownPrefix))
-				{
-					target.RemoveCooldown(cooldown.Id);
-				}
 			}
 
 			sender.ServerMessage(Localization.Get("Skill cooldowns reset."));
@@ -4774,7 +4618,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Handle the client's Run Script command
+		/// Handle Official Run Script command
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -4825,7 +4669,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Handle the client's GM Kill Monster command
+		/// Handle Official GM Kill Monster command
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -4855,7 +4699,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command, purpose unknown.
+		/// Official slash command, purpose unknown.
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="message"></param>
@@ -4864,6 +4708,9 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		private CommandResult HandleReqUpdateEquip(Character sender, Character target, string message, string command, Arguments args)
 		{
+			// Command is sent when the inventory is opened, purpose unknown,
+			// officials don't seem to send anything back.
+
 			// Comment in the client's Lua files:
 			//   내구도 회복 유료템 때문에 정확한 값을 지금 알아야 함.
 			//   (Durability recovery Due to the paid system, you need to know the correct value now.)
@@ -4872,7 +4719,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command, exchanges silver for ability points.
+		/// Official slash command, exchanges silver for ability points.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -4975,7 +4822,6 @@ namespace Melia.Zone.Commands
 			packet.PutString(title, 64);
 			packet.PutInt(items.Count);
 			packet.PutInt(personalShopPacketStringId); // PersonalShop
-			packet.PutInt(0); // skillId
 
 			var j = 0;
 			foreach (var item in items)
@@ -5044,15 +4890,13 @@ namespace Melia.Zone.Commands
 
 				// Find the item - use worldId if provided, otherwise fall back to itemId search
 				Item foundItem = null;
-				if (worldId != 0)
+				if (worldId != 0 && sender.Inventory.TryGetItem(worldId, out var itemByWorldId))
 				{
-					// Items of one class are not always interchangeable, so a
-					// named item that's gone is an error, not a reason to pick
-					// another one of its class.
-					if (sender.Inventory.TryGetItem(worldId, out var itemByWorldId) && itemByWorldId.Id == itemId)
+					if (itemByWorldId.Id == itemId)
 						foundItem = itemByWorldId;
 				}
-				else
+
+				if (foundItem == null)
 				{
 					// Fall back to search by itemId
 					var items = sender.Inventory.GetItems(item => item.Id == itemId);
@@ -5082,8 +4926,8 @@ namespace Melia.Zone.Commands
 
 			sender.Connection.ShopCreated = shop;
 			Send.ZC_AUTOSELLER_LIST(sender.Connection, sender);
-			Send.ZC_NORMAL.AutoSellerHistory(sender.Connection, shop);
-			Send.ZC_NORMAL.ShopAnimation(sender, shop.ShopAnimation, 1, 1);
+			Send.ZC_NORMAL.Shop_Unknown11C(sender.Connection, "Squire", shop.Type);
+			Send.ZC_NORMAL.ShopAnimation(sender, "Squire_Repair", 1, 1);
 			Send.ZC_AUTOSELLER_TITLE(sender);
 
 			Log.Debug("HandleSellShop: {0} opened sell shop '{1}' with {2} item(s)", sender.Name, title, shop.Products.Count);
@@ -5149,7 +4993,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to invite a character to a guild
+		/// Official slash command to invite a character to a guild
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5197,7 +5041,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command, increase guild exp up.
+		/// Official slash command, increase guild exp up.
 		/// </summary>
 		/// <example>
 		/// /guildexpup 527456344001753 9
@@ -5217,7 +5061,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to for fast travel (warp statues).
+		/// Official slash command to for fast travel (warp statues).
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5280,9 +5124,6 @@ namespace Melia.Zone.Commands
 				return CommandResult.Okay;
 			}
 
-			if (sender.WasWarpInterrupted())
-				return CommandResult.Okay;
-
 			if (unk1 == 0 || unk1 == 1)
 			{
 				var mapId = npc.Map.Id;
@@ -5296,91 +5137,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to warp via a consumed scroll item.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="commandName"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandleInteWarpByItem(Character sender, Character target, string message, string commandName, Arguments args)
-		{
-			if (args.Count != 3)
-			{
-				Log.Debug("HandleInteWarpByItem: Invalid call by user '{0}': {1}", sender.Connection.Account.Name, commandName);
-				return CommandResult.Okay;
-			}
-
-			var warp = "";
-			WarpData warpData = null;
-			if (!int.TryParse(args.Get(0), out var warpId))
-			{
-				warp = args.Get(0);
-			}
-
-			if (ZoneServer.Instance.Data.MapDb.TryFind(warpId, out var mapData))
-			{
-				warp = mapData.ClassName;
-				warpId = 0;
-			}
-
-			if (warpId != 0 && !ZoneServer.Instance.Data.WarpDb.TryFind(warpId, out warpData))
-			{
-				Log.Debug("HandleInteWarpByItem: Failed to find warp by id {0}, User: '{1}': {2}", args.Get(0), sender.Connection.Account.Name, commandName);
-				return CommandResult.Okay;
-			}
-
-			if (!string.IsNullOrEmpty(warp) && !ZoneServer.Instance.Data.WarpDb.TryFind(warp, out warpData))
-			{
-				Log.Debug("HandleInteWarpByItem: Failed to find warp by name {0}, User: '{1}': {2}", args.Get(0), sender.Connection.Account.Name, commandName);
-				return CommandResult.Okay;
-			}
-
-			if (!int.TryParse(args.Get(1), out var unk1))
-			{
-				Log.Debug("HandleInteWarpByItem: Failed to find parse by second arg '{0}': {1}", sender.Connection.Account.Name, commandName);
-				return CommandResult.Okay;
-			}
-
-			if (!long.TryParse(args.Get(2), out var itemWorldId))
-			{
-				Log.Debug("HandleInteWarpByItem: Failed to parse item world id '{0}': {1}", sender.Connection.Account.Name, commandName);
-				return CommandResult.Okay;
-			}
-
-			if (!ZoneServer.Instance.World.NPCs.TryGetValue($"{warpData.ClassName}_{warpData.Zone}", out var npc))
-			{
-				Log.Debug("HandleInteWarpByItem: Failed to find npc by class name '{0}': {1} : {2}", sender.Connection.Account.Name, commandName, warpData.ClassName);
-				return CommandResult.Okay;
-			}
-
-			if (!sender.Inventory.TryGetItem(itemWorldId, out var scrollItem))
-			{
-				Log.Debug("HandleInteWarpByItem: Failed to find scroll item {0}, User: '{1}': {2}", itemWorldId, sender.Connection.Account.Name, commandName);
-				return CommandResult.Okay;
-			}
-
-			if (sender.Inventory.Remove(scrollItem, 1, InventoryItemRemoveMsg.Used) != InventoryResult.Success)
-			{
-				Log.Debug("HandleInteWarpByItem: Failed to remove scroll item {0}, User: '{1}': {2}", itemWorldId, sender.Connection.Account.Name, commandName);
-				return CommandResult.Okay;
-			}
-
-			if (unk1 == 0 || unk1 == 1)
-			{
-				var mapId = npc.Map.Id;
-				var newPosition = npc.Position.GetRelative(npc.Direction, 50);
-				var newDirection = -npc.Direction;
-				sender.SetDirection(newDirection);
-				sender.Warp(mapId, newPosition);
-			}
-
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
-		/// Client slash command to set Homunculus Skill
+		/// Official slash command to set Homunculus Skill
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5424,7 +5181,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to save Sage Portal Skill Position
+		/// Official slash command to save Sage Portal Skill Position
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5434,47 +5191,39 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		private CommandResult HandleSageSavePosition(Character sender, Character target, string message, string commandName, Arguments args)
 		{
-			// Since this command is sent via UI interactions, we'll not
-			// use any automated command result messages, but we'll leave
-			// debug messages for now, in case of unexpected values.
-			if (args.Count != 0)
+			if (args.Count != 0 || sender.IsDead || sender.Map == null || !sender.Jobs.Has(JobId.Sage))
+				return CommandResult.Okay;
+
+			if (!sender.TryGetSkill(SkillId.Sage_Portal, out var portalSkill) || portalSkill.Level <= 0)
+				return CommandResult.Okay;
+
+			var properties = new[]
 			{
-				Log.Debug("HandleSageSavePosition: Invalid call by user '{0}': {1}", sender.Connection.Account.Name, commandName);
+		PropertyName.Sage_Portal_1,
+		PropertyName.Sage_Portal_2,
+		PropertyName.Sage_Portal_3,
+	};
+
+			foreach (var property in properties)
+			{
+				var savedPosition = sender.Etc.Properties.Has(property)
+					? sender.Etc.Properties.GetString(property)
+					: null;
+
+				if (!string.IsNullOrWhiteSpace(savedPosition) && savedPosition != "None")
+					continue;
+
+				sender.SetEtcProperty(property, sender.GetLocationToString());
+				Send.ZC_EXEC_CLIENT_SCP(sender.Connection, ClientScripts.SAGE_PORTAL_SAVE_SUCCESS);
 				return CommandResult.Okay;
 			}
 
-			// Check if user has Sage Job
-			if (!sender.Jobs.Has(JobId.Sage))
-				return CommandResult.Okay;
-
-			if (!sender.Etc.Properties.Has(PropertyName.Sage_Portal_1)
-				|| sender.Properties.GetString(PropertyName.Sage_Portal_1) == "None")
-			{
-				sender.SetEtcProperty(PropertyName.Sage_Portal_1, sender.GetLocationToString());
-			}
-			else if (!sender.Properties.Has(PropertyName.Sage_Portal_2)
-				|| sender.Properties.GetString(PropertyName.Sage_Portal_2) == "None")
-			{
-				sender.SetEtcProperty(PropertyName.Sage_Portal_2, sender.GetLocationToString());
-			}
-			else if (!sender.Properties.Has(PropertyName.Sage_Portal_3)
-				|| sender.Properties.GetString(PropertyName.Sage_Portal_3) == "None")
-			{
-				sender.SetEtcProperty(PropertyName.Sage_Portal_3, sender.GetLocationToString());
-			}
-			else
-			{
-				sender.SystemMessage("SageMaxSaveCnt");
-				return CommandResult.Okay;
-			}
-
-			Send.ZC_EXEC_CLIENT_SCP(sender.Connection, ClientScripts.SAGE_PORTAL_SAVE_SUCCESS);
-
+			sender.SystemMessage("SageMaxSaveCnt");
 			return CommandResult.Okay;
 		}
 
 		/// <summary>
-		/// Client slash command to delete Sage Portal Skill Position
+		/// Official slash command to delete Sage Portal Skill Position
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5531,7 +5280,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Client slash command to delete Sage Open Portal
+		/// Official slash command to delete Sage Open Portal
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5563,42 +5312,74 @@ namespace Melia.Zone.Commands
 			if (portalId < 1 || portalId > 3)
 				return CommandResult.Okay;
 
-			string portalPosition;
-			switch (portalId)
+			var portalProperty = portalId switch
 			{
-				case 1:
+				1 => PropertyName.Sage_Portal_1,
+				2 => PropertyName.Sage_Portal_2,
+				_ => PropertyName.Sage_Portal_3,
+			};
+
+			if (!sender.Etc.Properties.Has(portalProperty))
+				return CommandResult.Okay;
+
+			var savedPosition = sender.Etc.Properties.GetString(portalProperty);
+
+			if (string.IsNullOrWhiteSpace(savedPosition) || savedPosition == "None")
+				return CommandResult.Okay;
+
+			if (sender.IsDead || sender.Map == null || sender.IsOutOfBody())
+				return CommandResult.Okay;
+
+			if (!sender.TryGetSkill(SkillId.Sage_Portal, out var portalSkill) || portalSkill.Level <= 0)
+				return CommandResult.Okay;
+
+			// Remove a data de uma abertura anterior antes de interpretar as coordenadas.
+			var savedParts = savedPosition.Split('@');
+			var portalPosition = savedParts[0];
+			var cooldown = TimeSpan.FromMinutes(Math.Max(0, 31 - portalSkill.Level));
+
+			Log.Debug("Sage Portal: Level={0}, CooldownMinutes={1}, ServerNow={2}, StoredDate={3}",
+	portalSkill.Level,
+	Math.Max(0, 31 - portalSkill.Level),
+	DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+	DateTimeUtils.ToSPropertyDTNow);
+
+			if (savedParts.Length > 1)
+			{
+				var savedDate = savedParts[savedParts.Length - 1];
+
+				// O formato de propriedade possui exatamente 15 caracteres.
+				if (savedDate.Length != 15 || !savedDate.TryGetPropertyStringToDateTime(out var lastOpened))
 				{
-					portalPosition = sender.Properties.GetString(PropertyName.Sage_Portal_1);
-					sender.SetEtcProperty(PropertyName.Sage_Portal_1, portalPosition + "@" + DateTimeUtils.ToSPropertyDTNow);
+					sender.ServerMessage("The saved portal date is invalid. Delete this destination and save it again.");
+					return CommandResult.Okay;
 				}
-				break;
-				case 2:
+
+				var remaining = lastOpened.Add(cooldown) - DateTime.Now;
+
+				if (remaining > TimeSpan.Zero)
 				{
-					portalPosition = sender.Properties.GetString(PropertyName.Sage_Portal_2);
-					sender.SetEtcProperty(PropertyName.Sage_Portal_2, portalPosition + "@" + DateTimeUtils.ToSPropertyDTNow);
-				}
-				break;
-				case 3:
-				{
-					portalPosition = sender.Properties.GetString(PropertyName.Sage_Portal_3);
-					sender.SetEtcProperty(PropertyName.Sage_Portal_3, portalPosition + "@" + DateTimeUtils.ToSPropertyDTNow);
-				}
-				break;
-				default:
-				{
-					sender.SystemMessage("SageMaxSaveCnt");
+					var totalSeconds = (int)Math.Ceiling(remaining.TotalSeconds);
+					sender.ServerMessage($"Portal cooldown: {totalSeconds / 60}m {totalSeconds % 60}s remaining.");
 					return CommandResult.Okay;
 				}
 			}
 
-			Send.ZC_EXEC_CLIENT_SCP(sender.Connection, ClientScripts.SAGE_PORTAL_SAVE_SUCCESS);
 			var location = portalPosition.Split('#');
 			if (location.Length == 4)
 			{
-				var toMapData = ZoneServer.Instance.Data.MapDb.Find(location[0]);
-				if (!float.TryParse(location[1], out var destinationX)
-				|| !float.TryParse(location[2], out var destinationY)
-				|| !float.TryParse(location[3], out var destinationZ))
+				if (!ZoneServer.Instance.Data.MapDb.TryFind(location[0], out var toMapData))
+				{
+					sender.ServerMessage("The saved portal map was not found.");
+					return CommandResult.Okay;
+				}
+
+				if (!float.TryParse(location[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var destinationX)
+					|| !float.TryParse(location[2], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var destinationY)
+					|| !float.TryParse(location[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var destinationZ)
+					|| !float.IsFinite(destinationX)
+					|| !float.IsFinite(destinationY)
+					|| !float.IsFinite(destinationZ))
 				{
 					Log.Debug("HandleSageOpenPortal: Failed to parse portal position '{0}' by user '{1}'.", portalPosition, sender.Connection.Account.Name);
 					return CommandResult.Okay;
@@ -5614,9 +5395,9 @@ namespace Melia.Zone.Commands
 				var portal = new WarpMonster(MonsterId.MissionGate,
 					new Location(sender.MapId, sender.Position),
 					new Location(toMapData.Id, destinationX, destinationY, destinationZ),
-					new Direction(1, 0));
+					new Direction(1, 0),
+					false);
 				portal.AssociatedHandle = sender.Handle;
-				portal.DialogName = "SAGE_WARP";
 				portal.Properties[PropertyName.Scale] = 1;
 				if (sender.Connection.Party != null)
 				{
@@ -5634,13 +5415,16 @@ namespace Melia.Zone.Commands
 				sender.Map.AddMonster(portal);
 				// This is what makes the invisible npc look like a portal.
 				portal.AttachEffect(AnimationName.Portal, 1, EffectLocation.Top);
+
+				sender.SetEtcProperty(portalProperty, portalPosition + "@" + DateTimeUtils.ToSPropertyDTNow);
+				Send.ZC_EXEC_CLIENT_SCP(sender.Connection, ClientScripts.SAGE_PORTAL_SAVE_SUCCESS);
 			}
 
 			return CommandResult.Okay;
 		}
 
 		/// <summary>
-		/// Client slash command to Memo Portal
+		/// Official slash command to Memo Portal
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5766,27 +5550,6 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Stores the window the client just opened and where its owner
-		/// stood at the time.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="command"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandleLastUiOpenPos(Character sender, Character target, string message, string command, Arguments args)
-		{
-			if (args.Count < 1)
-				return CommandResult.InvalidArgument;
-
-			sender.Variables.Temp.SetString("LastUiOpenFrame", args.Get(0));
-			sender.Variables.Temp.Set("LastUiOpenPos", sender.Position);
-
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
 		/// Fixes or unfixes target's camera position.
 		/// </summary>
 		/// <param name="sender"></param>
@@ -5886,32 +5649,6 @@ namespace Melia.Zone.Commands
 				sender.ServerMessage(Localization.Get("The character was set to *not* be saved on logout."));
 			else
 				sender.ServerMessage(Localization.Get("The character was set to be saved on logout."));
-
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
-		/// Enables or disables the chat announcements of monster skills.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="commandName"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandleMobSkillAnnounce(Character sender, Character target, string message, string commandName, Arguments args)
-		{
-			var enabled = !Debug.MobSkillAnnounceEnabled;
-
-			if (args.Count > 0 && !bool.TryParse(args.Get(0), out enabled))
-				return CommandResult.InvalidArgument;
-
-			Debug.MobSkillAnnounceEnabled = enabled;
-
-			if (enabled)
-				sender.ServerMessage(Localization.Get("Monster skill announcements enabled."));
-			else
-				sender.ServerMessage(Localization.Get("Monster skill announcements disabled."));
 
 			return CommandResult.Okay;
 		}
@@ -6435,6 +6172,95 @@ namespace Melia.Zone.Commands
 			return CommandResult.Okay;
 		}
 
+		private const int BlessedGemItemId = 646045; // Troque pelo ID real da Blessed Gem
+		private CommandResult HandleTranscendTest(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			var equips = target.Inventory.GetEquip();
+
+			var equip = equips.Values.FirstOrDefault(item =>
+				item != null &&
+				item.ObjectId > 0 &&
+				item.Data.Type == ItemType.Equip);
+
+			if (equip == null)
+			{
+				sender.ServerMessage("No valid equipped item found.");
+				return CommandResult.Okay;
+			}
+
+			var currentStage = (int)equip.Properties.GetFloat(PropertyName.Transcend, 0);
+
+			var itemGrade = equip.Properties.GetFloat(PropertyName.ItemGrade, 0);
+			var changeBasicPropValue = equip.Properties.GetFloat(PropertyName.ChangeBasicPropValue, 0);
+			var reinforceValue = equip.Properties.GetFloat(PropertyName.Reinforce_2, 0);
+			var reinforceRatio = equip.Properties.GetFloat(PropertyName.ReinforceRatio, 100);
+
+			sender.ServerMessage(
+				$"Transcend debug: " +
+				$"ClassName={equip.Data.ClassName}, " +
+				$"Grade={itemGrade}, " +
+				$"Transcend={currentStage}, " +
+				$"ChangeBasicPropValue={changeBasicPropValue}, " +
+				$"Reinforce_2={reinforceValue}, " +
+				$"ReinforceRatio={reinforceRatio}, " +
+				$"UseLevel={equip.UseLevel}, " +
+				$"HiddenLevel={equip.HiddenLevel}, " +
+				$"EquipType={equip.Data.EquipType1}"
+			);
+
+			if (currentStage >= 10)
+			{
+				sender.ServerMessage("This item is already at max transcendence.");
+				return CommandResult.Okay;
+			}
+
+			var nextStage = currentStage + 1;
+			var requiredGems = GetRequiredBlessedGems(nextStage);
+
+			var blessedGem = target.Inventory.GetItems().Values.FirstOrDefault(item =>
+				item != null &&
+				item.Id == BlessedGemItemId &&
+				item.Amount >= requiredGems);
+
+			if (blessedGem == null)
+			{
+				sender.ServerMessage($"Not enough Blessed Gems. Required: {requiredGems}.");
+				return CommandResult.Okay;
+			}
+
+			target.Inventory.Remove(blessedGem.ObjectId, requiredGems, InventoryItemRemoveMsg.Used);
+
+			equip.Properties.SetFloat(PropertyName.Transcend, nextStage);
+			equip.Properties.InvalidateAll();
+
+			Send.ZC_OBJECT_PROPERTY(target, equip);
+			target.InvalidateProperties();
+			target.AddonMessage("INV_ITEM_LIST_GET");
+			target.AddonMessage("EQUIP_ITEM_LIST_UPDATE");
+
+			sender.ServerMessage($"Transcend test: {equip.Data.ClassName} {currentStage} -> {nextStage}. Blessed Gems used: {requiredGems}.");
+
+			return CommandResult.Okay;
+		}
+
+		private static int GetRequiredBlessedGems(int stage)
+		{
+			return stage switch
+			{
+				1 => 1,
+				2 => 2,
+				3 => 4,
+				4 => 8,
+				5 => 16,
+				6 => 32,
+				7 => 64,
+				8 => 128,
+				9 => 256,
+				10 => 512,
+				_ => 0,
+			};
+		}
+
 		/// <summary>
 		/// Sets a property on an item by its ObjectId.
 		/// </summary>
@@ -6626,56 +6452,6 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Reports the patrol state of the sender's map.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="command"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandlePatrolInfo(Character sender, Character target, string message, string command, Arguments args)
-		{
-			var filePath = Path.Combine(Path.GetTempPath(), "patrolinfo.txt");
-			var lines = ZoneServer.Instance.World.Patrols.GetStatus(sender);
-
-			File.WriteAllLines(filePath, lines);
-
-			sender.ServerMessage(Localization.Get("Patrol report written to {0}."), filePath);
-
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
-		/// Shows the patrol nodes around the sender.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="command"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandlePatrolNodes(Character sender, Character target, string message, string command, Arguments args)
-		{
-			var range = 1500f;
-			if (args.Count > 0 && !float.TryParse(args.Get(0), out range))
-			{
-				sender.ServerMessage(Localization.Get("Invalid range."));
-				return CommandResult.InvalidArgument;
-			}
-
-			if (!ZoneServer.Instance.World.Patrols.TryShowNodes(sender, range, out var shownCount, out var nodeCount, out var edgeCount))
-			{
-				sender.ServerMessage(Localization.Get("No patrol graph for this map yet, building it now. Try again in a moment."));
-				return CommandResult.Okay;
-			}
-
-			sender.ServerMessage(Localization.Get("Showing {0} of {1} patrol nodes ({2} connections)."), shownCount, nodeCount, edgeCount);
-
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
 		/// Makes nearest monster move to a given position.
 		/// Useful for debugging and testing.
 		/// </summary>
@@ -6780,90 +6556,40 @@ namespace Melia.Zone.Commands
 		/// </summary>
 		private CommandResult HandleEquipSet(Character sender, Character target, string message, string command, Arguments args)
 		{
-			// Parses a grade name, accepting "legendary" as an alias for
-			// ItemGrade.Legend.
-			static bool TryParseItemGrade(string token, out ItemGrade grade)
-			{
-				if (Enum.TryParse(token, true, out grade))
-					return true;
-
-				if (string.Equals(token, "legendary", StringComparison.OrdinalIgnoreCase))
-				{
-					grade = ItemGrade.Legend;
-					return true;
-				}
-
-				return false;
-			}
-
 			var itemDb = ZoneServer.Instance.Data.ItemDb;
 			var grade = ItemGrade.Legend;
 			var refine = 15;
 
 			string[] setNames;
-			var useDefaultSet = args.IndexedCount == 0;
-			var firstTokenIndex = 0;
 
-			// A leading token that isn't a grade or refine value is the set
-			// name; if it is one of those, no name was given and the
-			// default set is used instead.
-			if (!useDefaultSet && !TryParseItemGrade(args.Get(0), out _) && !int.TryParse(args.Get(0), out _))
+			if (args.IndexedCount == 0)
 			{
-				setNames = new[] { args.Get(0) };
-				firstTokenIndex = 1;
-			}
-			else
-			{
-				useDefaultSet = true;
 				setNames = new[] { "Raffye", "Blint" };
-			}
 
-			for (var i = firstTokenIndex; i < args.IndexedCount; i++)
-			{
-				var token = args.Get(i);
-
-				if (TryParseItemGrade(token, out var parsedGrade))
-				{
-					grade = parsedGrade;
-				}
-				else if (int.TryParse(token, out var parsedRefine) && parsedRefine >= 0 && parsedRefine <= 40)
-				{
-					refine = parsedRefine;
-				}
-				else
-				{
-					sender.ServerMessage(Localization.Get("Invalid grade or refine level '{0}'. Use: Normal/Magic/Rare/Unique/Legend/Goddess or 0-40."), token);
-					return CommandResult.Okay;
-				}
-			}
-
-			if (useDefaultSet)
-			{
 				target.Inventory.Add(new Item(640003, 100), InventoryAddType.PickUp);
 				target.Inventory.Add(new Item(640006, 100), InventoryAddType.PickUp);
 				target.Inventory.Add(new Item(640009, 100), InventoryAddType.PickUp);
+			}
+			else
+			{
+				setNames = new[] { args.Get(0) };
 
-				for (var trinketId = 694005; trinketId <= 695003; trinketId++)
+				if (args.IndexedCount >= 2)
 				{
-					var trinketData = itemDb.Find(trinketId);
-					if (trinketData == null || trinketData.EquipType1 != EquipType.Trinket)
-						continue;
+					if (!Enum.TryParse(args.Get(1), true, out grade))
+					{
+						sender.ServerMessage(Localization.Get("Invalid grade. Use: Normal/Magic/Rare/Unique/Legend/Goddess"));
+						return CommandResult.Okay;
+					}
+				}
 
-					var trinket = new Item(trinketData.Id, 1);
-
-					trinket.Properties.SetFloat(PropertyName.ItemGrade, (int)grade);
-
-					trinket.Properties.SetFloat(PropertyName.NeedRandomOption, 1);
-					trinket.GenerateGradeBasedRandomOptions();
-					trinket.Appraisal();
-
-					if (trinket.IsRefinable && refine > 0)
-						trinket.Properties.SetFloat(PropertyName.Reinforce_2, refine);
-
-					for (var i = 0; i < trinket.MaxSockets; i++)
-						trinket.CreateSocket(i);
-
-					target.Inventory.Add(trinket, InventoryAddType.PickUp);
+				if (args.IndexedCount >= 3)
+				{
+					if (!int.TryParse(args.Get(2), out refine) || refine < 0 || refine > 40)
+					{
+						sender.ServerMessage(Localization.Get("Invalid refine level. Use 0-40."));
+						return CommandResult.Okay;
+					}
 				}
 			}
 
@@ -6892,9 +6618,6 @@ namespace Melia.Zone.Commands
 					if (item.IsRefinable && refine > 0)
 						item.Properties.SetFloat(PropertyName.Reinforce_2, refine);
 
-					for (var i = 0; i < item.MaxSockets; i++)
-						item.CreateSocket(i);
-
 					target.Inventory.Add(item, InventoryAddType.PickUp);
 					itemCount++;
 				}
@@ -6914,18 +6637,10 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Sets all abilities of all character jobs to the given level,
-		/// or their max level if no level was given or it exceeds the cap.
+		/// Sets all abilities of all character jobs to their max level.
 		/// </summary>
 		private CommandResult HandleMaxAbilities(Character sender, Character target, string message, string command, Arguments args)
 		{
-			var targetLevel = -1;
-			if (args.Count > 0 && (!int.TryParse(args.Get(0), out targetLevel) || targetLevel <= 0))
-			{
-				sender.ServerMessage(Localization.Get("Invalid level '{0}'."), args.Get(0));
-				return CommandResult.Okay;
-			}
-
 			var abilityTreeDb = ZoneServer.Instance.Data.AbilityTreeDb;
 			var jobs = target.Jobs.GetList();
 			var learnedCount = 0;
@@ -6939,27 +6654,16 @@ namespace Melia.Zone.Commands
 					if (abilityData.MaxLevel <= 0)
 						continue;
 
-					var level = targetLevel <= 0 ? abilityData.MaxLevel : Math.Min(targetLevel, abilityData.MaxLevel);
-
-					target.Abilities.Learn(abilityData.AbilityId, level);
+					target.Abilities.Learn(abilityData.AbilityId, abilityData.MaxLevel);
 					learnedCount++;
 				}
 			}
 
 			if (learnedCount > 0)
 			{
-				if (targetLevel <= 0)
-				{
-					sender.ServerMessage(Localization.Get("Set {0} abilities to max level."), learnedCount);
-					if (sender != target)
-						target.ServerMessage(Localization.Get("All {0} abilities set to max level."), learnedCount);
-				}
-				else
-				{
-					sender.ServerMessage(Localization.Get("Set {0} abilities to level {1} (or their cap)."), learnedCount, targetLevel);
-					if (sender != target)
-						target.ServerMessage(Localization.Get("All {0} abilities set to level {1} (or their cap)."), learnedCount, targetLevel);
-				}
+				sender.ServerMessage(Localization.Get("Set {0} abilities to max level."), learnedCount);
+				if (sender != target)
+					target.ServerMessage(Localization.Get("All {0} abilities set to max level."), learnedCount);
 			}
 			else
 			{
@@ -6980,27 +6684,26 @@ namespace Melia.Zone.Commands
 
 			foreach (var job in jobs)
 			{
-				var skills = skillTreeDb.FindSkills(job.Id, job.EffectiveLevel);
+				var skills = skillTreeDb.FindSkills(job.Id, job.Level);
 
 				foreach (var skillData in skills)
 				{
-					var maxLevel = job.GetSkillMaxLevel(skillData);
-					if (maxLevel <= 0)
+					if (skillData.MaxLevel <= 0)
 						continue;
 
 					if (target.Skills.Has(skillData.SkillId))
 					{
 						var existing = target.Skills.Get(skillData.SkillId);
-						if (existing.LevelByDB < maxLevel)
+						if (existing.LevelByDB < skillData.MaxLevel)
 						{
-							existing.LevelByDB = maxLevel;
+							existing.LevelByDB = skillData.MaxLevel;
 							existing.Properties.InvalidateAll();
 							Send.ZC_OBJECT_PROPERTY(target.Connection, existing);
 						}
 					}
 					else
 					{
-						var skill = new Skill(target, skillData.SkillId, maxLevel);
+						var skill = new Skill(target, skillData.SkillId, skillData.MaxLevel);
 						target.Skills.Add(skill);
 					}
 

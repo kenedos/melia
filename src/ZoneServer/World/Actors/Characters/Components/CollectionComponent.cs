@@ -172,7 +172,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="collection"></param>
 		private void OnCompleted(Collection collection)
 		{
-			this.GrantRewards(collection, this.Character);
+			var characterPropertiesChanged = false;
+			var accountPropertiesChanged = false;
+			this.GrantRewards(collection, this.Character, ref characterPropertiesChanged, ref accountPropertiesChanged);
+			this.SendChangedProperties(this.Character, characterPropertiesChanged, accountPropertiesChanged);
 		}
 
 		/// <summary>
@@ -182,8 +185,13 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="character"></param>
 		public void GrantEligibleRewards()
 		{
+			var characterPropertiesChanged = false;
+			var accountPropertiesChanged = false;
+
 			foreach (var collection in this.GetList().Where(a => a.IsComplete))
-				this.GrantRewards(collection, this.Character);
+				this.GrantRewards(collection, this.Character, ref characterPropertiesChanged, ref accountPropertiesChanged);
+
+			this.SendChangedProperties(this.Character, characterPropertiesChanged, accountPropertiesChanged);
 		}
 
 		/// <summary>
@@ -191,13 +199,31 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// </summary>
 		/// <param name="collection"></param>
 		/// <param name="character"></param>
-		private void GrantRewards(Collection collection, Character character)
+		private void GrantRewards(Collection collection, Character character, ref bool characterPropertiesChanged, ref bool accountPropertiesChanged)
 		{
 			if (!collection.GotPropertyBonuses(character))
-				collection.GrantPropertyBonuses(character);
+				characterPropertiesChanged |= collection.GrantPropertyBonusesSilent(character);
 
 			if (!collection.GotAccountPropertyBonuses(character))
-				collection.GrantAccountPropertyBonuses(character);
+				accountPropertiesChanged |= collection.GrantAccountPropertyBonusesSilent(character);
+			else
+				accountPropertiesChanged |= collection.MigrateAccountPropertyBonuses(character);
+		}
+
+		private void SendChangedProperties(Character character, bool characterPropertiesChanged, bool accountPropertiesChanged)
+		{
+			if (characterPropertiesChanged)
+			{
+				character.Properties.InvalidateAll();
+				Send.ZC_OBJECT_PROPERTY(character);
+			}
+
+			if (accountPropertiesChanged && character.Connection?.Account != null)
+			{
+				character.Connection.Account.Properties.InvalidateAll();
+				character.Connection.Account.TeamStorage?.RefreshCapacity();
+				Send.ZC_NORMAL.AccountProperties(character);
+			}
 		}
 	}
 
@@ -296,20 +322,24 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="character"></param>
 		public void GrantPropertyBonuses(Character character)
 		{
-			var rewardProperties = this.Data.RewardProperties;
-
-			foreach (var bonus in rewardProperties)
-			{
-				var propertyName = bonus.Key;
-				var value = bonus.Value;
-
-				character.Properties.Modify(propertyName, value);
-			}
-
-			character.Variables.Perm.SetBool("Melia.Collections.GotProperties_" + this.Id, true);
+			if (!this.GrantPropertyBonusesSilent(character))
+				return;
 
 			character.Properties.InvalidateAll();
 			Send.ZC_OBJECT_PROPERTY(character);
+		}
+
+		internal bool GrantPropertyBonusesSilent(Character character)
+		{
+			if (character == null)
+				return false;
+
+			foreach (var bonus in this.Data.RewardProperties)
+				character.Properties.Modify(bonus.Key, bonus.Value);
+
+			character.Variables.Temp.SetBool(this.GetSessionPropertyFlag(), true);
+			character.Variables.Perm.SetBool(this.GetPropertyGrantedFlag(), true);
+			return this.Data.RewardProperties.Count > 0;
 		}
 
 		/// <summary>
@@ -319,21 +349,42 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="character"></param>
 		public void GrantAccountPropertyBonuses(Character character)
 		{
-			var account = character.Connection.Account;
-			var rewardProperties = this.Data.RewardAccountProperties;
+			if (!this.GrantAccountPropertyBonusesSilent(character))
+				return;
 
-			foreach (var bonus in rewardProperties)
-			{
-				var propertyName = bonus.Key;
-				var value = bonus.Value;
-
-				account.Properties.Modify(propertyName, value);
-			}
-
-			account.Variables.Perm.SetBool("Melia.Collections.GotProperties_" + this.Id, true);
-
-			account.Properties.InvalidateAll();
+			character.Connection.Account.Properties.InvalidateAll();
+			character.Connection.Account.TeamStorage?.RefreshCapacity();
 			Send.ZC_NORMAL.AccountProperties(character);
+		}
+
+		internal bool GrantAccountPropertyBonusesSilent(Character character)
+		{
+			var account = character?.Connection?.Account;
+			if (account == null)
+				return false;
+
+			foreach (var bonus in this.Data.RewardAccountProperties)
+				account.Properties.Modify(bonus.Key, bonus.Value);
+
+			account.Variables.Perm.SetBool(this.GetPropertyGrantedFlag(), true);
+			account.Variables.Perm.SetBool(this.GetAccountPropertyMigrationFlag(), true);
+			return this.Data.RewardAccountProperties.Count > 0;
+		}
+
+		internal bool MigrateAccountPropertyBonuses(Character character)
+		{
+			var account = character?.Connection?.Account;
+			if (account == null || this.Data.RewardMigrationVersion < 1 || account.Variables.Perm.GetBool(this.GetAccountPropertyMigrationFlag()))
+				return false;
+
+			foreach (var bonus in this.Data.LegacyRewardAccountProperties)
+				account.Properties.Modify(bonus.Key, -bonus.Value);
+
+			foreach (var bonus in this.Data.RewardAccountProperties)
+				account.Properties.Modify(bonus.Key, bonus.Value);
+
+			account.Variables.Perm.SetBool(this.GetAccountPropertyMigrationFlag(), true);
+			return this.Data.LegacyRewardAccountProperties.Count > 0 || this.Data.RewardAccountProperties.Count > 0;
 		}
 
 		/// <summary>
@@ -363,7 +414,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		public bool GotPropertyBonuses(Character character)
 		{
-			return character.Variables.Perm.GetBool("Melia.Collections.GotProperties_" + this.Id);
+			return character != null && character.Variables.Temp.GetBool(this.GetSessionPropertyFlag());
 		}
 
 		/// <summary>
@@ -374,7 +425,11 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		public bool GotAccountPropertyBonuses(Character character)
 		{
-			return character.Connection.Account.Variables.Perm.GetBool("Melia.Collections.GotProperties_" + this.Id);
+			return character?.Connection?.Account != null && character.Connection.Account.Variables.Perm.GetBool(this.GetPropertyGrantedFlag());
 		}
+
+		private string GetPropertyGrantedFlag() => "Melia.Collections.GotProperties_" + this.Id;
+		private string GetSessionPropertyFlag() => "Melia.Collections.AppliedProperties_" + this.Id;
+		private string GetAccountPropertyMigrationFlag() => "Melia.Collections.AccountRewardMigrationV1_" + this.Id;
 	}
 }

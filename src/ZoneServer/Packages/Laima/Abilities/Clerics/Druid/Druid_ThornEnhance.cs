@@ -1,0 +1,39 @@
+﻿using System;
+using Melia.Shared.Game.Const;
+using Melia.Shared.Packages;
+using Melia.Zone.Abilities;
+using Melia.Zone.Skills;
+using Melia.Zone.World.Actors.Characters;
+
+namespace Melia.Zone.Packages.Laima.Abilities.Clerics.Druid
+{
+	[Package("laima")]
+	[AbilityHandler(AbilityId.Druid17)]
+	public class Druid_ThornEnhanceAbility : AbilityPropertyHandler
+	{
+		private const int MaximumLevel = 100;
+
+		public override void OnActivate(Ability ability, Character character)
+		{
+		}
+
+		public override void OnDeactivate(Ability ability, Character character)
+		{
+		}
+
+		public static float GetDamageMultiplier(Character character)
+		{
+			var level = Math.Min(character.Abilities.GetLevel(AbilityId.Druid17), MaximumLevel);
+
+			if (level <= 0)
+				return 1f;
+
+			var enhancePercent = level * 0.5f;
+
+			if (level >= MaximumLevel)
+				enhancePercent += 10f;
+
+			return 1f + enhancePercent / 100f;
+		}
+	}
+}

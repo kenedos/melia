@@ -20,8 +20,7 @@ public class ExpCardScripts : GeneralScript
 		var jobExp = (long)(baseExp * 0.77f);
 
 		character.GiveExp(baseExp, jobExp, null);
-		character.PlayEffect("F_sys_expcard_normal", 2.5f);
-		character.SystemMessage("GetExp{CHAR}{JOB}", new MsgParameter("CHAR", baseExp), new MsgParameter("JOB", jobExp));
+		character.PlayEffect("F_sys_expcard_normal");
 
 		return ItemUseResult.Okay;
 	}
@@ -34,7 +33,7 @@ public class ExpCardScripts : GeneralScript
 			var item = txItem.Item;
 			var amount = txItem.Amount;
 
-			if (item.Data.Script?.StrArg != "XpCard" && item.Data.Script?.Function != "SCR_USE_ITEM_EXPCARD")
+			if (item.Data.Script.StrArg != "XpCard")
 				throw new ArgumentException($"Item '{item.Id}' is not an EXP card.");
 
 			var numArg1 = item.Data.Script.NumArg1;
@@ -50,7 +49,7 @@ public class ExpCardScripts : GeneralScript
 			character.Inventory.Remove(item, amount, InventoryItemRemoveMsg.Used);
 		}
 
-		character.PlayEffect("F_sys_expcard_normal", 2.5f);
+		character.PlayEffect("F_sys_expcard_normal");
 
 		return DialogTxResult.Okay;
 	}

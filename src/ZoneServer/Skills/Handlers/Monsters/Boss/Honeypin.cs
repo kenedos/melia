@@ -67,7 +67,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			}, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 4000f, 1, 30, -1, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 12000f, 1, 40, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 12000f, 1, 100, -1, hits);
 		}
 	}
 
@@ -88,7 +88,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			skill.IncreaseOverheat();
 			caster.TurnTowards(target);
 			caster.SetAttackState(true);
-			
+
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
@@ -116,20 +116,18 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("None", 1.5f),
 			};
 
-			var times = new[]
-			{
-				1200, 1300, 1350, 1500, 1500, 1600, 1800, 2000,
-				3800, 3800, 3950, 4100, 4200, 4300, 4550, 4600, 4600,
-				7100, 7100, 7150, 7300, 7400, 7600, 7700,
-			};
-			var elapsed = 1200;
-			foreach (var time in times)
-			{
-				await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
-				elapsed = time;
+			var waveDelays = new[] { 2200, 2800 };
 
-				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 60, height: 1);
-				_ = MissileThrow(skill, caster, position, config);
+			for (var wave = 0; wave < 3; wave++)
+			{
+				for (var i = 0; i < 9; i++)
+				{
+					var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 60, height: 1);
+					_ = MissileThrow(skill, caster, position, config);
+				}
+
+				if (wave < waveDelays.Length)
+					await skill.Wait(TimeSpan.FromMilliseconds(waveDelays[wave]));
 			}
 		}
 	}
@@ -192,7 +190,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				await skill.Wait(TimeSpan.FromMilliseconds(1350));
 				hits.Clear();
 				await EffectAndHit(skill, caster, position, config, hits);
-				SkillResultKnockTarget(caster, skill, KnockType.Motion, KnockDirection.TowardsTarget, 100, 10, 0, 1, 5, hits, 20);
+				SkillResultKnockTarget(caster, skill, KnockType.Motion, KnockDirection.TowardsTarget, 100, 10, 0, 1, 5, hits);
 
 				var validPos = caster.Map.Ground.GetLastValidPosition(caster.Position, position);
 				caster.Position = validPos;
@@ -224,7 +222,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -233,6 +230,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			var targetPos = originPos.GetRelative(farPos);
+			await skill.Wait(TimeSpan.FromMilliseconds(2800));
+
 			var config = new MissileConfig
 			{
 				Effect = new EffectConfig("I_force015_white#Dummy_atk2_effect", 1f),
@@ -250,24 +250,16 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				EffectMoveDelay = 0f,
 			};
 
-			var webs = new List<Task>();
-			var elapsed = 0;
-			foreach (var time in new[] { 2000, 4000, 6000 })
+			var delays = new[] { 1500, 1300 };
+
+			for (var i = 0; i < 3; i++)
 			{
-				await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
-				elapsed = time;
-
 				var position = GetRelativePosition(PosType.TargetRandom, caster, target, 30f, rand: 40);
-				webs.Add(this.ThrowWeb(caster, skill, position, config));
+				await MissilePadThrow(skill, caster, position, config, 0f, "Boss_slow");
+
+				if (i < delays.Length)
+					await skill.Wait(TimeSpan.FromMilliseconds(delays[i]));
 			}
-
-			await Task.WhenAll(webs);
-		}
-
-		private async Task ThrowWeb(ICombatEntity caster, Skill skill, Position position, MissileConfig config)
-		{
-			await MissileThrow(skill, caster, position, config);
-			SkillCreatePad(caster, skill, position, 0f, PadName.Monster_Slow);
 		}
 	}
 }

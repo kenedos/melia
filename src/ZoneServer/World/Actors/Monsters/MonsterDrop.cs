@@ -5,7 +5,6 @@ using System.Numerics;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.ObjectProperties;
-using Melia.Shared.Util;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Items;
 using Yggdrasil.Logging;
@@ -77,7 +76,7 @@ namespace Melia.Zone.World.Actors.Monsters
 					return grade;
 
 				var dropChance = this.CalculateGradeDropChance(grade, lootingChance, item);
-				var randomChance = GameRandom.Get().NextDouble() * 100;
+				var randomChance = RandomProvider.Get().NextDouble() * 100;
 				// Log.Debug("Drop Chance for '{0}' Grade: {1}%", grade.ToString(), dropChance);
 				if (randomChance < dropChance)
 					return grade;
@@ -89,6 +88,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		private void ApplyItemGrade(Item item, ItemGrade grade)
 		{
 			//Log.Debug("ApplyItemGrade: Applying {0} to item {1}", grade, item.Id);
+			item.Properties.Modify(PropertyName.UseLv, (int)grade);
 			item.Properties.SetFloat(PropertyName.ItemGrade, (int)grade); // Set the item grade property
 			switch (grade)
 			{

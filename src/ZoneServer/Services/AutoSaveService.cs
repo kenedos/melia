@@ -36,7 +36,9 @@ namespace Melia.Zone.Services
 
 			try
 			{
-				var allChars = _zoneServer.World.GetCharacters().ToList();
+				// Include autotraders (DummyConnection) which are filtered
+				// out by the no-predicate GetCharacters() overload.
+				var allChars = _zoneServer.World.GetCharacters(c => c.IsOnline || c.IsAutoTrading).ToList();
 				if (allChars.Count == 0)
 					return;
 
@@ -52,48 +54,52 @@ namespace Melia.Zone.Services
 				if (charactersInSlot.Count == 0)
 					return;
 
-				var savedCount = 0;
-				var failedCount = 0;
-				var capturedSlot = slotToSave;
+			var savedCount = 0;
+			var failedCount = 0;
+			var capturedSlot = slotToSave;
+			var slotTotalProps = 0;
+			var slotDirtyProps = 0;
 
-				foreach (var character in charactersInSlot)
+			foreach (var character in charactersInSlot)
+			{
+				try
 				{
-					try
-					{
-						var conn = character.Connection;
-						var account = conn?.Account;
-						var sessionKey = conn?.SessionKey;
-						var isAutoTrading = character.IsAutoTrading;
+					var conn = character.Connection;
+					var account = conn?.Account;
+					var sessionKey = conn?.SessionKey;
+					var isAutoTrading = character.IsAutoTrading;
 
-						if (account == null && !isAutoTrading)
+					if (account == null && !isAutoTrading)
+					{
+						Log.Warning($"AutoSaveService: Skipping save for {character.Name} ({character.DbId}), account is null.");
+						failedCount++;
+					}
+					else
+					{
+						var sessionValid = isAutoTrading || _database.CheckSessionKey(account.Id, sessionKey);
+
+						if ((character.IsOnline || isAutoTrading) && sessionValid)
 						{
-							Log.Warning($"AutoSaveService: Skipping save for {character.Name} ({character.DbId}), account is null.");
-							failedCount++;
+							_database.SavePlayerData(character, isAutoTrading ? null : account);
+							savedCount++;
+							slotTotalProps += character.Properties.Count() + character.Etc.Properties.Count();
+							slotDirtyProps += character.Properties.CountDirty() + character.Etc.Properties.CountDirty();
 						}
 						else
 						{
-							var sessionValid = isAutoTrading || _database.CheckSessionKey(account.Id, sessionKey);
-
-							if ((character.IsOnline || isAutoTrading) && sessionValid)
-							{
-								_database.SavePlayerData(character, isAutoTrading ? null : account);
-								savedCount++;
-							}
-							else
-							{
-								Log.Warning($"AutoSaveService: Skipping save for {character.Name} (logged out or session mismatch).");
-								failedCount++;
-							}
+							Log.Warning($"AutoSaveService: Skipping save for {character.Name} (logged out or session mismatch).");
+							failedCount++;
 						}
 					}
-					catch (Exception ex)
-					{
-						Log.Error($"AutoSaveService: Error saving character {character?.Name ?? "Unknown"} (ID: {character?.DbId ?? 0}): {ex}");
-						failedCount++;
-					}
 				}
+				catch (Exception ex)
+				{
+					Log.Error($"AutoSaveService: Error saving character {character?.Name ?? "Unknown"} (ID: {character?.DbId ?? 0}): {ex}");
+					failedCount++;
+				}
+			}
 
-				Log.Info($"AutoSaveService: Finished save for slot {capturedSlot}. Saved: {savedCount}, Skipped/Failed: {failedCount}.");
+			Log.Info($"AutoSaveService: Slot {capturedSlot} done. Saved: {savedCount}, Failed: {failedCount}. Props: {slotDirtyProps} dirty / {slotTotalProps} total.");
 
 				if (_currentSlot == 0)
 				{
@@ -119,15 +125,19 @@ namespace Melia.Zone.Services
 		/// <returns>Number of characters saved successfully.</returns>
 		public int SaveAllNow()
 		{
+			var sw = System.Diagnostics.Stopwatch.StartNew();
+
 			// Stop the timer so no new callbacks fire.
 			_timer?.Change(Timeout.Infinite, Timeout.Infinite);
 
-			var allChars = _zoneServer.World.GetCharacters().ToList();
+			var allChars = _zoneServer.World.GetCharacters(c => c.IsOnline || c.IsAutoTrading).ToList();
 			if (allChars.Count == 0)
 				return 0;
 
 			var savedCount = 0;
 			var failedCount = 0;
+			var totalProps = 0;
+			var dirtyProps = 0;
 
 			foreach (var character in allChars)
 			{
@@ -142,6 +152,10 @@ namespace Melia.Zone.Services
 
 					_database.SavePlayerData(character, account);
 					savedCount++;
+
+					// Accumulate property stats for benchmarking
+					totalProps += character.Properties.Count() + character.Etc.Properties.Count();
+					dirtyProps += character.Properties.CountDirty() + character.Etc.Properties.CountDirty();
 				}
 				catch (Exception ex)
 				{
@@ -150,7 +164,10 @@ namespace Melia.Zone.Services
 				}
 			}
 
-			Log.Info("SaveAllNow: Saved {0}, Failed {1}.", savedCount, failedCount);
+			sw.Stop();
+			Log.Info("SaveAllNow: Saved {0}, Failed {1} in {2}ms. Props: {3} dirty / {4} total ({5:F0}%).",
+				savedCount, failedCount, sw.ElapsedMilliseconds,
+				dirtyProps, totalProps, totalProps > 0 ? (100.0 * dirtyProps / totalProps) : 0);
 			return savedCount;
 		}
 

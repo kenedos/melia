@@ -3,6 +3,7 @@ using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
+using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
 
@@ -18,9 +19,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		private TimeSpan _rspTime;
 		private TimeSpan _staminaTime;
 		private TimeSpan _shieldTime;
-
-		private float _rhpTimeBase;
-		private float _rspTimeBase;
+		private TimeSpan? _customRhpTime;
+		private static readonly TimeSpan BossShieldRecoveryTime = TimeSpan.FromMinutes(3);
 
 		/// <summary>
 		/// Creates new component.
@@ -45,10 +45,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				this.UpdateSp(elapsed);
 				this.UpdateStamina(elapsed);
 			}
-			if (this.Entity is Mob mob)
+			if (this.Entity is Mob mob && mob.Rank == MonsterRank.Boss)
 			{
-				mob.UpdateShieldRefill();
-				this.UpdateShield(mob, elapsed);
+				this.UpdateShield(elapsed);
 			}
 		}
 
@@ -60,13 +59,11 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		{
 			_rhpTime -= elapsed;
 
-			if (_rhpTime <= TimeSpan.Zero)
-			{
-				this.RecoverHp();
+			if (_rhpTime > TimeSpan.Zero)
+				return;
 
-				_rhpTimeBase = this.Entity.Properties.GetFloat(PropertyName.RHPTIME);
-				_rhpTime = TimeSpan.FromMilliseconds(_rhpTimeBase);
-			}
+			this.RecoverHp();
+			_rhpTime = _customRhpTime ?? TimeSpan.FromMilliseconds(this.Entity.Properties.GetFloat(PropertyName.RHPTIME));
 		}
 
 		/// <summary>
@@ -80,25 +77,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (_rspTime <= TimeSpan.Zero)
 			{
 				this.RecoverSp();
-
-				_rspTimeBase = this.Entity.Properties.GetFloat(PropertyName.RSPTIME);
-				_rspTime = TimeSpan.FromMilliseconds(_rspTimeBase);
-			}
-		}
-
-		/// <summary>
-		/// Updates the monster's shield regeneration.
-		/// </summary>
-		/// <param name="mob"></param>
-		/// <param name="elapsed"></param>
-		private void UpdateShield(Mob mob, TimeSpan elapsed)
-		{
-			_shieldTime -= elapsed;
-
-			if (_shieldTime <= TimeSpan.Zero)
-			{
-				mob.RegenShield();
-				_shieldTime = TimeSpan.FromMilliseconds(mob.Properties.GetFloat(PropertyName.RHPTIME));
+				_rspTime = TimeSpan.FromMilliseconds(this.Entity.Properties.GetFloat(PropertyName.RSPTIME));
 			}
 		}
 
@@ -115,6 +94,33 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				this.RecoverStamina();
 				_staminaTime = TimeSpan.FromMilliseconds(this.Entity.Properties.GetFloat(PropertyName.Sta_R_Delay));
 			}
+		}
+
+		/// <summary>
+		/// Updates entity's shields.
+		/// </summary>
+		/// <param name="elapsed"></param>
+		private void UpdateShield(TimeSpan elapsed)
+		{
+			if (this.Entity is not Mob mob)
+				return;
+
+			if (mob.Rank != MonsterRank.Boss)
+				return;
+
+			if (mob.Shield > 0)
+			{
+				_shieldTime = BossShieldRecoveryTime;
+				return;
+			}
+
+			_shieldTime -= elapsed;
+
+			if (_shieldTime > TimeSpan.Zero)
+				return;
+
+			mob.HealShield(mob.MaxShield);
+			_shieldTime = BossShieldRecoveryTime;
 		}
 
 		/// <summary>
@@ -144,6 +150,22 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		}
 
 		/// <summary>
+		/// Recovers some Shield.
+		/// </summary>
+		private void RecoverShield()
+		{
+			if (this.Entity is not Mob mob)
+				return;
+
+			var cur = mob.Shield;
+			var max = mob.MaxShield;
+			var rec = (int)this.Entity.Properties.GetFloat(PropertyName.RHP);
+
+			if (rec > 0 && cur < max)
+				mob.HealShield(rec);
+		}
+
+		/// <summary>
 		/// Recovers or drains stamina.
 		/// </summary>
 		private void RecoverStamina()
@@ -159,13 +181,21 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 			var prev = stamina;
 
-			// Drain stamina during movement, recover otherwise. A cutscene
-			// moves the player too, and the game charges for that as it does
-			// for running.
+			// Drain stamina during movement, recover otherwise
 			if (character.Movement.IsMoving)
 			{
-				var runDrain = (int)character.Properties.GetFloat(PropertyName.Sta_Run, 0);
-				stamina = Math2.Clamp(0, maxStamina, stamina - runDrain);
+				var runDrain = character.Properties.GetFloat(PropertyName.Sta_Run, 0);
+
+				if (character.TryGetBuff(BuffId.Agility_Buff, out var agilityBuff))
+				{
+					var reductionRate = agilityBuff.NumArg3;
+					runDrain *= 1f - reductionRate;
+				}
+
+				if (character.Abilities.IsActive(AbilityId.ShinobiAruki))
+					runDrain *= 0.75f;
+
+				stamina = Math2.Clamp(0, maxStamina, stamina - (int)runDrain);
 			}
 			else
 			{
@@ -182,39 +212,16 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 		internal void ResetSpRecoveryTime()
 		{
-			_rspTimeBase = this.Entity.Properties.GetFloat(PropertyName.RSPTIME);
-			_rspTime = TimeSpan.FromMilliseconds(_rspTimeBase);
+			_rspTime = TimeSpan.FromMilliseconds(this.Entity.Properties.GetFloat(PropertyName.RSPTIME));
 		}
 
-		/// <summary>
-		/// Scales the time remaining until the next HP and SP tick to match
-		/// the entity's current recovery intervals, preserving progress.
-		/// </summary>
-		internal void ScaleRecoveryTimes()
+		public void SetHpRecoveryTime(TimeSpan recoveryTime)
 		{
-			var rhpTime = this.Entity.Properties.GetFloat(PropertyName.RHPTIME);
-			var rspTime = this.Entity.Properties.GetFloat(PropertyName.RSPTIME);
+			if (recoveryTime <= TimeSpan.Zero)
+				throw new ArgumentOutOfRangeException(nameof(recoveryTime));
 
-			_rhpTime = ScaleRemaining(_rhpTime, _rhpTimeBase, rhpTime);
-			_rspTime = ScaleRemaining(_rspTime, _rspTimeBase, rspTime);
-
-			_rhpTimeBase = rhpTime;
-			_rspTimeBase = rspTime;
-		}
-
-		/// <summary>
-		/// Returns the remaining time rescaled from the previous interval
-		/// to the new one.
-		/// </summary>
-		/// <param name="remaining"></param>
-		/// <param name="prevTime"></param>
-		/// <param name="newTime"></param>
-		private static TimeSpan ScaleRemaining(TimeSpan remaining, float prevTime, float newTime)
-		{
-			if (prevTime <= 0 || newTime <= 0 || remaining <= TimeSpan.Zero)
-				return remaining;
-
-			return TimeSpan.FromTicks((long)(remaining.Ticks * (newTime / prevTime)));
+			_customRhpTime = recoveryTime;
+			_rhpTime = recoveryTime;
 		}
 	}
 }
