@@ -62,25 +62,25 @@ namespace Melia.Test.Shared.World
 		{
 			var pos1 = new Position(100, 0, 100);
 
-			var pos3 = pos1.GetRelative(new Position(100, 0, 50), 100);
-			Assert.Equal(100, pos3.X);
-			Assert.Equal(-50, pos3.Z);
+			var pos3 = pos1.GetRelative3D(new Position(100, 0, 50), 100);
+   			Assert.Equal(100, pos3.X);
+    		Assert.Equal(-50, pos3.Z);
 
-			pos3 = pos1.GetRelative(new Position(150, 0, 100), 100);
-			Assert.Equal(250, pos3.X);
-			Assert.Equal(100, pos3.Z);
+    		pos3 = pos1.GetRelative3D(new Position(150, 0, 100), 100);
+    		Assert.Equal(250, pos3.X);
+    		Assert.Equal(100, pos3.Z);
 
-			pos3 = pos1.GetRelative(new Position(100, 0, 150), 100);
-			Assert.Equal(100, pos3.X);
-			Assert.Equal(250, pos3.Z);
+    		pos3 = pos1.GetRelative3D(new Position(100, 0, 150), 100);
+   			Assert.Equal(100, pos3.X);
+    		Assert.Equal(250, pos3.Z);
 
-			pos3 = pos1.GetRelative(new Position(50, 0, 100), 100);
-			Assert.Equal(-50, pos3.X);
-			Assert.Equal(100, pos3.Z);
+    		pos3 = pos1.GetRelative3D(new Position(50, 0, 100), 100);
+    		Assert.Equal(-50, pos3.X);
+    		Assert.Equal(100, pos3.Z);
 
-			pos3 = pos1.GetRelative(new Position(100, 0, 50), 100);
-			Assert.Equal(100, pos3.X);
-			Assert.Equal(-50, pos3.Z);
+    		pos3 = pos1.GetRelative3D(new Position(100, 0, 50), 100);
+    		Assert.Equal(100, pos3.X);
+    		Assert.Equal(-50, pos3.Z);
 
 			var pos4 = new Position(0, 0, 0);
 			var pos5 = new Position(20, 30, 60);
