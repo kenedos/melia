@@ -5679,14 +5679,14 @@ namespace Melia.Zone.Network
 		/// <param name="animationName">Name of the animation to play (uses packet string database to retrieve the id of the string).</param>
 		/// <param name="stopOnLastFrame">If true, the animation plays once and then stops on the last frame.</param>
 		public static void ZC_PLAY_ANI(IZoneConnection conn, IActor actor, string animationName,
-			bool stopOnLastFrame = false, float readyTime = 0, float animationSpeed = 1, byte b1 = 0)
+			bool stopOnLastFrame = false, float readyTime = 0, float animationSpeed = 1, byte b1 = 0, byte b2 = 0)
 		{
 			using var packet = Packet.Rent(Op.ZC_PLAY_ANI);
 
 			packet.PutInt(actor.Handle);
 			packet.AddStringId(animationName);
 			packet.PutByte(stopOnLastFrame);
-			packet.PutByte(0);
+			packet.PutByte(b2);
 			packet.PutFloat(readyTime);
 			packet.PutFloat(animationSpeed);
 
@@ -5707,14 +5707,14 @@ namespace Melia.Zone.Network
 		/// <param name="animationName">Name of the animation to play (uses packet string database to retrieve the id of the string).</param>
 		/// <param name="stopOnLastFrame">If true, the animation plays once and then stops on the last frame.</param>
 		public static void ZC_PLAY_ANI(IActor actor, string animationName,
-			bool stopOnLastFrame = false, float readyTime = 0, float animationSpeed = 1, byte b1 = 0)
+			bool stopOnLastFrame = false, float readyTime = 0, float animationSpeed = 1, byte b1 = 0, byte b2 = 0)
 		{
 			using var packet = Packet.Rent(Op.ZC_PLAY_ANI);
 
 			packet.PutInt(actor.Handle);
 			packet.AddStringId(animationName);
 			packet.PutByte(stopOnLastFrame);
-			packet.PutByte(0);
+			packet.PutByte(b2);
 			packet.PutFloat(readyTime);
 			packet.PutFloat(animationSpeed);
 

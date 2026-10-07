@@ -1272,7 +1272,7 @@
 { skillId: 160419, className: "Mon_Graztas_Skill_1", name: "Attack", classType: "Melee", attackType: "Strike", attribute: "Dark", maxRange: 40, factor: 25, factorByLevel: 0, atkAdd: 0, atkAddByLevel: 0 },
 { skillId: 161381, className: "Mon_Zombie_hoplite_Skill_1", name: "Attack", classType: "Melee", attackType: "Strike", attribute: "Dark", maxRange: 70, factor: 25, factorByLevel: 0, atkAdd: 0, atkAddByLevel: 0 },
 { skillId: 161382, className: "Mon_Zombie_hoplite_Skill_2", name: "Attack", classType: "Melee", attackType: "Strike", attribute: "Dark", maxRange: 55, factor: 25, factorByLevel: 0, atkAdd: 0, atkAddByLevel: 0 },
-{ skillId: 163096, className: "Mon_pcskill_FireFoxShikigami_Skill_1", name: "Attack", cooldownTime: 1500 },
+{ skillId: 163096, className: "Mon_pcskill_FireFoxShikigami_Skill_1", name: "Attack", cooldownTime: 3500 },
 
 ]
 { skillId: 31001, className: "Falconer_Calling", name: "Call", basicSp: 4, lvUpSpendSp: 0.4, captionTime: 15, captionTimeByLevel: 2 },

@@ -4023,6 +4023,25 @@ namespace Melia.Zone.Network
 				actor.Map.Broadcast(packet, actor);
 			}
 
+			/// <summary>
+			/// Summon (Monster) plays an animation on the given connection.
+			/// </summary>
+			/// <param name="conn"></param>
+			/// <param name="actor"></param>
+			/// <param name="playAnimation"></param>
+			/// <param name="f1"></param>
+			public static void SummonPlayAnimation(IZoneConnection conn, IActor actor, string playAnimation, float f1)
+			{
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
+
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.SummonPlayAnimation);
+				packet.PutInt(actor.Handle);
+				packet.AddStringId(playAnimation);
+				packet.PutFloat(f1);
+
+				conn.Send(packet);
+			}
+
 			public static void ShowHookEffect(IActor actor, string effectName, float effectScale, string linkTextureName, string actorNodeName, float speed, float easing, Position position)
 			{
 				using var packet = Packet.Rent(Op.ZC_NORMAL);

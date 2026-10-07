@@ -252,18 +252,20 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 	/// <summary>
 	/// Handler override for the Soul Fox Shikigami fox's Skill_1, which
-	/// throws an orb that flies out from the fox and back, striking the
-	/// enemies in its path each way as its Onmyoji.
+	/// throws an orb from the fox ahead of its Onmyoji that then bounces
+	/// onto the target, striking the enemies in its path as its Onmyoji.
 	/// </summary>
 	[Package("system")]
 	[SkillHandler(SkillId.Mon_pcskill_FireFoxShikigami_Skill_1)]
 	public class Mon_pcskill_FireFoxShikigami_Skill_1Override : ITargetSkillHandler
 	{
-		private const float OrbDistance = 150f;
+		private const string NoReturnVar = "Melia.Onmyoji.FoxOrb.NoReturn";
+		private const float FoxOffset = 20f;
+		private const float OrbDistance = 60f;
 		private const float OrbRadius = 30f;
 		private const float OrbSpeed = 200f;
-		private const float OrbReturnSpeed = 350f;
-		private const int ThrowDelay = 250;
+		private const float OrbBounceSpeed = 350f;
+		private const int ThrowDelay = 1000;
 
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
@@ -283,47 +285,76 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				return;
 			}
 
-			caster.TurnTowards(target);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
 
-			skill.Run(this.HandleSkill(caster, target, skill, caster.Position));
-		}
-
-		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos)
-		{
-			var splashArea = new SplashAreas.Square(originPos, caster.Direction, OrbDistance, OrbRadius);
-			var distance = Math.Min(OrbDistance, (float)originPos.Get2DDistance(target.Position));
-			var outHit = ThrowDelay + (int)(distance / OrbSpeed * 1000);
-			var returnHit = ThrowDelay + (int)(OrbDistance / OrbSpeed * 1000) + (int)((OrbDistance - distance) / OrbReturnSpeed * 1000);
-
-			if (caster is Summon summon && summon.Owner != null)
-				ShowRangePreview(summon.Owner, skill, splashArea, TimeSpan.FromMilliseconds(returnHit));
-
 			_ = ForceAttackEffect(caster, target, skill);
-			_ = this.ThrowOrb(caster, skill);
-
-			await SkillAttack(caster, skill, splashArea, outHit, outHit, modifySkillHitResult: AsOwner);
-			await SkillAttack(caster, skill, splashArea, returnHit - outHit, returnHit - outHit, modifySkillHitResult: AsOwner);
+			skill.Run(this.HandleSkill(caster, target, skill));
 		}
 
-		private async Task ThrowOrb(ICombatEntity caster, Skill skill)
+		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill)
 		{
 			await skill.Wait(ThrowDelay);
 
 			if (caster.IsDead)
 				return;
 
-			var start = caster.Position;
+			var owner = (caster is Summon summon && summon.Owner is ICombatEntity summoner && summoner.Map == caster.Map) ? summoner : caster;
+			var direction = owner.Direction;
+			var start = caster.Map.Ground.GetLastValidPosition(owner.Position, owner.Position.GetRelative(direction.Right, FoxOffset));
+			var bouncePos = caster.Map.Ground.GetLastValidPosition(start, start.GetRelative(direction, OrbDistance));
 
-			var pad = new Pad(PadName.Onmyoji_CrystalballShikigami_Pad, caster, skill, new SplashAreas.Circle(start, OrbRadius));
-			pad.Position = start;
-			pad.Direction = caster.Direction;
-			pad.Movement.Speed = OrbSpeed;
+			var throwArea = new SplashAreas.Square(start, direction, (float)start.Get2DDistance(bouncePos), OrbRadius);
+			ShowRangePreview(owner, skill, throwArea, TimeSpan.FromMilliseconds(start.Get2DDistance(bouncePos) / OrbSpeed * 1000));
+
+			var pad = this.CreateOrb(caster, skill, start, direction, OrbSpeed);
+			await pad.Movement.MoveToAndDestroy(bouncePos);
+			await SkillAttack(caster, skill, throwArea, modifySkillHitResult: AsOwner);
+
+			if (caster.IsDead || target.IsDead || target.Map != caster.Map)
+				return;
+
+			var targetPos = caster.Map.Ground.GetLastValidPosition(bouncePos, target.Position);
+			var bounceDirection = bouncePos.GetDirection(targetPos);
+			var bounceDistance = (float)bouncePos.Get2DDistance(targetPos);
+
+			var bounceArea = new SplashAreas.Square(bouncePos, bounceDirection, bounceDistance + OrbRadius, OrbRadius);
+			ShowRangePreview(owner, skill, bounceArea, TimeSpan.FromMilliseconds(bounceDistance / OrbBounceSpeed * 1000));
+
+			var bouncePad = this.CreateOrb(caster, skill, bouncePos, bounceDirection, OrbBounceSpeed);
+			await bouncePad.Movement.MoveToAndDestroy(targetPos);
+			await SkillAttack(caster, skill, bounceArea, modifySkillHitResult: AsOwner);
+		}
+
+		/// <summary>
+		/// Creates an orb at the given position that does not return to
+		/// the fox once it is destroyed.
+		/// </summary>
+		/// <param name="caster"></param>
+		/// <param name="skill"></param>
+		/// <param name="position"></param>
+		/// <param name="direction"></param>
+		/// <param name="speed"></param>
+		/// <returns></returns>
+		private Pad CreateOrb(ICombatEntity caster, Skill skill, Position position, Direction direction, float speed)
+		{
+			var pad = new Pad(PadName.Onmyoji_CrystalballShikigami_Pad, caster, skill, new SplashAreas.Circle(position, OrbRadius));
+			pad.Position = position;
+			pad.Direction = direction;
+			pad.Movement.Speed = speed;
+			pad.Variables.SetBool(NoReturnVar, true);
 			caster.Map.AddPad(pad);
 
-			var destination = caster.Map.Ground.GetLastValidPosition(start, start.GetRelative(caster.Direction, OrbDistance));
-			await pad.Movement.MoveToAndDestroy(destination);
+			return pad;
 		}
+
+		/// <summary>
+		/// Returns whether the orb pad was thrown by the fox and must not
+		/// return once it is destroyed.
+		/// </summary>
+		/// <param name="pad"></param>
+		/// <returns></returns>
+		public static bool IsNoReturnOrb(Pad pad)
+			=> pad.Variables.GetBool(NoReturnVar);
 
 		/// <summary>
 		/// Returns the hit rolled as the fox's Onmyoji using Soul Fox

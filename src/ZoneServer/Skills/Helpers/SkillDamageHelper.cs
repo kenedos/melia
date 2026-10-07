@@ -495,7 +495,7 @@ namespace Melia.Zone.Skills.Helpers
 
 		public static Mob MonsterSkillCreateMob(Skill skill, ICombatEntity caster,
 			string className, Position position, float angle, string name,
-			string behaviorTree, int levelOffset, float lifeTime, string simpleAiName, string monsterProperties)
+			string behaviorTree, int levelOffset, float lifeTime, string simpleAiName, string monsterProperties, bool immediate = false)
 		{
 			if (caster.IsDead)
 				return null;
@@ -604,7 +604,7 @@ namespace Melia.Zone.Skills.Helpers
 			mob.Vars.SetInt("Melia.Summon.Skill", (int)skill.Id);
 			mob.Vars.Set("Melia.Summoner.Owner", caster);
 
-			caster.Map.AddMonster(mob);
+			caster.Map.AddMonster(mob, immediate);
 
 			mob.FromGround = true;
 			mob.DelayEnterWorld();

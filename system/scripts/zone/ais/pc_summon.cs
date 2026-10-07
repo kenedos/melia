@@ -1,9 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.AI;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 
 [Ai("PC_Summon")]
 public class PCSummonAiScript : AiScript
@@ -97,12 +102,60 @@ public class PCSummonAiScript : AiScript
 [Ai("PC_Summon_FireFox")]
 public class PCSummonFireFoxAiScript : PCSummonAiScript
 {
+	private const string MoveAnimation = "run";
+	private const string StandAnimation = "astd";
+	private static readonly TimeSpan AnimationInterval = TimeSpan.FromMilliseconds(500);
+	private static readonly TimeSpan AttackAnimationPause = TimeSpan.FromMilliseconds(2050);
+	private static readonly TimeSpan SpawnDelay = TimeSpan.FromMilliseconds(1400);
+
+	private DateTime _nextAnimation = DateTime.MinValue;
+	private DateTime _readyTime = DateTime.MinValue;
+
 	protected override void Setup()
 	{
 		base.Setup();
 
+		_readyTime = GameClock.Now + SpawnDelay;
+		_nextAnimation = _readyTime;
+
 		During("Idle", StayWithMaster);
+		During("Idle", MatchMasterMovement);
 		During("Attack", StayWithMaster);
+		During("Attack", MatchMasterMovement);
+	}
+
+	/// <summary>
+	/// Plays the fox's run animation while its master moves and its stand
+	/// animation otherwise.
+	/// </summary>
+	protected void MatchMasterMovement()
+	{
+		if (GameClock.Now < _nextAnimation)
+			return;
+
+		this.PlayMovementAnimation();
+		_nextAnimation = GameClock.Now + AnimationInterval;
+	}
+
+	protected override IEnumerable UseSkill(Skill skill, ICombatEntity target, TimeSpan delay = default)
+	{
+		this.PlayMovementAnimation();
+		_nextAnimation = GameClock.Now + AttackAnimationPause;
+
+		yield return base.UseSkill(skill, target, delay);
+	}
+
+	/// <summary>
+	/// Sends the animation matching the master's movement.
+	/// </summary>
+	private void PlayMovementAnimation()
+	{
+		if (!this.TryGetMaster(out var master))
+			return;
+
+		var isMoving = master is Character character && character.Movement.IsMoving && character.Movement.MoveTarget == MoveTargetType.Direction;
+
+		Send.ZC_PLAY_ANI(this.Entity, isMoving ? MoveAnimation : StandAnimation, true, 0, 1, 1, 1);
 	}
 
 	/// <summary>
@@ -116,6 +169,12 @@ public class PCSummonFireFoxAiScript : PCSummonAiScript
 
 	protected override bool TryGetRandomSkill(out Skill skill)
 	{
+		if (GameClock.Now < _readyTime)
+		{
+			skill = null;
+			return false;
+		}
+
 		// The fox's fireball needs Onmyoji18, which the ability tree does not offer.
 		if (base.TryGetRandomSkill(out skill) && skill.Id == SkillId.Mon_pcskill_FireFoxShikigami_Skill_1)
 			return true;

@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
 using Melia.Zone.Network;
+using Melia.Zone.Skills.Handlers.Mon;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Monsters;
@@ -11,7 +12,7 @@ namespace Melia.Zone.Pads.Handlers.Wizards.Onmyoji
 {
 	/// <summary>
 	/// Handler for the shikigami orb's outward flight, which turns back
-	/// where it stops.
+	/// where it stops unless the Soul Fox threw it.
 	/// </summary>
 	/// <remarks>
 	/// The orb is only the visual; the throwing skill deals the damage.
@@ -39,7 +40,7 @@ namespace Melia.Zone.Pads.Handlers.Wizards.Onmyoji
 
 			Send.ZC_NORMAL.PadUpdate(pad, false);
 
-			if (creator.IsDead || creator.Map != pad.Map)
+			if (creator.IsDead || creator.Map != pad.Map || Mon_pcskill_FireFoxShikigami_Skill_1Override.IsNoReturnOrb(pad))
 				return;
 
 			var returnPad = new Pad(PadName.Onmyoji_CrystalballShikigami_Pad2, creator, pad.Skill, new Circle(pad.Position, Range));

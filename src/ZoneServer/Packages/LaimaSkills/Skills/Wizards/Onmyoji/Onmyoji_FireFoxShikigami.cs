@@ -9,6 +9,7 @@ using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
+using Melia.Zone.World.Maps;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 
 namespace Melia.Zone.Skills.Handlers.Wizards.Onmyoji
@@ -27,6 +28,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Onmyoji
 		private const string FoxAiName = "PC_Summon_FireFox";
 		private const string FoxProperties = "Faction#Summon#FIXMSPD_BM#140";
 		private const string FollowNode = "Dummy_RU_armband";
+		private const string FoxAnimation = "ONMYOJI_FIREFOXSHIKIGAMI";
+		private static readonly TimeSpan FoxEnterDelay = TimeSpan.FromMilliseconds(400);
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -50,15 +53,34 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Onmyoji
 			var duration = skill.Properties.CaptionTime;
 			var name = "!@#${Auto_1}_of_{Auto_2}$*$Auto_1$*$" + caster.Name + "$*$Auto_2$*$@dicID_^*$ETC_20150317_000235$*^#@!";
 
-			var fox = MonsterSkillCreateMob(skill, caster, FoxClassName, caster.Position, 0, name, "None", 0, (float)duration.TotalSeconds, "None", FoxProperties);
+			var fox = MonsterSkillCreateMob(skill, caster, FoxClassName, caster.Position, 0, name, "None", 0, (float)duration.TotalSeconds, "None", FoxProperties, immediate: true);
 			if (fox == null)
 				return;
 
 			fox.Tendency = TendencyType.Aggressive;
+			fox.Vars.SetString("Melia.Summon.PlayAnimation", FoxAnimation);
 			fox.Components.Add(new AiComponent(fox, FoxAiName, caster));
-			fox.Components.Add(new FollowToActorComponent(fox, caster, FollowNode, 10f, 30f, 0f, 1, 0.1f));
-			fox.StartBuff(BuffId.Invincible, duration);
+
+			var viewers = fox.Map.GetCharacters(c => c.Position.InRange2D(fox.Position, Map.VisibleRange));
+			foreach (var viewer in viewers)
+				viewer.LookAround();
+
+			var syncKey = ZoneServer.Instance.World.CreateSkillHandle();
+			Send.ZC_SYNC_START(caster, syncKey, 1);
+
+			Send.ZC_MOVE_STOP(fox, fox.Position);
+			fox.DelayEnterWorld();
+			fox.EnterDelayedActor();
+
+			var follow = new FollowToActorComponent(fox, caster, FollowNode, 10f, 30f, 0f, 1, 0.1f);
+			fox.Components.Add(follow);
+			foreach (var viewer in viewers)
+				Send.ZC_FOLLOW_TO_ACTOR(viewer.Connection, fox, caster, follow.NodeName, follow.F1, follow.F2, follow.F3, follow.B1, follow.F4);
+
 			fox.StartBuff(BuffId.Ability_buff_PC_FireFox_Summon, skill.Level, 0, TimeSpan.Zero, fox, skill.Id);
+
+			Send.ZC_SYNC_END(caster, syncKey, 0);
+			Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, syncKey, FoxEnterDelay);
 
 			var buff = caster.StartBuff(BuffId.FireFoxShikigami_Buff, skill.Level, 0, duration, caster, skill.Id);
 			buff?.Vars.Set(FoxVar, fox);
