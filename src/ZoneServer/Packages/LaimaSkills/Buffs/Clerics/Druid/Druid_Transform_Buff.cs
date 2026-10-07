@@ -27,8 +27,8 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Druid
 			if (buff.Target is not Character character)
 				return;
 
-			character.AddEffect(EffectName, new TransmuteEffect((int)buff.NumArg2));
-			DruidSkillHelper.AddTemporarySkills(buff, character, DruidSkillHelper.GetShapeSkills(character), 1);
+			DruidSkillHelper.AddFormSkills(buff, character, DruidSkillHelper.GetShapeSkills(character), 1);
+			character.AddEffect(EffectName, new TransmuteEffect((int)buff.NumArg2, BuffId.transform));
 		}
 
 		public override void OnEnd(Buff buff)
@@ -37,7 +37,8 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Druid
 				return;
 
 			character.RemoveEffect(EffectName);
-			DruidSkillHelper.RemoveTemporarySkills(buff, character);
+			DruidSkillHelper.PlayFormEndEffect(character);
+			DruidSkillHelper.RemoveFormSkills(buff, character);
 		}
 	}
 }

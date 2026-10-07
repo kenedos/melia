@@ -11,12 +11,13 @@ namespace Melia.Zone.Network.Helpers
 		/// </summary>
 		/// <param name="packet"></param>
 		/// <param name="skill"></param>
-		public static void AddSkill(this Packet packet, Skill skill)
+		/// <param name="withObjectId"></param>
+		public static void AddSkill(this Packet packet, Skill skill, bool withObjectId = true)
 		{
 			var propertyList = skill.Properties.GetAll();
 			var propertiesSize = propertyList.GetByteCount();
 
-			packet.PutLong(skill.ObjectId);
+			packet.PutLong(withObjectId ? skill.ObjectId : 0);
 			packet.PutInt((int)skill.Id);
 			packet.PutShort(propertiesSize);
 			packet.PutEmptyBin(2); // alignment

@@ -4326,14 +4326,14 @@ namespace Melia.Zone.Network
 				}
 			}
 
-			public static void Transmutation(IActor actor, int monsterId, byte b1 = 1)
+			public static void Transmutation(IActor actor, int monsterId, BuffId buffId = 0, byte b1 = 1)
 			{
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.Transmutation);
 
 				packet.PutInt(actor.Handle);
 				packet.PutInt(monsterId);
-				packet.PutInt(0);
+				packet.PutInt((int)buffId);
 				packet.PutInt(0);
 				if (monsterId > 0)
 					packet.PutByte(b1);
@@ -4341,14 +4341,14 @@ namespace Melia.Zone.Network
 				actor.Map.Broadcast(packet);
 			}
 
-			public static void Transmutation(IZoneConnection conn, IActor actor, int monsterId, byte b1 = 1)
+			public static void Transmutation(IZoneConnection conn, IActor actor, int monsterId, BuffId buffId = 0, byte b1 = 1)
 			{
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.Transmutation);
 
 				packet.PutInt(actor.Handle);
 				packet.PutInt(monsterId);
-				packet.PutInt(0);
+				packet.PutInt((int)buffId);
 				packet.PutInt(0);
 				packet.PutByte(b1);
 

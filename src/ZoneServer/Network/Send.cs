@@ -653,10 +653,11 @@ namespace Melia.Zone.Network
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="skill"></param>
-		public static void ZC_SKILL_ADD(Character character, Skill skill)
+		/// <param name="isLent"></param>
+		public static void ZC_SKILL_ADD(Character character, Skill skill, bool isLent = false)
 		{
 			// Passive skills and basic attack replacements aren't added to the quickbar
-			var addToQuickbar = skill.Data.ActivationType == SkillActivationType.ActiveSkill && !skill.Data.Tags.Has("NormalSkill");
+			var addToQuickbar = !isLent && skill.Data.ActivationType == SkillActivationType.ActiveSkill && !skill.Data.Tags.Has("NormalSkill");
 
 			using var packet = Packet.Rent(Op.ZC_SKILL_ADD);
 
@@ -665,7 +666,7 @@ namespace Melia.Zone.Network
 			packet.PutByte(addToQuickbar);
 			packet.PutByte(0); // SKILL_LIST_GET ?
 			packet.PutLong(0); // ?
-			packet.AddSkill(skill);
+			packet.AddSkill(skill, !isLent);
 
 			character.Connection.Send(packet);
 		}

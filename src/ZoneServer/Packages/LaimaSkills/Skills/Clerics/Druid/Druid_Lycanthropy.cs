@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
 using Melia.Shared.World;
@@ -23,6 +24,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Druid
 	{
 		private static readonly TimeSpan HumanFormDuration = TimeSpan.FromSeconds(10);
 		private static readonly TimeSpan WolfSpiritDuration = TimeSpan.FromMinutes(30);
+		private static readonly TimeSpan TransformDelay = TimeSpan.FromMilliseconds(900);
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -38,6 +40,19 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Druid
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
+
+			skill.Run(this.Transform(skill, caster));
+		}
+
+		/// <summary>
+		/// Transforms the Druid once the cast animation reaches the change.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <param name="caster"></param>
+		/// <returns></returns>
+		private async Task Transform(Skill skill, ICombatEntity caster)
+		{
+			await skill.Wait(TransformDelay);
 
 			if (caster.IsAbilityActive(AbilityId.Druid14) && !caster.IsAbilityActive(AbilityId.Druid27))
 			{

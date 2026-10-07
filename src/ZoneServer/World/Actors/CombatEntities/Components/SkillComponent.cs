@@ -33,12 +33,15 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// skills.
 		/// </summary>
 		/// <param name="skill"></param>
-		public void Add(Skill skill)
+		/// <param name="isLent"></param>
+		public void Add(Skill skill, bool isLent = false)
 		{
 			this.AddSilent(skill);
 
-			Send.ZC_SKILL_ADD(this.Character, skill);
-			Send.ZC_UPDATE_SKL_SPDRATE_LIST(this.Character, skill);
+			Send.ZC_SKILL_ADD(this.Character, skill, isLent);
+
+			if (!isLent)
+				Send.ZC_UPDATE_SKL_SPDRATE_LIST(this.Character, skill);
 		}
 
 		/// <summary>

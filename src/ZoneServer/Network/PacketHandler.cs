@@ -1941,6 +1941,9 @@ namespace Melia.Zone.Network
 				{
 					case SkillUseType.MeleeGround:
 					{
+						if (DruidSkillHelper.TryUseShapeSkill(character, skill, targets.FirstOrDefault()))
+							break;
+
 						if (ZoneServer.Instance.SkillHandlers.TryGetHandler<IMeleeGroundSkillHandler>(skillId, out var meleeHandler))
 						{
 							skill.PrepareCancellation();
@@ -2258,6 +2261,9 @@ namespace Melia.Zone.Network
 					}
 					case SkillUseType.MeleeGround:
 					{
+						if (DruidSkillHelper.TryUseShapeSkill(character, skill, target))
+							break;
+
 						if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<IGroundSkillHandler>(skillId, out var handler))
 						{
 							character.ServerMessage(Localization.Get("This skill has not been implemented yet."));
@@ -4621,12 +4627,14 @@ namespace Melia.Zone.Network
 
 			// Only allow dashing for swordsmen, unless the respective
 			// feature was enabled.
-			if (character.JobClass != JobClass.Swordsman && !Feature.IsEnabled(FeatureId.DashingForAll))
+			if (character.JobClass != JobClass.Swordsman && !Feature.IsEnabled(FeatureId.DashingForAll) && !DruidSkillHelper.CanDash(character))
 				return;
 
 			// Only start the buff when the client signals to start dashing
-			// start = 1 for normal dash, start = 3 for mounted dash
-			if (start != 1 && start != 3)
+			// start = 1 for normal dash, start = 3 for mounted dash, and a
+			// Lycanthropy form from druid sends 0 for whatever reason
+			var isFormDash = start == 0 && DruidSkillHelper.CanDash(character);
+			if (start != 1 && start != 3 && !isFormDash)
 				return;
 
 			// For some reason this packet is sent multiple times while

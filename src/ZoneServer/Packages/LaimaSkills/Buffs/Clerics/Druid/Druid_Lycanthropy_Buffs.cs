@@ -1,13 +1,13 @@
 using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
 using Melia.Zone.Buffs.Base;
-using Melia.Zone.Network;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Effects;
 
 namespace Melia.Zone.Buffs.Handlers.Clerics.Druid
 {
@@ -30,6 +30,7 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Druid
 		private const float MoveSpeedBonus = 10f;
 		private const float DefenseRate = 0.5f;
 		private const float BlockPenetrationRate = 0.1f;
+		private const string EffectName = "Melia.Druid.Lycanthropy";
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
@@ -37,15 +38,18 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Druid
 
 			buff.SetUpdateTime(HealInterval);
 
+			if (target is Character character)
+				DruidSkillHelper.AddFormSkills(buff, character, DruidSkillHelper.WolfSkills, (int)buff.NumArg1);
+
+			if (activationType == ActivationType.Start)
+				target.AddEffect(EffectName, new TransmuteEffect(MonsterId.Lycanthrope, BuffId.Lycanthropy_Buff));
+
 			UpdatePropertyModifier(buff, target, PropertyName.MHP_RATE_BM, 1);
 			UpdatePropertyModifier(buff, target, PropertyName.MSPD_BM, MoveSpeedBonus);
 			UpdatePropertyModifier(buff, target, PropertyName.DEF_RATE_BM, DefenseRate);
 			UpdatePropertyModifier(buff, target, PropertyName.MDEF_RATE_BM, DefenseRate);
 			UpdatePropertyModifier(buff, target, PropertyName.CRTHR_RATE_BM, GetCaptionRatio(buff, 2) / 100f);
 			UpdatePropertyModifier(buff, target, PropertyName.BLK_BREAK_BM, target.Properties.GetFloat(PropertyName.BLK_BREAK) * BlockPenetrationRate);
-
-			if (target is Character character)
-				DruidSkillHelper.AddTemporarySkills(buff, character, DruidSkillHelper.WolfSkills, (int)buff.NumArg1);
 		}
 
 		public override void WhileActive(Buff buff)
@@ -65,8 +69,11 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Druid
 			RemovePropertyModifier(buff, target, PropertyName.CRTHR_RATE_BM);
 			RemovePropertyModifier(buff, target, PropertyName.BLK_BREAK_BM);
 
+			target.RemoveEffect(EffectName);
+			DruidSkillHelper.PlayFormEndEffect(target);
+
 			if (target is Character character)
-				DruidSkillHelper.RemoveTemporarySkills(buff, character);
+				DruidSkillHelper.RemoveFormSkills(buff, character);
 		}
 
 		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Lycanthropy_Buff)]
@@ -89,29 +96,42 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Druid
 	/// </summary>
 	[Package("laima-skills")]
 	[BuffHandler(BuffId.Lycanthropy_Half_Buff)]
-	public class Druid_Lycanthropy_Half_BuffOverride : BuffHandler
+	public class Druid_Lycanthropy_Half_BuffOverride : BuffHandler, ITransformationBuff
 	{
 		private const float MoveSpeedBonus = 5f;
+		private const string HatEffectName = "Melia.Druid.LycanthropyHalf.Hat";
+		private const string HairEffectName = "Melia.Druid.LycanthropyHalf.Hair";
+		private const string OuterEffectName = "Melia.Druid.LycanthropyHalf.Outer";
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			UpdatePropertyModifier(buff, buff.Target, PropertyName.MSPD_BM, MoveSpeedBonus);
 
-			if (buff.Target is not Character character)
+			if (buff.Target is not Character character || activationType != ActivationType.Start)
 				return;
 
-			if (!character.Skills.Has(SkillId.Lycan_Half_Attack))
-				character.Skills.Add(new Skill(character, SkillId.Lycan_Half_Attack));
+			var hairClassName = character.Gender == Gender.Female ? "HAIR_F_10000" : "HAIR_M_10000";
 
-			Send.ZC_NORMAL.SetMainAttackSkill(character, SkillId.Lycan_Half_Attack);
+			character.AddEffect(HatEffectName, new CostumeTransformEffect("Hat_700000", EquipSlot.HairAccessory));
+			character.AddEffect(HairEffectName, new CostumeTransformEffect(hairClassName, EquipSlot.Hair));
+			character.AddEffect(OuterEffectName, new CostumeTransformEffect("costume_lycan", EquipSlot.Outer1));
+
+			DruidSkillHelper.AddTemporarySkills(buff, character, [SkillId.Lycan_Half_Attack], 1);
 		}
 
 		public override void OnEnd(Buff buff)
 		{
 			RemovePropertyModifier(buff, buff.Target, PropertyName.MSPD_BM);
 
-			if (buff.Target is Character character)
-				Send.ZC_NORMAL.SetMainAttackSkill(character, SkillId.None);
+			if (buff.Target is not Character character)
+				return;
+
+			character.RemoveEffect(HatEffectName);
+			character.RemoveEffect(HairEffectName);
+			character.RemoveEffect(OuterEffectName);
+			DruidSkillHelper.PlayFormEndEffect(character);
+
+			DruidSkillHelper.RemoveTemporarySkills(buff, character);
 		}
 
 		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Lycanthropy_Half_Buff)]
