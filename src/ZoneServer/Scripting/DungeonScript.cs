@@ -704,6 +704,7 @@ namespace Melia.Zone.Scripting
 
 			// Start the dungeon (only the first caller will actually start it due to IsStarted check)
 			await instance.StartDungeon(this);
+			instance.RegisterEntry(character);
 
 			// Set up this character for the dungeon
 			character.SetPosition(instance.StartPosition);
@@ -769,6 +770,8 @@ namespace Melia.Zone.Scripting
 
 			// Restore permanent variable reference
 			character.Variables.Perm.SetString(ActiveInstanceVarName, this.Id);
+
+			instance.RegisterEntry(character);
 
 			character.SetPosition(instance.StartPosition);
 			character.SetLayer(instance.Layer, silent: true);
@@ -1226,6 +1229,9 @@ namespace Melia.Zone.Scripting
 
 				// Give rewards immediately
 				this.GiveDungeonRewards(instance, character);
+
+				character.AdventureBook.AddDungeonClear(instance.DungeonId);
+				ZoneServer.Instance.ServerEvents.PlayerClearedDungeon.Raise(new PlayerDungeonEventArgs(character, instance.DungeonId));
 			}
 
 			// Display the results screen

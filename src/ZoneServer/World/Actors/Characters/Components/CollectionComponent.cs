@@ -333,6 +333,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			account.Variables.Perm.SetBool("Melia.Collections.GotProperties_" + this.Id, true);
 
 			account.Properties.InvalidateAll();
+			account.TeamStorage?.RefreshSize();
 			Send.ZC_NORMAL.AccountProperties(character);
 		}
 

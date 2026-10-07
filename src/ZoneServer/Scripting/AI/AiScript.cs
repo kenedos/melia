@@ -1518,7 +1518,7 @@ namespace Melia.Zone.Scripting.AI
 			// as long as the caster remains in range
 			if (this.Entity.TryGetBuff(BuffId.ProvocationImmunity_Debuff, out var piDebuff))
 			{
-				var caster = (ICombatEntity)piDebuff.Caster;
+				var caster = piDebuff.Caster as ICombatEntity;
 
 				if (entity != caster && !this.EntityGone(caster) && this.InRangeOf(caster, 300))
 					return false;
@@ -1559,7 +1559,7 @@ namespace Melia.Zone.Scripting.AI
 			// remains in range.
 			if (this.Entity.TryGetBuff(BuffId.ProvocationImmunity_Debuff, out var piDebuff))
 			{
-				var caster = (ICombatEntity)piDebuff.Caster;
+				var caster = piDebuff.Caster as ICombatEntity;
 
 				if (!this.EntityGone(caster) && this.InRangeOf(caster, 300))
 					return caster;
@@ -2245,7 +2245,11 @@ namespace Melia.Zone.Scripting.AI
 			if (entity.IsDead)
 				return true;
 
-			if (this.Entity.Map.GetCombatEntity(entity.Handle) == null)
+			if (entity.Map != this.Entity.Map)
+				return true;
+
+			// Handles are reused, so the entity under this handle may be a different one.
+			if (!ReferenceEquals(this.Entity.Map.GetCombatEntity(entity.Handle), entity))
 				return true;
 
 			return false;

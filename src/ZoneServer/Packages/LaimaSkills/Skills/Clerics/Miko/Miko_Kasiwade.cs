@@ -1,0 +1,45 @@
+using System;
+using System.Linq;
+using Melia.Shared.Game.Const;
+using Melia.Shared.L10N;
+using Melia.Shared.Packages;
+using Melia.Shared.World;
+using Melia.Zone.Network;
+using Melia.Zone.Skills.Combat;
+using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.Helpers;
+using Melia.Zone.World.Actors;
+
+namespace Melia.Zone.Skills.Handlers.Clerics.Miko
+{
+	/// <summary>
+	/// Handler for the Miko skill Clap, which raises the damage of up to 5
+	/// allies around the Miko for 10 seconds.
+	/// </summary>
+	[Package("laima-skills")]
+	[SkillHandler(SkillId.Miko_Kasiwade)]
+	public class Miko_KasiwadeOverride : IGroundSkillHandler
+	{
+		private const float Range = 100f;
+		private const int MaxTargets = 5;
+		private static readonly TimeSpan Duration = TimeSpan.FromSeconds(10);
+
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		{
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
+
+			skill.IncreaseOverheat();
+			caster.SetAttackState(true);
+
+			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
+
+			foreach (var ally in PartySkillHelper.GetAlliesInRange(caster, caster.Position, Range).Take(MaxTargets))
+				ally.StartBuff(BuffId.Kasiwade_Buff, skill.Level, 0, Duration, caster, skill.Id);
+		}
+	}
+}

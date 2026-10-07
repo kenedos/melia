@@ -12,8 +12,11 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using static Melia.Zone.Skills.Helpers.SkillRangePreviewHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Mon
 {
@@ -244,6 +247,99 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				for (var i = 0; i < hits.Count; i++)
 					summon.Owner.StartBuff(BuffId.PowerOfDarkness_Buff, TimeSpan.FromSeconds(30), summon.Owner);
 			}
+		}
+	}
+
+	/// <summary>
+	/// Handler override for the Soul Fox Shikigami fox's Skill_1, which
+	/// throws an orb that flies out from the fox and back, striking the
+	/// enemies in its path each way as its Onmyoji.
+	/// </summary>
+	[Package("system")]
+	[SkillHandler(SkillId.Mon_pcskill_FireFoxShikigami_Skill_1)]
+	public class Mon_pcskill_FireFoxShikigami_Skill_1Override : ITargetSkillHandler
+	{
+		private const float OrbDistance = 150f;
+		private const float OrbRadius = 30f;
+		private const float OrbSpeed = 200f;
+		private const float OrbReturnSpeed = 350f;
+		private const int ThrowDelay = 250;
+
+		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
+		{
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
+
+			skill.IncreaseOverheat();
+			caster.SetAttackState(true);
+
+			if (target == null)
+			{
+				Send.ZC_NORMAL.SkillTargetAnimation(caster, skill, caster.Direction, 1);
+				Send.ZC_SKILL_FORCE_TARGET(caster, null, skill);
+				return;
+			}
+
+			caster.TurnTowards(target);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
+
+			skill.Run(this.HandleSkill(caster, target, skill, caster.Position));
+		}
+
+		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos)
+		{
+			var splashArea = new SplashAreas.Square(originPos, caster.Direction, OrbDistance, OrbRadius);
+			var distance = Math.Min(OrbDistance, (float)originPos.Get2DDistance(target.Position));
+			var outHit = ThrowDelay + (int)(distance / OrbSpeed * 1000);
+			var returnHit = ThrowDelay + (int)(OrbDistance / OrbSpeed * 1000) + (int)((OrbDistance - distance) / OrbReturnSpeed * 1000);
+
+			if (caster is Summon summon && summon.Owner != null)
+				ShowRangePreview(summon.Owner, skill, splashArea, TimeSpan.FromMilliseconds(returnHit));
+
+			_ = ForceAttackEffect(caster, target, skill);
+			_ = this.ThrowOrb(caster, skill);
+
+			await SkillAttack(caster, skill, splashArea, outHit, outHit, modifySkillHitResult: AsOwner);
+			await SkillAttack(caster, skill, splashArea, returnHit - outHit, returnHit - outHit, modifySkillHitResult: AsOwner);
+		}
+
+		private async Task ThrowOrb(ICombatEntity caster, Skill skill)
+		{
+			await skill.Wait(ThrowDelay);
+
+			if (caster.IsDead)
+				return;
+
+			var start = caster.Position;
+
+			var pad = new Pad(PadName.Onmyoji_CrystalballShikigami_Pad, caster, skill, new SplashAreas.Circle(start, OrbRadius));
+			pad.Position = start;
+			pad.Direction = caster.Direction;
+			pad.Movement.Speed = OrbSpeed;
+			caster.Map.AddPad(pad);
+
+			var destination = caster.Map.Ground.GetLastValidPosition(start, start.GetRelative(caster.Direction, OrbDistance));
+			await pad.Movement.MoveToAndDestroy(destination);
+		}
+
+		/// <summary>
+		/// Returns the hit rolled as the fox's Onmyoji using Soul Fox
+		/// Shikigami, or the fox's own hit if it has no such owner.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <param name="caster"></param>
+		/// <param name="target"></param>
+		/// <param name="skillHitResult"></param>
+		/// <returns></returns>
+		private static SkillHitResult AsOwner(Skill skill, ICombatEntity caster, ICombatEntity target, SkillHitResult skillHitResult)
+		{
+			if (caster is Summon summon && summon.Owner is ICombatEntity owner && owner.TryGetSkill(SkillId.Onmyoji_FireFoxShikigami, out var ownerSkill))
+				return SCR_SkillHit(owner, target, ownerSkill);
+
+			return skillHitResult;
 		}
 	}
 }

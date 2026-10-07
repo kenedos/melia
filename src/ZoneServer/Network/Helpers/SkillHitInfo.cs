@@ -112,7 +112,7 @@ namespace Melia.Zone.Network.Helpers
 			{
 				packet.PutByte(0);
 				packet.PutByte(0);
-				packet.PutFloat(hitInfo.UnkFloat1);
+				packet.PutFloat(hitInfo.MultiHitInterval);
 				packet.PutFloat(hitInfo.DamageRatio);
 				packet.PutInt(hitInfo.HitCount);
 				packet.PutByte(1);

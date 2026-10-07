@@ -21,6 +21,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 	[SkillHandler(SkillId.Necromancer_GatherCorpse)]
 	public class Necromancer_GatherCorpseOverride : IForceSkillHandler
 	{
+		private const float ExpandDamageRate = 0.70f;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -51,9 +53,13 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 
 			var skillHits = new List<SkillHitInfo>();
 
+			var modifier = SkillModifier.Default;
+			if (caster.IsAbilityActive(AbilityId.Necromancer34))
+				modifier.DamageMultiplier *= ExpandDamageRate;
+
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
-				var skillHitResult = SCR_SkillHit(caster, target, skill);
+				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);

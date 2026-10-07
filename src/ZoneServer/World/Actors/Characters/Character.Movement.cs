@@ -771,6 +771,9 @@ namespace Melia.Zone.World.Actors.Characters
 			if (monster.OwnerHandle != 0 && this.Map.TryGetCharacter(monster.OwnerHandle, out _))
 				Send.ZC_OWNER(this, monster);
 
+			if (monster is ICombatEntity follower && follower.Components.TryGet<FollowToActorComponent>(out var follow))
+				Send.ZC_FOLLOW_TO_ACTOR(this.Connection, monster, follow.Target, follow.NodeName, follow.F1, follow.F2, follow.F3, follow.B1, follow.F4);
+
 			if (monster is Summon summon)
 			{
 				Send.ZC_IS_SUMMON_SORCERER_MONSTER(this, summon);

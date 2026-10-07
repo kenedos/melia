@@ -3,14 +3,13 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
-using Yggdrasil.Util;
 
 namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 {
@@ -21,13 +20,30 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 	[SkillHandler(SkillId.Necromancer_RaiseSkullwizard)]
 	public class Necromancer_RaiseSkullwizardOverride : IGroundSkillHandler
 	{
+		private const int CorpsePartsCost = 5;
+		private static readonly TimeSpan ProtectionMagicDuration = TimeSpan.FromSeconds(45);
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
+			if (!NecromancerSkillHelper.CanSummonSkeleton(caster, MonsterId.SkeletonMage))
+			{
+				caster.ServerMessage(Localization.Get("You cannot summon any more Skeleton Mages."));
+				return;
+			}
+
+			if (!NecromancerSkillHelper.HasCorpseParts(caster, CorpsePartsCost))
+			{
+				caster.ServerMessage(Localization.Get("Not enough corpse parts."));
+				return;
+			}
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
 				return;
 			}
+
+			NecromancerSkillHelper.SpendCorpseParts(caster, CorpsePartsCost);
 
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
@@ -51,18 +67,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 				summon.Properties.SetFloat(PropertyName.Lv, caster.Level);
 				summon.Properties.SetFloat(PropertyName.FIXMSPD_BM, 140f);
 
-				var attack = GameRandom.Get().Next((int)caster.Properties.GetFloat(PropertyName.MINMATK),
-					(int)caster.Properties.GetFloat(PropertyName.MAXMATK) + 1)
-					* (skill.Properties.GetFloat(PropertyName.CaptionRatio) / 100f);
-				var life = caster.Properties.GetFloat(PropertyName.MHP) * (skill.Properties.GetFloat(PropertyName.CaptionRatio3) / 100f);
-				var defense = (caster.Properties.GetFloat(PropertyName.DEF)
-					+ caster.Properties.GetFloat(PropertyName.MDEF)) / 2
-					* (skill.Properties.GetFloat(PropertyName.CaptionRatio2) / 100f);
-
-				summon.Properties.SetFloat(PropertyName.FixedAttack, attack);
-				summon.Properties.SetFloat(PropertyName.FixedLife, life);
-				summon.Properties.SetFloat(PropertyName.FixedDefence, defense);
-				summon.Properties.InvalidateAll();
+				NecromancerSkillHelper.ApplySummonTransfer(summon, caster, NecromancerSkillHelper.GetReinforcedRatio(skill, PropertyName.CaptionRatio), skill.Properties.GetFloat(PropertyName.CaptionRatio2), skill.Properties.GetFloat(PropertyName.CaptionRatio3));
 				summon.Components.Add(new LifeTimeComponent(summon, TimeSpan.FromMinutes(30)));
 				summon.SetState(true);
 				summon.Direction = caster.Direction;
@@ -72,6 +77,12 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 				summon.StartBuff(BuffId.Ability_buff_PC_Summon, skill.Level, 0, TimeSpan.Zero, summon, skill.Id);
 				Send.ZC_SYNC_END(caster, skillHandle, 0);
 				Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, skillHandle, skill.Data.DefaultHitDelay);
+
+				if (caster.IsAbilityActive(AbilityId.Necromancer24))
+				{
+					foreach (var ally in character.Summons.GetSummons(s => !s.IsDead))
+						ally.StartBuff(BuffId.SkullFollowPainBarrier_Buff, 1, 0, ProtectionMagicDuration, caster, skill.Id);
+				}
 			}
 		}
 	}

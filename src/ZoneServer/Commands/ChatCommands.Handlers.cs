@@ -5434,35 +5434,18 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		private CommandResult HandleSageSavePosition(Character sender, Character target, string message, string commandName, Arguments args)
 		{
-			// Since this command is sent via UI interactions, we'll not
-			// use any automated command result messages, but we'll leave
-			// debug messages for now, in case of unexpected values.
 			if (args.Count != 0)
 			{
 				Log.Debug("HandleSageSavePosition: Invalid call by user '{0}': {1}", sender.Connection.Account.Name, commandName);
 				return CommandResult.Okay;
 			}
 
-			// Check if user has Sage Job
 			if (!sender.Jobs.Has(JobId.Sage))
 				return CommandResult.Okay;
 
-			if (!sender.Etc.Properties.Has(PropertyName.Sage_Portal_1)
-				|| sender.Properties.GetString(PropertyName.Sage_Portal_1) == "None")
-			{
-				sender.SetEtcProperty(PropertyName.Sage_Portal_1, sender.GetLocationToString());
-			}
-			else if (!sender.Properties.Has(PropertyName.Sage_Portal_2)
-				|| sender.Properties.GetString(PropertyName.Sage_Portal_2) == "None")
-			{
-				sender.SetEtcProperty(PropertyName.Sage_Portal_2, sender.GetLocationToString());
-			}
-			else if (!sender.Properties.Has(PropertyName.Sage_Portal_3)
-				|| sender.Properties.GetString(PropertyName.Sage_Portal_3) == "None")
-			{
-				sender.SetEtcProperty(PropertyName.Sage_Portal_3, sender.GetLocationToString());
-			}
-			else
+			SageSkillHelper.RefreshPortalCooldowns(sender);
+
+			if (!SageSkillHelper.SavePortal(sender))
 			{
 				sender.SystemMessage("SageMaxSaveCnt");
 				return CommandResult.Okay;
@@ -5484,46 +5467,25 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		private CommandResult HandleSageDeletePosition(Character sender, Character target, string message, string commandName, Arguments args)
 		{
-			// Since this command is sent via UI interactions, we'll not
-			// use any automated command result messages, but we'll leave
-			// debug messages for now, in case of unexpected values.
 			if (args.Count == 0)
 			{
 				Log.Debug("HandleSageDeletePosition: Invalid call by user '{0}': {1}", sender.Connection.Account.Name, commandName);
 				return CommandResult.Okay;
 			}
 
-			// Check if user has Sage Job
 			if (!sender.Jobs.Has(JobId.Sage))
 				return CommandResult.Okay;
 
-			if (!int.TryParse(args.Get(0), out var position))
+			if (!int.TryParse(args.Get(0), out var index))
 			{
-				Log.Debug("HandleSageDeletePosition: Invalid position" +
-					" '{0}' by user '{1}'.", position, sender.Connection.Account.Name);
+				Log.Debug("HandleSageDeletePosition: Invalid position '{0}' by user '{1}'.", args.Get(0), sender.Connection.Account.Name);
 				return CommandResult.Okay;
 			}
 
-			if (position < 1 || position > 3)
-				return CommandResult.Okay;
+			SageSkillHelper.RefreshPortalCooldowns(sender);
 
-			switch (position)
-			{
-				case 1:
-					sender.SetEtcProperty(PropertyName.Sage_Portal_1, "None");
-					break;
-				case 2:
-					sender.SetEtcProperty(PropertyName.Sage_Portal_2, "None");
-					break;
-				case 3:
-					sender.SetEtcProperty(PropertyName.Sage_Portal_3, "None");
-					break;
-				default:
-				{
-					sender.SystemMessage("SageMaxSaveCnt");
-					return CommandResult.Okay;
-				}
-			}
+			if (!SageSkillHelper.DeletePortal(sender, index))
+				return CommandResult.Okay;
 
 			Send.ZC_EXEC_CLIENT_SCP(sender.Connection, ClientScripts.SAGE_PORTAL_SAVE_SUCCESS);
 
@@ -5541,100 +5503,25 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		private CommandResult HandleSageOpenPortal(Character sender, Character target, string message, string commandName, Arguments args)
 		{
-			// Since this command is sent via UI interactions, we'll not
-			// use any automated command result messages, but we'll leave
-			// debug messages for now, in case of unexpected values.
 			if (args.Count == 0)
 			{
 				Log.Debug("HandleSageOpenPortal: Invalid call by user '{0}': {1}", sender.Connection.Account.Name, commandName);
 				return CommandResult.Okay;
 			}
 
-			// Check if user has Sage Job
-			if (!sender.Jobs.Has(JobId.Sage))
+			if (!sender.Jobs.Has(JobId.Sage) || !sender.TryGetSkill(SkillId.Sage_Portal, out _))
 				return CommandResult.Okay;
 
-			if (!int.TryParse(args.Get(0), out var portalId))
+			if (!int.TryParse(args.Get(0), out var index))
 			{
-				Log.Debug("HandleSageOpenPortal: Invalid portal id '{0}' by user '{1}'.", portalId, sender.Connection.Account.Name);
+				Log.Debug("HandleSageOpenPortal: Invalid portal id '{0}' by user '{1}'.", args.Get(0), sender.Connection.Account.Name);
 				return CommandResult.Okay;
 			}
 
-			if (portalId < 1 || portalId > 3)
-				return CommandResult.Okay;
+			SageSkillHelper.RefreshPortalCooldowns(sender);
 
-			string portalPosition;
-			switch (portalId)
-			{
-				case 1:
-				{
-					portalPosition = sender.Properties.GetString(PropertyName.Sage_Portal_1);
-					sender.SetEtcProperty(PropertyName.Sage_Portal_1, portalPosition + "@" + DateTimeUtils.ToSPropertyDTNow);
-				}
-				break;
-				case 2:
-				{
-					portalPosition = sender.Properties.GetString(PropertyName.Sage_Portal_2);
-					sender.SetEtcProperty(PropertyName.Sage_Portal_2, portalPosition + "@" + DateTimeUtils.ToSPropertyDTNow);
-				}
-				break;
-				case 3:
-				{
-					portalPosition = sender.Properties.GetString(PropertyName.Sage_Portal_3);
-					sender.SetEtcProperty(PropertyName.Sage_Portal_3, portalPosition + "@" + DateTimeUtils.ToSPropertyDTNow);
-				}
-				break;
-				default:
-				{
-					sender.SystemMessage("SageMaxSaveCnt");
-					return CommandResult.Okay;
-				}
-			}
-
-			Send.ZC_EXEC_CLIENT_SCP(sender.Connection, ClientScripts.SAGE_PORTAL_SAVE_SUCCESS);
-			var location = portalPosition.Split('#');
-			if (location.Length == 4)
-			{
-				var toMapData = ZoneServer.Instance.Data.MapDb.Find(location[0]);
-				if (!float.TryParse(location[1], out var destinationX)
-				|| !float.TryParse(location[2], out var destinationY)
-				|| !float.TryParse(location[3], out var destinationZ))
-				{
-					Log.Debug("HandleSageOpenPortal: Failed to parse portal position '{0}' by user '{1}'.", portalPosition, sender.Connection.Account.Name);
-					return CommandResult.Okay;
-				}
-				var warpPosition = new Position(destinationX, destinationY, destinationZ);
-				if (!ZoneServer.Instance.World.TryGetMap(toMapData.Id, out var map)
-					|| !map.Ground.IsValidPosition(warpPosition))
-				{
-					Log.Debug("HandleSageOpenPortal: Invalid portal position '{0}' by user '{1}'.", portalPosition, sender.Connection.Account.Name);
-					return CommandResult.Okay;
-				}
-
-				var portal = new WarpMonster(MonsterId.MissionGate,
-					new Location(sender.MapId, sender.Position),
-					new Location(toMapData.Id, destinationX, destinationY, destinationZ),
-					new Direction(1, 0));
-				portal.AssociatedHandle = sender.Handle;
-				portal.DialogName = "SAGE_WARP";
-				portal.Properties[PropertyName.Scale] = 1;
-				if (sender.Connection.Party != null)
-				{
-					portal.Visibility = ActorVisibility.Party;
-					portal.VisibilityId = sender.Connection.Party.ObjectId;
-				}
-				else
-				{
-					portal.Visibility = ActorVisibility.Individual;
-					portal.VisibilityId = sender.ObjectId;
-				}
-				// Remove portal after 15 seconds
-				portal.DisappearTime = DateTime.Now.AddSeconds(15);
-				//portal.Components.Add(new LifeTimeComponent(portal, TimeSpan.FromSeconds(15)));
-				sender.Map.AddMonster(portal);
-				// This is what makes the invisible npc look like a portal.
-				portal.AttachEffect(AnimationName.Portal, 1, EffectLocation.Top);
-			}
+			if (SageSkillHelper.OpenPortal(sender, index))
+				Send.ZC_EXEC_CLIENT_SCP(sender.Connection, ClientScripts.SAGE_PORTAL_SAVE_SUCCESS);
 
 			return CommandResult.Okay;
 		}

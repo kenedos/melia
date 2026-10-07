@@ -197,6 +197,14 @@ namespace Melia.Zone.World.Actors.Characters
 					this.ModifyHpSafe(1, out _, out _);
 					reviveBuff.Activate(Zone.Buffs.Base.ActivationType.Start);
 				}
+				else if (ZealotSkillHelper.TrySurviveAsMartyr(this))
+				{
+					this.ModifyHpSafe(1, out _, out _);
+				}
+				else if (this.IsBuffActive(BuffId.Engkrateia_Buff) && this.IsAbilityActive(AbilityId.Exorcist9))
+				{
+					this.ModifyHpSafe(1, out _, out _);
+				}
 				else
 					this.Kill(attacker);
 			}

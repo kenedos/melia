@@ -144,7 +144,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			bounceTarget.TakeDamage(skillHitResult.Damage, caster);
 
 			var hit = new HitInfo(caster, bounceTarget, skill, skillHitResult);
-			hit.UnkFloat1 = -1f;
+			hit.MultiHitInterval = -1f;
 			Send.ZC_HIT_INFO(caster, bounceTarget, hit);
 		}
 

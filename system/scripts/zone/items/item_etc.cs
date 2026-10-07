@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Game.Properties;
 using Melia.Shared.Util;
 using Melia.Zone;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
@@ -245,6 +247,18 @@ public class ItemEtcScripts : GeneralScript
 
 		character.SystemMessage($"GainAchieveHair{color.ToUpperInvariant()[0] + color.Substring(1)}");
 		character.AddonMessage("ACHIEVE_REWARD", "", 0);
+	}
+
+	[ScriptableFunction]
+	public ItemUseResult SCR_QUEST_CLEAR_LEGEND_CARD_LIFT(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Etc.Properties.GetFloat(PropertyName.IS_LEGEND_CARD_OPEN, 0) == 1)
+			return ItemUseResult.Fail;
+
+		character.SetEtcProperty(PropertyName.IS_LEGEND_CARD_OPEN, 1);
+		Send.ZC_PC_PROP_UPDATE(character, PropertyTable.GetId("PCEtc", PropertyName.IS_LEGEND_CARD_OPEN), 1);
+
+		return ItemUseResult.Okay;
 	}
 
 	[ScriptableFunction]

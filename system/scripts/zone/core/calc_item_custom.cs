@@ -111,6 +111,25 @@ public class ItemCalculationsScript : GeneralScript
 		return gradeData.BasicRatio;
 	}
 
+	/// <summary>
+	/// Returns the multiplier transcendence applies to an item's base
+	/// attack and defense: 10% per stage, 30% of that on Goddess grade.
+	/// </summary>
+	/// <param name="item"></param>
+	/// <returns></returns>
+	private static float GetTranscendRatio(Item item)
+	{
+		var stage = item.Properties.GetFloat(PropertyName.Transcend, 0);
+		if (stage <= 0)
+			return 1f;
+
+		var ratio = stage * 10f;
+		if (item.Properties.GetFloat(PropertyName.ItemGrade) >= (int)ItemGrade.Goddess)
+			ratio *= 0.3f;
+
+		return 1f + ratio / 100f;
+	}
+
 	[ScriptableFunction]
 	public float SCR_Get_Item_MAXATK(Item item)
 	{
@@ -119,7 +138,7 @@ public class ItemCalculationsScript : GeneralScript
 			return 0;
 
 		//Log.Debug("Calculated Max ATK: {0}", maxAtk);
-		return MathF.Round(maxAtk + GetReinforceAddValue(item, PropertyName.ATK, maxAtk), MidpointRounding.AwayFromZero) + GetMaintenanceAddValue(item);
+		return MathF.Round(maxAtk * GetTranscendRatio(item) + GetReinforceAddValue(item, PropertyName.ATK, maxAtk), MidpointRounding.AwayFromZero) + GetMaintenanceAddValue(item);
 	}
 
 
@@ -132,7 +151,7 @@ public class ItemCalculationsScript : GeneralScript
 			return 0;
 
 		//Log.Debug("Calculated Min ATK: {0} + {1}", minAtk, GetReinforceAddValue(item, PropertyName.ATK, minAtk));
-		return MathF.Round(minAtk + GetReinforceAddValue(item, PropertyName.ATK, minAtk), MidpointRounding.AwayFromZero) + GetMaintenanceAddValue(item);
+		return MathF.Round(minAtk * GetTranscendRatio(item) + GetReinforceAddValue(item, PropertyName.ATK, minAtk), MidpointRounding.AwayFromZero) + GetMaintenanceAddValue(item);
 	}
 
 	[ScriptableFunction]
@@ -143,7 +162,7 @@ public class ItemCalculationsScript : GeneralScript
 			return 0;
 
 		//Log.Debug("Calculated MATK: {0}", itemATK);
-		return MathF.Round(itemATK + GetReinforceAddValue(item, PropertyName.MATK, itemATK), MidpointRounding.AwayFromZero) + GetMaintenanceAddValue(item);
+		return MathF.Round(itemATK * GetTranscendRatio(item) + GetReinforceAddValue(item, PropertyName.MATK, itemATK), MidpointRounding.AwayFromZero) + GetMaintenanceAddValue(item);
 	}
 
 	/// <summary>
@@ -160,7 +179,7 @@ public class ItemCalculationsScript : GeneralScript
 
 		basicDef = MathF.Floor(basicDef);
 		//Log.Debug("Calculated DEF: {0}", basicDef);
-		return MathF.Floor(basicDef + GetReinforceAddValue(item, PropertyName.DEF, basicDef)) + GetMaintenanceAddValue(item);
+		return MathF.Floor(basicDef * GetTranscendRatio(item) + GetReinforceAddValue(item, PropertyName.DEF, basicDef)) + GetMaintenanceAddValue(item);
 	}
 
 	/// <summary>
@@ -177,7 +196,7 @@ public class ItemCalculationsScript : GeneralScript
 
 		basicMDef = MathF.Floor(basicMDef);
 		//Log.Debug("Calculated MDEF: {0}", basicMDef);
-		return MathF.Floor(basicMDef + GetReinforceAddValue(item, PropertyName.MDEF, basicMDef)) + GetMaintenanceAddValue(item);
+		return MathF.Floor(basicMDef * GetTranscendRatio(item) + GetReinforceAddValue(item, PropertyName.MDEF, basicMDef)) + GetMaintenanceAddValue(item);
 	}
 
 	/// <summary>

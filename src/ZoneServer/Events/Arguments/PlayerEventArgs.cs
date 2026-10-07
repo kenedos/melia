@@ -213,4 +213,15 @@ namespace Melia.Zone.Events.Arguments
 		/// </summary>
 		public int NewValue { get; } = newValue;
 	}
+
+	/// <summary>
+	/// Arguments for events related to a player and an instance dungeon.
+	/// </summary>
+	public class PlayerDungeonEventArgs(Character character, int dungeonId) : PlayerEventArgs(character)
+	{
+		/// <summary>
+		/// Returns the id of the dungeon.
+		/// </summary>
+		public int DungeonId { get; } = dungeonId;
+	}
 }

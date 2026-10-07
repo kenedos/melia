@@ -7,6 +7,7 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
@@ -20,11 +21,19 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 	[SkillHandler(SkillId.Necromancer_FleshCannon)]
 	public class Necromancer_FleshCannonOverride : IGroundSkillHandler
 	{
+		private const int CorpsePartsCost = 15;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
 				caster.ServerMessage(Localization.Get("No target location specified."));
+				return;
+			}
+
+			if (!NecromancerSkillHelper.HasCorpseParts(caster, CorpsePartsCost))
+			{
+				caster.ServerMessage(Localization.Get("Not enough corpse parts."));
 				return;
 			}
 
@@ -34,6 +43,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 				return;
 			}
 
+			NecromancerSkillHelper.SpendCorpseParts(caster, CorpsePartsCost);
+
 			skill.IncreaseOverheat();
 			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 
@@ -42,7 +53,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 
 			var effectHandle = ZoneServer.Instance.World.CreateEffectHandle();
 
-			Send.ZC_NORMAL.PlayCorpsePartsRing(caster, effectHandle, 0.25f, 20, 15, 9, 400981);
+			Send.ZC_NORMAL.PlayCorpsePartsRing(caster, effectHandle, 0.25f, 20, 15, CorpsePartsCost, 400981);
 
 			var targetList = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, (int)skill.Data.SplashRange * 4);
 			var damageDelay = TimeSpan.FromMilliseconds(200);
@@ -60,12 +71,15 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, targetPos, hits);
 
-			foreach (var hit in hits)
+			if (caster.IsAbilityActive(AbilityId.Necromancer2))
 			{
-				Send.ZC_SYNC_START(caster, skillHandle, 1);
-				hit.Target.StartBuff(BuffId.Debrave_Debuff, skill.Level, 0, TimeSpan.FromSeconds(4), caster, skill.Id);
-				Send.ZC_SYNC_END(caster, skillHandle, 0);
-				Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, skillHandle, TimeSpan.FromMilliseconds(400));
+				foreach (var hit in hits)
+				{
+					Send.ZC_SYNC_START(caster, skillHandle, 1);
+					NecromancerSkillHelper.ApplyDemoralize(caster, hit.Target, skill);
+					Send.ZC_SYNC_END(caster, skillHandle, 0);
+					Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, skillHandle, TimeSpan.FromMilliseconds(400));
+				}
 			}
 
 			caster.StopBuff(BuffId.FleshHoop_Buff);

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -13,6 +14,10 @@ public class CustomNpcStatSkillReset : GeneralScript
 
 	private const int BasePrice = 100000;
 	private const int MaxPrice = 1600000;
+
+	private const int SkillPointCoinItemId = ItemId.Misc_0533;
+	private const int SkillPointPrice = 100;
+	private const int MaxSkillPointPurchases = 5;
 
 	protected override void Load()
 	{
@@ -32,8 +37,11 @@ public class CustomNpcStatSkillReset : GeneralScript
 
 		var statResetCount = player.Variables.Perm.GetInt("StatResetCount");
 		var skillResetCount = player.Variables.Perm.GetInt("SkillResetCount");
+		var abilityResetCount = player.Variables.Perm.GetInt("AbilityResetCount");
+		var skillPointPurchases = player.Variables.Perm.GetInt("SkillPointPurchaseCount");
 		var statPrice = CalculatePrice(statResetCount);
 		var skillPrice = CalculatePrice(skillResetCount);
+		var abilityPrice = CalculatePrice(abilityResetCount);
 
 		var statPriceStr = FormatSilver(statPrice);
 		var skillPriceStr = FormatSilver(skillPrice);
@@ -43,6 +51,8 @@ public class CustomNpcStatSkillReset : GeneralScript
 		var selection = await dialog.Select(greeting,
 			Option(LF("Stat Reset ({0} Silver)", statPriceStr), "stat_reset"),
 			Option(LF("Skill Reset ({0} Silver)", skillPriceStr), "skill_reset"),
+			Option(LF("Ability Reset ({0} Silver)", FormatSilver(abilityPrice)), "ability_reset"),
+			Option(LF("Skill Point ({0} Wings of Vaivora Coins, {1}/{2})", SkillPointPrice, skillPointPurchases, MaxSkillPointPurchases), "skill_point"),
 			Option(L("No thanks."), "cancel")
 		);
 
@@ -53,6 +63,12 @@ public class CustomNpcStatSkillReset : GeneralScript
 				break;
 			case "skill_reset":
 				await this.HandleReset(dialog, player, false, skillPrice, skillResetCount);
+				break;
+			case "ability_reset":
+				await this.HandleAbilityReset(dialog, player, abilityPrice, abilityResetCount);
+				break;
+			case "skill_point":
+				await this.HandleSkillPointPurchase(dialog, player, skillPointPurchases);
 				break;
 			case "cancel":
 				await dialog.Msg(L("May the blessings of the goddess Laima be with you."));
@@ -103,6 +119,74 @@ public class CustomNpcStatSkillReset : GeneralScript
 		{
 			await dialog.Msg(L("Perhaps another time, then."));
 		}
+	}
+
+	private async Task HandleAbilityReset(Dialog dialog, Character player, int price, int resetCount)
+	{
+		var confirmMsg = LF("An ability reset will cost {0} Silver.\nYou have used this service {1} time(s) before.", FormatSilver(price), resetCount);
+
+		if (!player.HasSilver(price))
+		{
+			await dialog.Msg(LF("{0}\n\nYou don't have enough Silver. You need {1} Silver.", confirmMsg, FormatSilver(price)));
+			return;
+		}
+
+		var confirm = await dialog.Select(confirmMsg,
+			Option(L("Yes, reset my abilities"), "confirm"),
+			Option(L("No, nevermind"), "cancel")
+		);
+
+		if (confirm != "confirm")
+		{
+			await dialog.Msg(L("Perhaps another time, then."));
+			return;
+		}
+
+		player.RemoveItem(VisItemId, price);
+		player.ResetAbilities();
+
+		Send.ZC_ABILITY_LIST(player);
+		Send.ZC_OBJECT_PROPERTY(player);
+
+		player.Variables.Perm.Set("AbilityResetCount", resetCount + 1);
+
+		await dialog.Msg(LF("Your abilities have been reset successfully.\n\nYour next ability reset will cost {0} Silver.", FormatSilver(CalculatePrice(resetCount + 1))));
+	}
+
+	private async Task HandleSkillPointPurchase(Dialog dialog, Character player, int purchaseCount)
+	{
+		if (purchaseCount >= MaxSkillPointPurchases)
+		{
+			await dialog.Msg(LF("You have already received all {0} skill points I can grant.", MaxSkillPointPurchases));
+			return;
+		}
+
+		var confirm = await dialog.Select(LF("For {0} Wings of Vaivora Coins I can grant 1 skill point to each of your jobs.\nYou have used this service {1}/{2} times.", SkillPointPrice, purchaseCount, MaxSkillPointPurchases),
+			Option(L("Yes, grant my skill points"), "confirm"),
+			Option(L("No, nevermind"), "cancel")
+		);
+
+		if (confirm != "confirm")
+		{
+			await dialog.Msg(L("Perhaps another time, then."));
+			return;
+		}
+
+		if (player.Inventory.CountItem(SkillPointCoinItemId) < SkillPointPrice)
+		{
+			await dialog.Msg(LF("You need {0} Wings of Vaivora Coins.", SkillPointPrice));
+			return;
+		}
+
+		player.RemoveItem(SkillPointCoinItemId, SkillPointPrice);
+
+		foreach (var job in player.Jobs.GetList())
+			player.Jobs.ModifySkillPoints(job.Id, 1);
+
+		player.Variables.Perm.Set("SkillPointPurchaseCount", purchaseCount + 1);
+		player.Variables.Perm.SetInt(Character.BonusSkillPointsVarName, player.GetBonusSkillPoints() + 1);
+
+		await dialog.Msg(L("The goddess has heard you. Your skill points have been granted."));
 	}
 
 	private static int CalculatePrice(int resetCount)

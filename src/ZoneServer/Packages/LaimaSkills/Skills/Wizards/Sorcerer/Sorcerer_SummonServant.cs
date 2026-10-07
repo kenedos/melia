@@ -159,56 +159,9 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 		/// </summary>
 		private void CreateServantPad(Summon servant, Character owner, string padName, Position position)
 		{
-			// Create the pad using the pad system
-			// The pad should apply its buff to allies who step on it
 			var pad = new Pad(owner, owner.GetSkill(SkillId.Sorcerer_SummonServant), padName, position, servant.Direction);
 			pad.Position = position;
-			pad.Trigger.LifeTime = TimeSpan.FromSeconds(30);
-			pad.Trigger.Subscribe(TriggerType.Enter, this.OnPadEnter);
-
 			owner.Map.AddPad(pad);
-		}
-
-		/// <summary>
-		/// Called when an entity enters a servant pad.
-		/// </summary>
-		private void OnPadEnter(object sender, PadTriggerActorArgs args)
-		{
-			if (sender is not Pad pad)
-				return;
-
-			if (args.Initiator is not ICombatEntity target)
-				return;
-
-			if (pad.Creator is not ICombatEntity creator)
-				return;
-
-			// Only affect friendly targets
-			if (!target.IsFriendlyTo(creator))
-				return;
-
-			// Apply the appropriate buff based on pad name
-			var buffId = this.GetBuffForPad(pad.Name);
-			if (buffId != BuffId.None)
-			{
-				target.StartBuff(buffId, pad.Skill.Level, 0, TimeSpan.FromSeconds(30), pad.Creator, pad.Skill.Id);
-			}
-		}
-
-		/// <summary>
-		/// Gets the buff ID for a servant pad.
-		/// </summary>
-		private BuffId GetBuffForPad(string padName)
-		{
-			return padName switch
-			{
-				PadName.servantpad_SR => BuffId.ServantSR_Buff,
-				PadName.servantpad_SP => BuffId.ServantSP_Buff,
-				PadName.servantpad_STA => BuffId.ServantSTA_Buff,
-				PadName.servantpad_MDEF => BuffId.ServantMDEF_Buff,
-				PadName.servantpad_DARKATK => BuffId.ServantDARKATK_Buff,
-				_ => BuffId.None
-			};
 		}
 
 		/// <summary>

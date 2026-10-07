@@ -3,14 +3,13 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
-using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
-using Yggdrasil.Util;
 
 namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 {
@@ -21,13 +20,29 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 	[SkillHandler(SkillId.Necromancer_RaiseDead)]
 	public class Necromancer_RaiseDeadOverride : IGroundSkillHandler
 	{
+		private const int CorpsePartsCost = 5;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
+			if (!NecromancerSkillHelper.CanSummonSkeleton(caster, MonsterId.SkeletonSoldier))
+			{
+				caster.ServerMessage(Localization.Get("You cannot summon any more Skeleton Soldiers."));
+				return;
+			}
+
+			if (!NecromancerSkillHelper.HasCorpseParts(caster, CorpsePartsCost))
+			{
+				caster.ServerMessage(Localization.Get("Not enough corpse parts."));
+				return;
+			}
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
 				return;
 			}
+
+			NecromancerSkillHelper.SpendCorpseParts(caster, CorpsePartsCost);
 
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
@@ -51,20 +66,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 				summon.Properties.SetFloat(PropertyName.Lv, caster.Level);
 				summon.Properties.SetFloat(PropertyName.FIXMSPD_BM, 140f);
 
-				var attack = GameRandom.Get().Next((int)caster.Properties.GetFloat(PropertyName.MINMATK),
-					(int)caster.Properties.GetFloat(PropertyName.MAXMATK) + 1)
-					* (skill.Properties.GetFloat(PropertyName.CaptionRatio) / 100f);
-				var life = caster.Properties.GetFloat(PropertyName.MHP) * (skill.Properties.GetFloat(PropertyName.CaptionRatio3) / 100f);
-				var defense = (caster.Properties.GetFloat(PropertyName.DEF)
-					+ caster.Properties.GetFloat(PropertyName.MDEF)) / 2
-					* (skill.Properties.GetFloat(PropertyName.CaptionRatio2) / 100f);
-
-				summon.Properties.SetFloat(PropertyName.FixedAttack, attack);
-				summon.Properties.SetFloat(PropertyName.FixedLife, life);
-				summon.Properties.SetFloat(PropertyName.FixedDefence, defense);
-				summon.Properties.InvalidateAll();
-				summon.Properties.SetFloat(PropertyName.HP, summon.Properties.GetFloat(PropertyName.MHP));
-				summon.Properties.SetFloat(PropertyName.SP, summon.Properties.GetFloat(PropertyName.MSP));
+				NecromancerSkillHelper.ApplySummonTransfer(summon, caster, NecromancerSkillHelper.GetReinforcedRatio(skill, PropertyName.CaptionRatio), skill.Properties.GetFloat(PropertyName.CaptionRatio2), skill.Properties.GetFloat(PropertyName.CaptionRatio3));
 				summon.Components.Add(new LifeTimeComponent(summon, TimeSpan.FromMinutes(30)));
 				summon.SetState(true);
 

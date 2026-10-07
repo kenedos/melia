@@ -258,6 +258,10 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (this.IsDead)
 				return;
 
+			var maxLevel = ZoneServer.Instance.Conf.World.MaxCompanionLevel;
+			if (exp <= 0 || this.Level >= maxLevel)
+				return;
+
 			// Base EXP
 			this.Exp += exp;
 			this.TotalExp += exp;
@@ -267,7 +271,6 @@ namespace Melia.Zone.World.Actors.Monsters
 			var level = this.Level;
 			var levelUps = 0;
 			var maxExp = this.MaxExp;
-			var maxLevel = ZoneServer.Instance.Conf.World.MaxCompanionLevel;
 
 			// Consume EXP as many times as possible to reach new levels
 			while (maxExp > 0 && this.Exp >= maxExp && level < maxLevel)

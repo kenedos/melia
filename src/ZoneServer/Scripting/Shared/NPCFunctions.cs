@@ -17028,6 +17028,7 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task GT_RELICSHOP_NPC(Dialog dialog)
 		{
 			await COMMON_QUEST_HANDLER(dialog);
+			Send.ZC_EXEC_CLIENT_SCP(dialog.Player.Connection, "REQ_EARTH_TOWER_SHOP_OPEN()");
 		}
 
 		[DialogFunction("INSTANCE_GT_GROUNDTOWER_1")]
@@ -17058,6 +17059,7 @@ namespace Melia.Zone.Scripting.Shared
 		public static async Task GT_RELICSHOP_NPC2(Dialog dialog)
 		{
 			await COMMON_QUEST_HANDLER(dialog);
+			Send.ZC_EXEC_CLIENT_SCP(dialog.Player.Connection, "REQ_EARTH_TOWER2_SHOP_OPEN()");
 		}
 
 		[DialogFunction("CHAR220_MSETP2_5_OBJ2_1")]

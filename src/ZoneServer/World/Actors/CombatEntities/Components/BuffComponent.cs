@@ -8,6 +8,7 @@ using Melia.Zone.Buffs;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
 using Melia.Zone.Skills;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Extensions;
 using Yggdrasil.Scheduling;
@@ -764,6 +765,30 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (this.TryGet(BuffId.Prophecy_Buff, out var prophecyBuff))
 			{
 				this.NotifyBuffOnDebuffResisted(prophecyBuff, buffId, caster);
+				return true;
+			}
+
+			if (this.TryGet(BuffId.Disinter_Wizard_Buff, out var disinterWizardBuff))
+			{
+				this.NotifyBuffOnDebuffResisted(disinterWizardBuff, buffId, caster);
+				return true;
+			}
+
+			if (this.TryGet(BuffId.BeakMask_Buff, out var beakMaskBuff) && PlagueDoctorSkillHelper.IsCurableDebuff(buffId))
+			{
+				this.NotifyBuffOnDebuffResisted(beakMaskBuff, buffId, caster);
+				return true;
+			}
+
+			if (buffData.Removable && this.TryGet(BuffId.Fumigate_Buff_ResAbil, out var purificationBuff) && GameRandom.Get().Next(100) < 50)
+			{
+				this.NotifyBuffOnDebuffResisted(purificationBuff, buffId, caster);
+				return true;
+			}
+
+			if (buffData.Removable && this.TryGet(BuffId.HoukiBroom_Buff, out var houkiBroomBuff))
+			{
+				this.NotifyBuffOnDebuffResisted(houkiBroomBuff, buffId, caster);
 				return true;
 			}
 

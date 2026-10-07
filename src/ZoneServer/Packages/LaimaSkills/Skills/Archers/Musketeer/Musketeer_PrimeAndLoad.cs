@@ -30,8 +30,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var farPos = new Position(originPos);
-			farPos.X += 100;
+			var farPos = originPos.GetRelative(dir, 100f);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster);

@@ -961,7 +961,7 @@ namespace Melia.Zone.Database
 					cmd.Set("numArg4", buff.NumArg4);
 					cmd.Set("numArg5", buff.NumArg5);
 					cmd.Set("duration", buff.Duration);
-					cmd.Set("runTime", buff.RunTime);
+					cmd.Set("runTime", buff.ElapsedDuration);
 					cmd.Set("skillId", (int)buff.SkillId);
 					cmd.Set("overbuffCount", buff.OverbuffCounter);
 					cmd.Execute();
@@ -1207,7 +1207,7 @@ namespace Melia.Zone.Database
 		/// </summary>
 		internal void InternalSaveAchievements(Character character, MySqlConnection conn, MySqlTransaction trans)
 		{
-			var achievements = character.Achievements.GetAchievements();
+			var achievements = character.Achievements.GetUnlockDates();
 
 			if (!achievements.Any())
 			{
@@ -1221,14 +1221,15 @@ namespace Melia.Zone.Database
 			}
 
 			// Use UPSERT to insert achievements atomically (achievements don't change, just exist or not)
-			using (var batch = new BatchInsertCommand("achievements", "ON DUPLICATE KEY UPDATE `achievementId` = VALUES(`achievementId`)", conn, trans))
+			using (var batch = new BatchInsertCommand("achievements", "ON DUPLICATE KEY UPDATE `unlockDate` = VALUES(`unlockDate`)", conn, trans))
 			{
-				foreach (var achievementId in achievements)
+				foreach (var achievement in achievements)
 				{
 					batch.AddRow(new Dictionary<string, object>
 					{
 						{ "characterId", character.DbId },
-						{ "achievementId", achievementId }
+						{ "achievementId", achievement.Key },
+						{ "unlockDate", achievement.Value }
 					});
 				}
 
@@ -1237,7 +1238,7 @@ namespace Melia.Zone.Database
 			}
 
 			// Only delete achievements that were removed
-			var achievementIdsInMemory = new HashSet<int>(achievements);
+			var achievementIdsInMemory = new HashSet<int>(achievements.Select(a => a.Key));
 			var achievementIdsInDb = new HashSet<int>();
 			using (var cmd = new MySqlCommand("SELECT `achievementId` FROM `achievements` WHERE `characterId` = @charId", conn, trans))
 			{
@@ -1327,8 +1328,8 @@ namespace Melia.Zone.Database
 		}
 
 		/// <summary>
-		/// INTERNAL USE: Saves the Adventure Book (Monster Kills) within an existing transaction.
-		/// Enhanced with batch operations.
+		/// INTERNAL USE: Saves the Adventure Book's monster kills and dungeon
+		/// clears within an existing transaction.
 		/// </summary>
 		internal void InternalSaveAdventureBook(Character character, MySqlConnection conn, MySqlTransaction trans)
 		{
@@ -1340,20 +1341,20 @@ namespace Melia.Zone.Database
 				cmdDel.ExecuteNonQuery();
 			}
 
-			var monsterKilledSnapshot = character.AdventureBook.GetListSnapshot(AdventureBookType.MonsterKilled);
-			if (monsterKilledSnapshot.Length == 0) return;
-
 			using (var batch = new BatchInsertCommand("adventure_book", null, conn, trans))
 			{
-				foreach (var info in monsterKilledSnapshot)
+				foreach (var type in new[] { AdventureBookType.MonsterKilled, AdventureBookType.Dungeon })
 				{
-					batch.AddRow(new Dictionary<string, object>
+					foreach (var info in character.AdventureBook.GetListSnapshot(type))
 					{
-						{ "accountId", accountId },
-						{ "type", AdventureBookType.MonsterKilled },
-						{ "classId", info.Key },
-						{ "count", info.Value }
-					});
+						batch.AddRow(new Dictionary<string, object>
+						{
+							{ "accountId", accountId },
+							{ "type", type },
+							{ "classId", info.Key },
+							{ "count", info.Value }
+						});
+					}
 				}
 
 				if (batch.HasRows)

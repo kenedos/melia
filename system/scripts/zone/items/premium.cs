@@ -44,6 +44,7 @@ public class PremiumItemScripts : GeneralScript
 	public ItemUseResult SCR_USE_EXTEND_ACCOUNT_WAREHOUSE(Character character, Item item, string strArg, float numArg1, float numArg2)
 	{
 		character.ModifyAccountProperty(PropertyName.AccountWareHouseExtend, 1);
+		character.TeamStorage?.RefreshSize();
 		character.AddonMessage(AddonMessage.ACCOUNT_WAREHOUSE_ITEM_LIST);
 		character.AddonMessage(AddonMessage.ACCOUNT_UPDATE);
 		return ItemUseResult.Okay;
@@ -56,6 +57,7 @@ public class PremiumItemScripts : GeneralScript
 		if (amount <= 0) amount = 1;
 
 		character.ModifyAccountProperty(PropertyName.AccountWareHouseExtendByItem, amount);
+		character.TeamStorage?.RefreshSize();
 
 		character.AddonMessage(AddonMessage.ACCOUNT_WAREHOUSE_ITEM_LIST);
 		character.AddonMessage(AddonMessage.ACCOUNT_UPDATE);

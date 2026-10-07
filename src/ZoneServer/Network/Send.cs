@@ -2921,7 +2921,7 @@ namespace Melia.Zone.Network
 		/// Makes actor appear dead on all clients in range of it.
 		/// </summary>
 		/// <param name="actor"></param>
-		public static void ZC_DEAD(IActor actor, IActor killer = null, bool showCorpse = true, bool isOverkill = false, bool isSpecialDrop = false)
+		public static void ZC_DEAD(IActor actor, IActor killer = null, bool showCorpse = true, bool isOverkill = false, bool isSpecialDrop = false, int overkillAmount = 0)
 		{
 			using var packet = Packet.Rent(Op.ZC_DEAD);
 
@@ -2948,8 +2948,8 @@ namespace Melia.Zone.Network
 			// The overkill amount is the percentage displayed on the
 			// client. It needs to be at least 100 for the overkill
 			// effect to appear.
-			//if (isOverkill)
-			//	packet.PutByte((byte)overkillAmount);
+			if (isOverkill)
+				packet.PutByte((byte)overkillAmount);
 
 			actor.Map.Broadcast(packet, actor);
 		}
@@ -4940,7 +4940,7 @@ namespace Melia.Zone.Network
 					packet.PutInt(product.RequiredAmount); // Amount Left
 					packet.PutInt(product.Price);
 					packet.PutInt(product.Amount);
-					packet.PutEmptyBin(260);
+					packet.PutString(product.ArgStr ?? "", 260);
 				}
 
 				// A Refreshment Table's window reads its owner and who they
@@ -4999,7 +4999,7 @@ namespace Melia.Zone.Network
 					packet.PutInt(product.RequiredAmount); // Amount Left
 					packet.PutInt(product.Price);
 					packet.PutInt(product.Amount);
-					packet.PutEmptyBin(260);
+					packet.PutString(product.ArgStr ?? "", 260);
 				}
 
 				// A Refreshment Table's window reads its owner and who they
@@ -6932,6 +6932,35 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
+		/// Makes the follower trail one of the target's model nodes on the
+		/// connection's client.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="follower"></param>
+		/// <param name="target"></param>
+		/// <param name="nodeName"></param>
+		/// <param name="f1"></param>
+		/// <param name="f2"></param>
+		/// <param name="f3"></param>
+		/// <param name="b1"></param>
+		/// <param name="f4"></param>
+		public static void ZC_FOLLOW_TO_ACTOR(IZoneConnection conn, IActor follower, IActor target, string nodeName, float f1, float f2, float f3, byte b1, float f4)
+		{
+			using var packet = Packet.Rent(Op.ZC_FOLLOW_TO_ACTOR);
+
+			packet.PutInt(follower.Handle);
+			packet.PutInt(target.Handle);
+			packet.PutFloat(f1);
+			packet.PutFloat(f2);
+			packet.PutFloat(f3);
+			packet.AddStringId(nodeName);
+			packet.PutByte(b1);
+			packet.PutFloat(f4);
+
+			conn.Send(packet);
+		}
+
+		/// <summary>
 		/// Sets monsters to specific height from ground
 		/// </summary>
 		/// <param name="actor"></param>
@@ -7111,6 +7140,33 @@ namespace Melia.Zone.Network
 				{
 					zpacket.PutInt(info.Key);
 					zpacket.PutInt(info.Value);
+				}
+			});
+
+			character.Connection.Send(packet);
+		}
+
+		/// <summary>
+		/// Sends the adventure book's achievements with their unlock dates.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="unlockDates"></param>
+		public static void ZC_ADVENTURE_BOOK_INFO(Character character, KeyValuePair<int, DateTime>[] unlockDates)
+		{
+			using var packet = Packet.Rent(Op.ZC_ADVENTURE_BOOK_INFO);
+
+			packet.PutInt(unlockDates.Length);
+			packet.PutShort((short)AdventureBookType.Achievement);
+			packet.PutByte(1);
+			packet.PutByte(1);
+			packet.PutShort(1);
+
+			packet.Zlib(true, zpacket =>
+			{
+				foreach (var entry in unlockDates)
+				{
+					zpacket.PutInt(entry.Key);
+					zpacket.PutLong(entry.Value.ToFileTime());
 				}
 			});
 

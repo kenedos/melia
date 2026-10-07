@@ -5,13 +5,13 @@
 		MonsterKilled = 0,
 		MonsterDrop = 1,
 		ItemObtained = 2,
-		Monster3 = 3,
-		ItemUsed = 4,
+		ItemPermanent = 3,
+		Dungeon = 4,
 		ItemCrafted = 5,
 		Fishing = 6,
-		Unknown3 = 7,
+		PersonalShop = 7,
 		Achievement = 8,
-		Job = 9,
+		Character = 9,
 	}
 
 	/// <summary>

@@ -427,6 +427,17 @@ namespace Melia.Zone.World.Storages
 		}
 
 		/// <summary>
+		/// Grows the storage to the size its account properties grant,
+		/// for slots granted while the account is online.
+		/// </summary>
+		public void RefreshSize()
+		{
+			var savedSize = this.GetSavedSize();
+			if (savedSize > this.GetStorageSize())
+				this.SetStorageSize(savedSize);
+		}
+
+		/// <summary>
 		/// Returns the saved size of the storage.
 		/// </summary>
 		/// <returns></returns>
@@ -458,8 +469,10 @@ namespace Melia.Zone.World.Storages
 				account.Properties.SetFloat(PropertyName.BasicAccountWarehouseSlotCount, clientBaseSlots);
 			}
 
-			// Get the number of extensions purchased
-			var extensions = (int)account.Properties.GetFloat(PropertyName.AccountWareHouseExtend, 0);
+			// Matches the client's GET_ACCOUNT_WAREHOUSE_SLOT_COUNT.
+			var extensions = (int)account.Properties.GetFloat(PropertyName.AccountWareHouseExtend, 0)
+				+ (int)account.Properties.GetFloat(PropertyName.AccountWareHouseExtendByItem, 0)
+				+ (int)account.Properties.GetFloat(PropertyName.MaxAccountWarehouseCount, 0);
 
 			// Server's actual storage size = what the client WOULD show (before the +1)
 			// This gives us the correct number of usable slots

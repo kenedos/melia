@@ -109,8 +109,9 @@ namespace Melia.Zone.Database
 					while (reader.Read())
 					{
 						var achievementId = reader.GetInt32("achievementId");
+						var unlockDate = reader["unlockDate"] as DateTime?;
 						if (!character.Achievements.HasAchievement(achievementId))
-							character.Achievements.AddAchievement(achievementId, true);
+							character.Achievements.AddAchievement(achievementId, true, unlockDate);
 					}
 				}
 			}
@@ -486,9 +487,9 @@ namespace Melia.Zone.Database
 						var classId = reader.GetInt32("classId");
 						var count = reader.GetInt32("count");
 						if (adventureBookType == AdventureBookType.MonsterKilled)
-						{
 							character.AdventureBook.AddMonsterKill(classId, count, true);
-						}
+						else if (adventureBookType == AdventureBookType.Dungeon)
+							character.AdventureBook.AddDungeonClear(classId, count, true);
 					}
 				}
 			}

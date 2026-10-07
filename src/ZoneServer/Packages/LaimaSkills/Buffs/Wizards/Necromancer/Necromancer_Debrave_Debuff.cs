@@ -8,23 +8,24 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Necromancer
 {
 	/// <summary>
 	/// Handler for the Attack Weakened debuff, which lowers the target's
-	/// physical and magical attack.
+	/// physical and magical attack by 2% per Flesh: Demoralize level.
 	/// </summary>
 	[Package("laima-skills")]
 	[BuffHandler(BuffId.Debrave_Debuff)]
 	public class Necromancer_Debrave_DebuffOverride : BuffHandler
 	{
-		private const float AttackReduction = 0.20f;
+		private const float AttackReductionPerLevel = 0.02f;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			var target = buff.Target;
+			var reduction = AttackReductionPerLevel * buff.NumArg1;
 
 			var patk = target.Properties.GetFloat(PropertyName.PATK);
 			var matk = target.Properties.GetFloat(PropertyName.MATK);
 
-			AddPropertyModifier(buff, target, PropertyName.PATK_BM, -MathF.Floor(patk * AttackReduction));
-			AddPropertyModifier(buff, target, PropertyName.MATK_BM, -MathF.Floor(matk * AttackReduction));
+			AddPropertyModifier(buff, target, PropertyName.PATK_BM, -MathF.Floor(patk * reduction));
+			AddPropertyModifier(buff, target, PropertyName.MATK_BM, -MathF.Floor(matk * reduction));
 			target.InvalidateProperties();
 		}
 

@@ -127,4 +127,35 @@ public class ItemTxFunctionsScript : GeneralScript
 
 		return ItemTxResult.Okay;
 	}
+
+	[ScriptableFunction]
+	public ItemTxResult SCR_USE_ITEM_PREMIUM_TOKEN(Character character, Item item, int[] numArgs)
+	{
+		if (item == null || !character.Inventory.TryGetItem(item.ObjectId, out _) || item.IsLocked || item.IsExpired)
+			return ItemTxResult.Fail;
+
+		var script = item.Data.Script;
+		if (script == null || !Enum.TryParse<BuffId>(script.StrArg, out var buffId) || !script.StrArg.StartsWith("Premium_boostToken"))
+			return ItemTxResult.Fail;
+
+		foreach (var tomeBuffId in TomeBuffIds)
+			character.StopBuff(tomeBuffId);
+
+		character.StartBuff(buffId, script.NumArg2, 0, TimeSpan.FromMilliseconds(script.NumArg1), character);
+
+		return ItemTxResult.Okay;
+	}
+
+	private static readonly BuffId[] TomeBuffIds = { BuffId.Premium_boostToken, BuffId.Premium_boostToken02, BuffId.Premium_boostToken03, BuffId.Premium_boostToken04, BuffId.Premium_boostToken05, BuffId.Premium_boostToken06 };
+
+	[ScriptableFunction]
+	public ItemTxResult SCR_USE_ITEM_INDUN_COUNT_RESET(Character character, Item item, int[] numArgs)
+	{
+		if (item == null || !character.Inventory.TryGetItem(item.ObjectId, out _) || item.IsLocked || item.IsExpired)
+			return ItemTxResult.Fail;
+
+		ZoneServer.Instance.DungeonReset.ResetDailyForCharacter(character);
+
+		return ItemTxResult.Okay;
+	}
 }

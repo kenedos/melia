@@ -11,18 +11,18 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Necromancer
 	[BuffHandler(BuffId.Disinter_Archer_Buff)]
 	public class Necromancer_Disinter_Archer_BuffOverride : BuffHandler
 	{
-		private const string VarName = "Melia.CriticalAttackModifier";
+		private const string VarName = "Melia.CriticalRateModifier";
 		private const float Bonus = 1.00f;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			var target = buff.Target;
-			var criticalRate = target.Properties.GetFloat(PropertyName.CRTATK);
+			var criticalRate = target.Properties.GetFloat(PropertyName.CRTHR);
 
 			buff.Vars.SetFloat(VarName, criticalRate * Bonus);
 
-			target.Properties.Modify(PropertyName.CRTATK_BM, criticalRate * Bonus);
-			target.Properties.Invalidate(PropertyName.CRTATK);
+			target.Properties.Modify(PropertyName.CRTHR_BM, criticalRate * Bonus);
+			target.Properties.Invalidate(PropertyName.CRTHR);
 		}
 
 		public override void OnEnd(Buff buff)
@@ -31,8 +31,8 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Necromancer
 
 			if (buff.Vars.TryGetFloat(VarName, out var crtMod))
 			{
-				target.Properties.Modify(PropertyName.CRTATK_BM, -crtMod);
-				target.Properties.Invalidate(PropertyName.CRTATK);
+				target.Properties.Modify(PropertyName.CRTHR_BM, -crtMod);
+				target.Properties.Invalidate(PropertyName.CRTHR);
 			}
 		}
 	}

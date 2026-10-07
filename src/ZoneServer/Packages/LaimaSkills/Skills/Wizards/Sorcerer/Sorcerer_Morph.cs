@@ -173,6 +173,9 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			// Apply PC_Summon buff
 			newSummon.StartBuff(BuffId.Ability_buff_PC_Summon, skill.Level, 0, TimeSpan.Zero, newSummon, skill.Id);
 
+			if (character.TryGetActiveAbilityLevel(AbilityId.Sorcerer18, out var overworkLevel))
+				newSummon.StartBuff(BuffId.Summoning_Overwork_Buff, overworkLevel, 0, TimeSpan.Zero, character, skill.Id);
+
 			// Send property updates
 			//Send.ZC_OBJECT_PROPERTY(newSummon, PropertyName.Scale);
 

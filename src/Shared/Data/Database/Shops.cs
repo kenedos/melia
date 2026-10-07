@@ -170,6 +170,12 @@ namespace Melia.Shared.Data.Database
 		/// Used to track and verify that the seller still has the exact items listed.
 		/// </summary>
 		public List<long> ItemWorldIds { get; set; } = new List<long>();
+
+		/// <summary>
+		/// String the client reads off a skill shop's product, such as a
+		/// Portal Shop's "map#x#y#z" destination.
+		/// </summary>
+		public string ArgStr { get; set; }
 	}
 
 	/// <summary>

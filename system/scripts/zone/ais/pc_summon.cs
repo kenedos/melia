@@ -1,6 +1,8 @@
 ﻿using System.Collections;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.AI;
+using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
 
 [Ai("PC_Summon")]
@@ -89,5 +91,36 @@ public class PCSummonAiScript : AiScript
 
 		yield return StopMove();
 		StartRoutine("Attack", Attack());
+	}
+}
+
+[Ai("PC_Summon_FireFox")]
+public class PCSummonFireFoxAiScript : PCSummonAiScript
+{
+	protected override void Setup()
+	{
+		base.Setup();
+
+		During("Idle", StayWithMaster);
+		During("Attack", StayWithMaster);
+	}
+
+	/// <summary>
+	/// Keeps the fox on its master, whom the client makes it hover beside.
+	/// </summary>
+	protected void StayWithMaster()
+	{
+		if (this.TryGetMaster(out var master) && master.Map == this.Entity.Map)
+			this.Entity.Position = master.Position;
+	}
+
+	protected override bool TryGetRandomSkill(out Skill skill)
+	{
+		// The fox's fireball needs Onmyoji18, which the ability tree does not offer.
+		if (base.TryGetRandomSkill(out skill) && skill.Id == SkillId.Mon_pcskill_FireFoxShikigami_Skill_1)
+			return true;
+
+		skill = null;
+		return false;
 	}
 }

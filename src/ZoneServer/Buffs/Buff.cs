@@ -82,6 +82,11 @@ namespace Melia.Zone.Buffs
 		public TimeSpan RemainingDuration => Math2.Max(TimeSpan.Zero, this.RemovalTime - GameClock.LocalNow);
 
 		/// <summary>
+		/// Returns the part of the buff's duration that has already passed.
+		/// </summary>
+		public TimeSpan ElapsedDuration => this.HasDuration ? Math2.Max(TimeSpan.Zero, this.Duration - this.RemainingDuration) : this.RunTime;
+
+		/// <summary>
 		/// Index in world collection?
 		/// </summary>
 		public int Handle { get; }

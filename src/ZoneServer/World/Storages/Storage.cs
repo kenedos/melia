@@ -637,13 +637,12 @@ namespace Melia.Zone.World.Storages
 			if (newSize <= 0)
 				return StorageResult.InvalidOperation;
 
-			_storageSize += addSize;
-
-			// Decrease in storage size may result in items being lost
-			if (addSize < 0)
+			lock (_syncLock)
 			{
-				for (var i = _storageItems.Count - 1; i >= _storageSize; i--)
-					_storageItems.RemoveAt(i);
+				if (addSize < 0 && _storageItems.Keys.Any(position => position >= newSize))
+					return StorageResult.StorageFull;
+
+				_storageSize = newSize;
 			}
 
 			return StorageResult.Success;

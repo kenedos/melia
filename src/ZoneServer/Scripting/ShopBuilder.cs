@@ -597,6 +597,18 @@ namespace Melia.Zone.Scripting
 				return;
 			}
 
+			if (shop.Type == PersonalShopType.Portal)
+			{
+				if (alreadyOpen && optionSelected >= 0)
+					SageSkillHelper.SellPortal(character, shopOwner, shop, optionSelected);
+
+				SageSkillHelper.RefreshPortalShopStock(shopOwner, shop);
+
+				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
+				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
+				return;
+			}
+
 			// A Refreshment Table is eaten from through this same request,
 			// carrying the dish's list index, exactly as a Spell Shop is
 			// bought from.
@@ -820,6 +832,10 @@ namespace Melia.Zone.Scripting
 
 				case PersonalShopType.Oblation:
 					Send.ZC_EXEC_CLIENT_SCP(conn, "ui.CloseFrame('oblation_sell')");
+					break;
+
+				case PersonalShopType.Portal:
+					Send.ZC_EXEC_CLIENT_SCP(conn, "ui.CloseFrame('portal_seller')");
 					break;
 
 				case PersonalShopType.FoodTable:

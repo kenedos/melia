@@ -13,34 +13,22 @@ namespace Melia.Zone.Pads.Handlers.Wizards.Sorcerer
 {
 	[Package("laima-skills")]
 	[PadHandler(PadName.servantpad_STA)]
-	public class Sorcerer_servantpad_STAOverride : ICreatePadHandler, IEnterPadHandler, IUpdatePadHandler
+	public class Sorcerer_servantpad_STAOverride : ICreatePadHandler, IEnterPadHandler
 	{
 		public void Created(object sender, PadTriggerArgs args)
 		{
 			var pad = args.Trigger;
-			var creator = args.Creator;
 
 			pad.SetRange(100f);
-			pad.SetUpdateInterval(750);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(1000);
+			pad.Trigger.LifeTime = TimeSpan.FromSeconds(30);
 		}
 
 		public void Entered(object sender, PadTriggerActorArgs args)
 		{
 			var pad = args.Trigger;
-			var creator = args.Creator;
 			var initiator = args.Initiator;
-			var skill = pad.Skill;
 
-			PadTargetBuff(pad, initiator, RelationType.Party, 0, 0, BuffId.ServantSTA_Buff, 1, 0, 1800000, 1, 100, false);
-		}
-
-		public void Updated(object sender, PadTriggerArgs args)
-		{
-			var pad = args.Trigger;
-			var creator = args.Creator;
-			var skill = pad.Skill;
-
+			PadTargetBuff(pad, initiator, RelationType.Party, 0, 0, BuffId.ServantSTA_Buff, pad.Skill.Level, 0, 1800000, 1, 100, false);
 		}
 	}
 }

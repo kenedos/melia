@@ -673,6 +673,9 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var value = 250f * baseValue / 100f;
 
+		if (character.TryGetBuff(BuffId.Agility_Buff, out var agilityBuff))
+			value *= Math.Max(0, 1f - agilityBuff.NumArg2 / 100f);
+
 		return (int)value;
 	}
 
@@ -2317,7 +2320,21 @@ public class CharacterCalculationsScript : GeneralScript
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.Add_Damage_Atk);
 		var byBuff = character.Properties.GetFloat(PropertyName.Add_Damage_Atk_BM);
 
-		var value = byItem + byBuff;
+		var byAbility = 0f;
+		if (character.TryGetActiveAbilityLevel(AbilityId.Schwarzereiter35, out var abilityLevel))
+		{
+			var patk = (character.Properties.GetFloat(PropertyName.MINPATK) + character.Properties.GetFloat(PropertyName.MAXPATK)) / 2;
+			var matk = (character.Properties.GetFloat(PropertyName.MINMATK) + character.Properties.GetFloat(PropertyName.MAXMATK)) / 2;
+			byAbility = (float)Math.Floor(Math.Max(patk, matk) * 0.1f * abilityLevel);
+		}
+
+		if (character.TryGetActiveAbilityLevel(AbilityId.NakMuay14, out var nakMuayLevel))
+		{
+			var patk = (character.Properties.GetFloat(PropertyName.MINPATK) + character.Properties.GetFloat(PropertyName.MAXPATK)) / 2;
+			byAbility += (float)Math.Floor(patk * 0.1f * nakMuayLevel);
+		}
+
+		var value = byItem + byBuff + byAbility;
 
 		return (float)Math.Floor(value);
 	}

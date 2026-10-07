@@ -68,6 +68,11 @@ namespace Melia.Zone.World.Dungeons
 		private readonly object _stateLock = new();
 
 		/// <summary>
+		/// Database ids of the characters whose entry this instance counted.
+		/// </summary>
+		private readonly HashSet<long> _entryCountedCharacters = new();
+
+		/// <summary>
 		/// Gets or sets the unique dungeon instance's id.
 		/// </summary>
 		public string Id { get; set; }
@@ -432,6 +437,28 @@ namespace Melia.Zone.World.Dungeons
 		}
 
 		/// <summary>
+		/// Counts the character's entry to the dungeon, once per instance,
+		/// unless entries are counted on completion.
+		/// </summary>
+		/// <param name="character"></param>
+		public void RegisterEntry(Character character)
+		{
+			if (ZoneServer.Instance.Conf.World.InstancedDungeonIncrementEntryOnComplete)
+				return;
+
+			if (character.Connection?.Account == null)
+				return;
+
+			lock (_stateLock)
+			{
+				if (!_entryCountedCharacters.Add(character.DbId))
+					return;
+			}
+
+			character.Dungeon.IncreaseEntryCount(this.DungeonId, 1);
+		}
+
+		/// <summary>
 		/// Called when the dungeon instance should start.
 		/// Handles state transitions and entry count tracking.
 		/// Thread-safe - only the first caller will execute the start logic.
@@ -478,11 +505,7 @@ namespace Melia.Zone.World.Dungeons
 					continue;
 				}
 
-				// Increment entry count on enter if not configured to increment on complete
-				if (!incrementOnComplete && character.Connection?.Account != null)
-				{
-					character.Dungeon.IncreaseEntryCount(this.DungeonId, 1);
-				}
+				this.RegisterEntry(character);
 
 				character.SetPosition(this.StartPosition);
 				Send.ZC_SET_POS(character);

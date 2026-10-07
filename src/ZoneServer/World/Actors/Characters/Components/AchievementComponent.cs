@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Data.Database;
@@ -13,6 +14,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 	{
 		private readonly Dictionary<int, bool> _achievements = new Dictionary<int, bool>();
 		private readonly Dictionary<int, int> _achievementPoints = new Dictionary<int, int>();
+		private readonly Dictionary<int, DateTime> _unlockDates = new Dictionary<int, DateTime>();
 
 		public AchievementComponent(Character character) : base(character)
 		{
@@ -24,6 +26,17 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			{
 				return _achievements.Keys.ToArray();
 			}
+		}
+
+		/// <summary>
+		/// Returns the achievements the character has, with the time each
+		/// was unlocked.
+		/// </summary>
+		/// <returns></returns>
+		public KeyValuePair<int, DateTime>[] GetUnlockDates()
+		{
+			lock (_achievements)
+				return _unlockDates.ToArray();
 		}
 
 		public int[] GetPointIds()
@@ -180,7 +193,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// </summary>
 		/// <param name="achievementId"></param>
 		/// <param name="silently"></param>
-		public void AddAchievement(int achievementId, bool silently = false)
+		/// <param name="unlockDate">When it was unlocked, defaults to now.</param>
+		public void AddAchievement(int achievementId, bool silently = false, DateTime? unlockDate = null)
 		{
 			if (!ZoneServer.Instance.Data.AchievementDb.TryFind(achievementId, out var achievement))
 			{
@@ -195,10 +209,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			}
 
 			lock (_achievements)
+			{
 				_achievements[achievementId] = true;
+				_unlockDates[achievementId] = unlockDate ?? DateTime.Now;
+			}
 
 			if (!silently)
-				Send.ZC_ACHIEVE_POINT(this.Character, pointData.Id, _achievementPoints[pointData.Id], achievement.Id);
+			{
+				Send.ZC_ACHIEVE_POINT(this.Character, pointData.Id, this.GetPoints(pointData.Id), achievement.Id);
+				Send.ZC_ADVENTURE_BOOK_INFO(this.Character, this.GetUnlockDates());
+			}
 		}
 
 		/// <summary>

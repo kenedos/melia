@@ -21,6 +21,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly SortedList<int, SortedList<int, int>> _monstersDrops = new();
 		private readonly SortedList<int, AdventureBookItemEntry> _items = new();
 		private readonly SortedList<int, int> _fishing = new();
+		private readonly SortedList<int, int> _dungeons = new();
 		public AdventureBookComponent(Character character) : base(character)
 		{
 		}
@@ -32,6 +33,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					lock (_monstersKilled) return _monstersKilled;
 				case AdventureBookType.Fishing:
 					lock (_fishing) return _fishing;
+				case AdventureBookType.Dungeon:
+					lock (_dungeons) return _dungeons;
 				default:
 					return (SortedList<int, int>)Enumerable.Empty<SortedList<int, int>>();
 			}
@@ -48,6 +51,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					lock (_monstersKilled) return _monstersKilled.ToArray();
 				case AdventureBookType.Fishing:
 					lock (_fishing) return _fishing.ToArray();
+				case AdventureBookType.Dungeon:
+					lock (_dungeons) return _dungeons.ToArray();
 				default:
 					return Array.Empty<KeyValuePair<int, int>>();
 			}
@@ -110,9 +115,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					lock (_monstersKilled) return !_monstersKilled.ContainsKey(id);
 				case AdventureBookType.Fishing:
 					lock (_fishing) return !_fishing.ContainsKey(id);
+				case AdventureBookType.Dungeon:
+					lock (_dungeons) return !_dungeons.ContainsKey(id);
 				case AdventureBookType.ItemObtained:
 				case AdventureBookType.ItemCrafted:
-				case AdventureBookType.ItemUsed:
 					lock (_items) return !_items.ContainsKey(id);
 			}
 
@@ -167,7 +173,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					value.CraftedCount += amount;
 
 				if (!silently)
-					Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.ItemCrafted, _items);
+				{
+					Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.ItemObtained, _items);
+					Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.ItemCrafted, this.GetCraftCounts());
+				}
 			}
 		}
 
@@ -203,8 +212,45 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					value.UsedCount += amount;
 
 				if (!silently)
-					Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.ItemUsed, _items);
+					Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.ItemObtained, _items);
 			}
+		}
+
+		/// <summary>
+		/// Adds clears of the dungeon with the given id.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="amount"></param>
+		/// <param name="silently"></param>
+		public void AddDungeonClear(int id, int amount = 1, bool silently = false)
+		{
+			lock (_dungeons)
+			{
+				if (!_dungeons.ContainsKey(id))
+					_dungeons.Add(id, amount);
+				else
+					_dungeons[id] += amount;
+
+				if (!silently)
+					Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.Dungeon, _dungeons);
+			}
+		}
+
+		/// <summary>
+		/// Returns the craft count of every crafted item, for callers holding the item lock.
+		/// </summary>
+		/// <returns></returns>
+		private SortedList<int, int> GetCraftCounts()
+		{
+			var crafts = new SortedList<int, int>();
+
+			foreach (var entry in _items.Values)
+			{
+				if (entry.CraftedCount > 0)
+					crafts.Add(entry.ItemId, entry.CraftedCount);
+			}
+
+			return crafts;
 		}
 		public void AddMonsterDrop(int monsterId, int id, int amount, bool silently = false)
 		{
@@ -232,7 +278,14 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			lock (_monstersDrops)
 				Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.MonsterDrop, _monstersDrops);
 			lock (_items)
+			{
 				Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.ItemObtained, _items);
+				Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.ItemCrafted, this.GetCraftCounts());
+			}
+			lock (_dungeons)
+				Send.ZC_ADVENTURE_BOOK_INFO(this.Character, AdventureBookType.Dungeon, _dungeons);
+
+			Send.ZC_ADVENTURE_BOOK_INFO(this.Character, this.Character.Achievements.GetUnlockDates());
 		}
 	}
 

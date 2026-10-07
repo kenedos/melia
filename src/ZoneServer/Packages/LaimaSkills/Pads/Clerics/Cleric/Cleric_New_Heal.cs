@@ -136,9 +136,8 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Cleric
 
 			// Heal Damage Bonus (exclude 5% MaxHP heal component)
 			var modifier = SkillModifier.Default;
-			var SCR_CalculateHeal = ScriptableFunctions.Combat.Get("SCR_CalculateHeal");
-			var damageBonus = SCR_CalculateHeal(caster, target, skill, modifier, skillHitResult);
-			damageBonus -= (float)Math.Floor(target.MaxHp * 0.05f);
+			var SCR_CalculateHealDamageBonus = ScriptableFunctions.Combat.Get("SCR_CalculateHealDamageBonus");
+			var damageBonus = SCR_CalculateHealDamageBonus(caster, target, skill, modifier, skillHitResult);
 
 			modifier.AttackAttribute = AttributeType.Holy;
 			modifier.BonusDamage += damageBonus;

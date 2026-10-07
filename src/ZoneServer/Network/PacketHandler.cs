@@ -1202,7 +1202,11 @@ namespace Melia.Zone.Network
 			{
 				case InventoryType.PersonalStorage:
 				{
-					var storage = character.CurrentStorage as PersonalStorage;
+					if (character.CurrentStorage is not PersonalStorage storage || !storage.IsBrowsing)
+					{
+						Log.Warning("CZ_EXTEND_WAREHOUSE: User '{0}' tried to extend their personal storage without it being open.", conn.Account.Name);
+						break;
+					}
 
 					var result = storage.TryExtendStorage(PersonalStorage.ExtensionSize);
 					if (result != StorageResult.Success)
@@ -1211,7 +1215,11 @@ namespace Melia.Zone.Network
 				}
 				case InventoryType.TeamStorage:
 				{
-					var storage = character.CurrentStorage as TeamStorage;
+					if (character.CurrentStorage is not TeamStorage storage || !storage.IsBrowsing)
+					{
+						Log.Warning("CZ_EXTEND_WAREHOUSE: User '{0}' tried to extend their team storage without it being open.", conn.Account.Name);
+						break;
+					}
 
 					var result = storage.TryExtendStorage(TeamStorage.ExtensionSize);
 					if (result != StorageResult.Success)
@@ -1431,7 +1439,12 @@ namespace Melia.Zone.Network
 
 				// Remove consumeable items on success
 				if (item.Data.Type == ItemType.Consume && result != ItemUseResult.OkayNotConsumed)
+				{
 					character.Inventory.Remove(item, 1, InventoryItemRemoveMsg.Used);
+
+					if (item.Data.Journal)
+						character.AdventureBook.AddItemUsed(item.Id, 1);
+				}
 
 				if (character.IsSitting)
 					character.RemoveBuff(BuffId.SitRest);
@@ -1887,6 +1900,12 @@ namespace Melia.Zone.Network
 				return;
 			}
 
+			if (!DruidSkillHelper.CanUseSkill(character, skill.Id))
+			{
+				character.ServerMessage(Localization.Get("You can't use this skill while transformed."));
+				return;
+			}
+
 			// Check cooldown
 			if (skill.IsOnCooldown)
 			{
@@ -1986,6 +2005,12 @@ namespace Melia.Zone.Network
 			if (!character.Skills.TryGet(skillId, out var skill))
 			{
 				Log.Warning("CZ_SKILL_TARGET: User '{0}' tried to use a skill they don't have ({1}).", conn.Account.Name, skillId);
+				return;
+			}
+
+			if (!DruidSkillHelper.CanUseSkill(character, skill.Id))
+			{
+				character.ServerMessage(Localization.Get("You can't use this skill while transformed."));
 				return;
 			}
 
@@ -2172,6 +2197,12 @@ namespace Melia.Zone.Network
 				}
 			}
 
+			if (!DruidSkillHelper.CanUseSkill(character, skill.Id))
+			{
+				character.ServerMessage(Localization.Get("You can't use this skill while transformed."));
+				return;
+			}
+
 			// Check cooldown
 			if (skill.IsOnCooldown)
 			{
@@ -2273,6 +2304,12 @@ namespace Melia.Zone.Network
 			if (!character.Skills.TryGet(skillId, out var skill))
 			{
 				Log.Warning("CZ_SKILL_SELF: User '{0}' tried to use a skill they don't have ({1}).", conn.Account.Name, skillId);
+				return;
+			}
+
+			if (!DruidSkillHelper.CanUseSkill(character, skill.Id))
+			{
+				character.ServerMessage(Localization.Get("You can't use this skill while transformed."));
 				return;
 			}
 
@@ -3238,6 +3275,17 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
+		/// Sent when the client starts making an actor follow another.
+		/// Dummy Handler
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_FOLLOW_TO_ACTOR_ACK)]
+		public void CZ_FOLLOW_TO_ACTOR_ACK(IZoneConnection conn, Packet packet)
+		{
+		}
+
+		/// <summary>
 		/// Sent when a player tries to enter instance dungeon via UI.
 		/// Dummy Handler
 		/// </summary>
@@ -3774,6 +3822,8 @@ namespace Melia.Zone.Network
 
 				character.Skills.Remove(skill.Id);
 			}
+
+			character.ResetAbilities(oldJobId);
 
 			// Remove old job and grant new one
 			var newJob = new Job(character, newJobId, oldJob.Circle);
@@ -4977,15 +5027,13 @@ namespace Melia.Zone.Network
 				ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(ability, character);
 
 			character.Abilities.RaiseToggled(ability, activated: ability.Active, wasActive: wasActive);
+			character.Skills.InvalidateAll();
 
 			Send.ZC_OBJECT_PROPERTY(conn, ability, PropertyName.ActiveState);
 			Send.ZC_ADDON_MSG(character, "RESET_ABILITY_ACTIVE", ability.Active ? 1 : 0, ability.Data.ClassName);
 
-			if (ZoneServer.Instance.AbilityHandlers.HasPropertyHandler(abilityId))
-			{
-				character.Properties.InvalidateAll();
-				Send.ZC_OBJECT_PROPERTY(character);
-			}
+			character.Properties.InvalidateAll();
+			Send.ZC_OBJECT_PROPERTY(character);
 		}
 
 		[PacketHandler(Op.CZ_OPEN_HELP)]
@@ -5211,6 +5259,16 @@ namespace Melia.Zone.Network
 									product.Amount = shop.Level;
 									product.RequiredAmount = 0;
 									shop.AddProduct(product);
+								}
+								else if (shop.Type == PersonalShopType.Portal)
+								{
+									if (!SageSkillHelper.TryCreatePortalProduct(character, itemId, requiredAmount, shop.Level, out var portalProduct))
+									{
+										Log.Warning("CZ_REGISTER_AUTOSELLER: User '{0}' tried to sell portal {1}, which they haven't saved.", conn.Account.Name, itemId);
+										return;
+									}
+
+									shop.AddProduct(portalProduct);
 								}
 								else
 								{
@@ -6712,7 +6770,7 @@ namespace Melia.Zone.Network
 			if (shop == null)
 				return;
 
-			var balance = (int)character.Connection.Account.Properties.GetFloat(shop.CurrencyProperty);
+			var balance = shop.GetBalance(character);
 			Send.ZC_SHOP_POINT_UPDATE(conn, pointName, balance);
 		}
 
@@ -6732,7 +6790,7 @@ namespace Melia.Zone.Network
 
 			var character = conn.SelectedCharacter;
 
-			if (!Scripting.PropertyShops.TryGet(shopName, out var shop))
+			if (!Scripting.PropertyShops.TryGet(character, shopName, out var shop))
 			{
 				Log.Warning("CZ_BUY_PROPERTYSHOP_ITEM: User '{0}' tried to buy from unknown shop '{1}'.", conn.Account.Name, shopName);
 				return;
@@ -6759,17 +6817,16 @@ namespace Melia.Zone.Network
 
 				purchases.Add((productIndex, amount));
 				totalCost += shop.Items[productIndex].Price * amount;
+
+				if (totalCost < 0)
+					return;
 			}
 
-			var properties = character.Connection.Account.Properties;
-			var currentBalance = (int)properties.GetFloat(shop.CurrencyProperty);
-			if (currentBalance < totalCost)
+			if (!shop.TrySpend(character, totalCost))
 			{
-				character.ServerMessage(Localization.Get("Not enough Mercenary Badges."));
+				character.ServerMessage(Localization.Get("You don't have enough to buy this."));
 				return;
 			}
-
-			character.ModifyAccountProperty(shop.CurrencyProperty, -totalCost);
 
 			foreach (var (productIndex, amount) in purchases)
 			{
@@ -6778,8 +6835,7 @@ namespace Melia.Zone.Network
 			}
 
 			// Refresh the balance in the UI
-			var balance = (int)properties.GetFloat(shop.CurrencyProperty);
-			Send.ZC_SHOP_POINT_UPDATE(conn, shop.PointName, balance);
+			Send.ZC_SHOP_POINT_UPDATE(conn, shop.PointName, shop.GetBalance(character));
 		}
 	}
 }

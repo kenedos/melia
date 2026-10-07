@@ -997,6 +997,172 @@ public class DialogTxFunctionsScript : GeneralScript
 	}
 
 	[ScriptableFunction]
+	public DialogTxResult SCR_ADD_SOCKET_BY_TICKET(Character character, DialogTxArgs args)
+	{
+		if (args.TxItems.Length != 2)
+			return DialogTxResult.Fail;
+
+		var ticketTxItem = args.TxItems.FirstOrDefault(a => a.Item?.Data.ClassName == "Old_Socket_Gold_Team");
+		var targetTxItem = args.TxItems.FirstOrDefault(a => a != ticketTxItem);
+		if (ticketTxItem == null || targetTxItem?.Item == null)
+			return DialogTxResult.Fail;
+
+		var ticket = ticketTxItem.Item;
+		var targetItem = targetTxItem.Item;
+
+		if (ticket.IsLocked || targetItem.IsLocked)
+		{
+			character.SystemMessage("MaterialItemIsLock");
+			return DialogTxResult.Fail;
+		}
+
+		if (targetItem.Data.Type != ItemType.Equip || targetItem.NeedsAppraisal || targetItem.NeedRandomOptions || targetItem.Potential != 0)
+		{
+			character.SystemMessage("ThisItemCannotPlusSocket");
+			return DialogTxResult.Fail;
+		}
+
+		var nextFreeSocket = targetItem.GetNextFreeSocket();
+		if (targetItem.GetUsedSockets() >= targetItem.MaxSockets || nextFreeSocket < 0)
+		{
+			character.SystemMessage("ALREADY_MAX_SOCKET");
+			return DialogTxResult.Fail;
+		}
+
+		var price = 100;
+		if (ScriptableFunctions.ItemCalc.TryGet("SCR_Get_Item_SocketPrice", out var socketPriceFunc))
+			price = (int)socketPriceFunc(targetItem);
+
+		if (!character.HasSilver(price))
+			return DialogTxResult.Fail;
+
+		if (character.Inventory.Remove(ticket, 1, InventoryItemRemoveMsg.Used) != InventoryResult.Success)
+			return DialogTxResult.Fail;
+
+		if (price > 0)
+			character.RemoveItem(ItemId.Vis, price);
+
+		targetItem.CreateSocket(nextFreeSocket);
+		Send.ZC_OBJECT_PROPERTY(character, targetItem);
+		Send.ZC_EQUIP_GEM_INFO(character);
+		character.AddonMessage(AddonMessage.MSG_MAKE_ITEM_SOCKET);
+		character.InvalidateProperties();
+
+		return DialogTxResult.Okay;
+	}
+
+	private static readonly string[] NecroCardProperties = { PropertyName.Necro_bosscard1, PropertyName.Necro_bosscard2, PropertyName.Necro_bosscard3, PropertyName.Necro_bosscard4 };
+	private static readonly string[] NecroGuidProperties = { PropertyName.Necro_bosscardGUID1, PropertyName.Necro_bosscardGUID2, PropertyName.Necro_bosscardGUID3, PropertyName.Necro_bosscardGUID4 };
+
+	[ScriptableFunction]
+	public DialogTxResult SCR_NECRO_SET_CARD(Character character, DialogTxArgs args)
+	{
+		if (!character.Jobs.Has(JobId.Necromancer))
+			return DialogTxResult.Fail;
+
+		int slot, action;
+
+		if (args.NumArgs.Length >= 2)
+		{
+			slot = args.NumArgs[0];
+			action = args.NumArgs[1];
+		}
+		else if (args.StrArgs.Length >= 1)
+		{
+			var parts = args.StrArgs[0].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			if (parts.Length < 2 || !int.TryParse(parts[0], out slot) || !int.TryParse(parts[1], out action))
+				return DialogTxResult.Fail;
+		}
+		else
+		{
+			return DialogTxResult.Fail;
+		}
+
+		if (slot < 1 || slot > NecroCardProperties.Length)
+			return DialogTxResult.Fail;
+
+		var cardProperty = NecroCardProperties[slot - 1];
+		var guidProperty = NecroGuidProperties[slot - 1];
+
+		if (action == 1)
+		{
+			if (args.TxItems.Length < 1)
+				return DialogTxResult.Fail;
+
+			var cardItem = args.TxItems[0].Item;
+			if (cardItem == null || cardItem.Data.Group != ItemGroup.Card)
+				return DialogTxResult.Fail;
+
+			if (!ZoneServer.Instance.Data.MonsterDb.TryFind((int)cardItem.Data.Script.NumArg1, out var monsterData)
+				|| monsterData.Race == RaceType.Velnias || monsterData.Race == RaceType.Klaida)
+			{
+				character.SystemMessage("CheckCardType");
+				return DialogTxResult.Fail;
+			}
+
+			var guid = cardItem.ObjectId.ToString();
+			if (NecroGuidProperties.Any(a => character.Etc.Properties.GetString(a, "None") == guid))
+			{
+				character.SystemMessage("AlreadRegSameCard");
+				return DialogTxResult.Fail;
+			}
+
+			character.SetEtcProperty(cardProperty, cardItem.Id);
+			character.SetEtcProperty(guidProperty, guid);
+		}
+		else
+		{
+			character.SetEtcProperty(cardProperty, 0);
+			character.SetEtcProperty(guidProperty, "None");
+		}
+
+		this.UpdateNecronomicon(character);
+
+		return DialogTxResult.Okay;
+	}
+
+	[ScriptableFunction]
+	public DialogTxResult SCR_NECRO_BOSSCARD_ROTATE(Character character, DialogTxArgs args)
+	{
+		if (!character.Jobs.Has(JobId.Necromancer))
+			return DialogTxResult.Fail;
+
+		var count = NecroCardProperties.Length;
+		var cards = NecroCardProperties.Select(a => (int)character.Etc.Properties.GetFloat(a, 0)).ToArray();
+		var guids = NecroGuidProperties.Select(a => character.Etc.Properties.GetString(a, "None")).ToArray();
+
+		for (var i = 0; i < count; i++)
+		{
+			character.SetEtcProperty(NecroCardProperties[i], cards[(i + 1) % count]);
+			character.SetEtcProperty(NecroGuidProperties[i], guids[(i + 1) % count]);
+		}
+
+		this.UpdateNecronomicon(character);
+
+		return DialogTxResult.Okay;
+	}
+
+	/// <summary>
+	/// Names the main Necronomicon card after its monster and refreshes the client's window.
+	/// </summary>
+	private void UpdateNecronomicon(Character character)
+	{
+		var mainCard = (int)character.Etc.Properties.GetFloat(PropertyName.Necro_bosscard1, 0);
+		var mainName = "None";
+
+		if (mainCard != 0 && ZoneServer.Instance.Data.ItemDb.TryFind(mainCard, out var itemData) && ZoneServer.Instance.Data.MonsterDb.TryFind((int)itemData.Script.NumArg1, out var monsterData))
+			mainName = monsterData.ClassName;
+
+		character.SetEtcProperty(PropertyName.Necro_bosscardName, mainName);
+
+		foreach (var property in NecroCardProperties)
+			Send.ZC_PC_PROP_UPDATE(character, PropertyTable.GetId("PCEtc", property), 1);
+
+		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		character.AddonMessage(AddonMessage.UPDATE_NECRONOMICON_UI);
+	}
+
+	[ScriptableFunction]
 	public DialogTxResult SCR_TX_POISONPOT(Character character, DialogTxArgs args)
 	{
 		if (!character.Jobs.Has(JobId.Wugushi))

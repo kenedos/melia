@@ -7,6 +7,7 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 
@@ -19,13 +20,23 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 	[SkillHandler(SkillId.Necromancer_CorpseTower)]
 	public class Necromancer_CorpseTowerOverride : IGroundSkillHandler
 	{
+		private const int CorpsePartsCost = 7;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
+			if (!NecromancerSkillHelper.HasCorpseParts(caster, CorpsePartsCost))
+			{
+				caster.ServerMessage(Localization.Get("Not enough corpse parts."));
+				return;
+			}
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
 				return;
 			}
+
+			NecromancerSkillHelper.SpendCorpseParts(caster, CorpsePartsCost);
 
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
@@ -42,7 +53,9 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			var spawnPos = originPos.GetRelative(farPos, distance: 20f);
-			MonsterSkillCreateMob(skill, caster, "pcskill_CorpseTower", spawnPos, 0f, "local name = GetClassString(\"Monster\", \"pcskill_CorpseTower\", \"Name\"); return SofS(name, self.Name);", "PC_Summon_Holding", 0, 100f, "None", "WlkMSPD#0#RunMSPD#0#Attribute#Melee");
+			var tower = MonsterSkillCreateMob(skill, caster, "pcskill_CorpseTower", spawnPos, 0f, "local name = GetClassString(\"Monster\", \"pcskill_CorpseTower\", \"Name\"); return SofS(name, self.Name);", "PC_Summon_Holding", 0, 100f, "None", "WlkMSPD#0#RunMSPD#0#Attribute#Melee");
+			if (tower != null)
+				NecromancerSkillHelper.ApplySummonTransfer(tower, caster, skill.Properties.GetFloat(PropertyName.SkillFactor), 0, 0);
 		}
 	}
 }

@@ -1,0 +1,25 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.1 Binary Template
+//
+//      File: ZC_FOLLOW_TO_ACTOR.bt
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+
+int followerHandle;
+int targetHandle;
+float f1;
+float f2;
+float f3;
+int nodeNameStringId;
+byte b1;
+float f4;

@@ -69,7 +69,7 @@ namespace Melia.Zone.Pads.Helpers
 		}
 
 		public static IMonster PadCreateMonster(Pad pad, string className, Position pos, float angle, float lifeTime,
-			string effect, float eftScale, int range = 0, bool own = true)
+			string effect, float eftScale, int range = 0, bool own = true, bool immediate = false)
 		{
 			var caster = (ICombatEntity)pad.Creator;
 			var skill = pad.Skill;
@@ -106,7 +106,7 @@ namespace Melia.Zone.Pads.Helpers
 			monster.Vars.Set("Melia.Summoner.Handle", caster.Handle);
 			pad.Monster = monster;
 			monster.OwnerHandle = caster.Handle;
-			caster.Map.AddMonster(monster);
+			caster.Map.AddMonster(monster, immediate);
 
 			return monster;
 		}

@@ -130,7 +130,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </summary>
 		/// <param name="attacker"></param>
 		/// <returns></returns>
-		private static ICombatEntity ResolveEffectiveAttacker(ICombatEntity attacker)
+		public static ICombatEntity ResolveEffectiveAttacker(ICombatEntity attacker)
 		{
 			if (attacker == null)
 				return null;

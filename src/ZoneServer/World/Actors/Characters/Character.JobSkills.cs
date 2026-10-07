@@ -18,6 +18,11 @@ namespace Melia.Zone.World.Actors.Characters
 {
 	public partial class Character
 	{
+		/// <summary>
+		/// Permanent variable holding the extra skill points every job gets.
+		/// </summary>
+		public const string BonusSkillPointsVarName = "Melia.Jobs.BonusSkillPoints";
+
 		#region Job & Skill Management
 		/// <summary>
 		/// Increases character's job level by the given amount. Returns the amount of levels actually gained.
@@ -155,7 +160,7 @@ namespace Melia.Zone.World.Actors.Characters
 			// level up.
 			foreach (var job in this.Jobs.GetList())
 			{
-				job.SetSkillPoints(job.EffectiveLevel);
+				job.SetSkillPoints(job.EffectiveLevel + this.GetBonusSkillPoints());
 			}
 
 			this.Inventory.RefreshGemSkills();
@@ -202,7 +207,7 @@ namespace Melia.Zone.World.Actors.Characters
 				}
 			}
 
-			job.SetSkillPoints(job.EffectiveLevel);
+			job.SetSkillPoints(job.EffectiveLevel + this.GetBonusSkillPoints());
 
 			this.Inventory.RefreshGemSkills();
 
@@ -240,23 +245,68 @@ namespace Melia.Zone.World.Actors.Characters
 				if (abilityData == null)
 					continue;
 
-				if (treeData.HasPriceTimeScript)
-				{
-					if (ScriptableFunctions.AbilityPrice.TryGet(treeData.PriceTimeScript, out var priceTimeFunc))
-					{
-						for (var i = 1; i <= ability.Level; i++)
-						{
-							priceTimeFunc(this, abilityData, i, treeData.MaxLevel, out var price, out var time);
-							totalRefund += price;
-						}
-					}
-				}
-
+				totalRefund += this.GetAbilityRefund(ability, abilityData, treeData);
 				this.Abilities.Remove(ability.Id);
 			}
 
 			if (totalRefund > 0)
 				this.ModifyAbilityPoints(totalRefund);
+		}
+
+		/// <summary>
+		/// Removes the abilities learned through the given job and refunds
+		/// their cost, keeping those another of the character's jobs grants.
+		/// </summary>
+		/// <param name="jobId"></param>
+		public void ResetAbilities(JobId jobId)
+		{
+			var totalRefund = 0;
+			var otherJobIds = this.Jobs.GetList().Select(j => j.Id).Where(id => id != jobId).ToList();
+
+			foreach (var ability in this.Abilities.GetList())
+			{
+				var treeData = ZoneServer.Instance.Data.AbilityTreeDb.Find(jobId, ability.Id);
+				if (treeData == null)
+					continue;
+
+				if (otherJobIds.Any(id => ZoneServer.Instance.Data.AbilityTreeDb.Find(id, ability.Id) != null))
+					continue;
+
+				var abilityData = ZoneServer.Instance.Data.AbilityDb.Find(ability.Id);
+				if (abilityData == null)
+					continue;
+
+				totalRefund += this.GetAbilityRefund(ability, abilityData, treeData);
+				this.Abilities.Remove(ability.Id);
+			}
+
+			if (totalRefund > 0)
+				this.ModifyAbilityPoints(totalRefund);
+		}
+
+		/// <summary>
+		/// Returns the ability points spent on the given ability's levels.
+		/// </summary>
+		/// <param name="ability"></param>
+		/// <param name="abilityData"></param>
+		/// <param name="treeData"></param>
+		/// <returns></returns>
+		private int GetAbilityRefund(Ability ability, AbilityData abilityData, AbilityTreeData treeData)
+		{
+			if (!treeData.HasPriceTimeScript)
+				return 0;
+
+			if (!ScriptableFunctions.AbilityPrice.TryGet(treeData.PriceTimeScript, out var priceTimeFunc))
+				return 0;
+
+			var refund = 0;
+			for (var i = 1; i <= ability.Level; i++)
+			{
+				priceTimeFunc(this, abilityData, i, treeData.MaxLevel, out var price, out _);
+				refund += price;
+			}
+
+			return refund;
 		}
 
 		/// <summary>
@@ -281,8 +331,16 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public void ChangeJob(JobId jobId)
 		{
-			this.ChangeJob(jobId, JobCircle.First, skillPoints: 1, playEffect: true);
+			this.ChangeJob(jobId, JobCircle.First, skillPoints: 1 + this.GetBonusSkillPoints(), playEffect: true);
 		}
+
+		/// <summary>
+		/// Returns the extra skill points every job of the character has on
+		/// top of the ones its levels grant.
+		/// </summary>
+		/// <returns></returns>
+		public int GetBonusSkillPoints()
+			=> this.Variables.Perm.GetInt(BonusSkillPointsVarName, 0);
 
 		/// <summary>
 		/// Changes the character's job with specified circle and skill points.

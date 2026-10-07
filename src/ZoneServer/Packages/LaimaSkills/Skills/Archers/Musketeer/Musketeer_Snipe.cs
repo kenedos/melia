@@ -9,6 +9,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
+using Yggdrasil.Geometry.Shapes;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
@@ -21,6 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 	public class Musketeer_SnipeOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int InitialExposedStacks = 3;
+		private const float HitRadius = 22f;
 		private static readonly TimeSpan HitAniTime = TimeSpan.FromMilliseconds(150);
 
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
@@ -30,11 +32,19 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out _))
+			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
 				caster.ServerMessage(Localization.Get("No target location specified."));
 				return;
 			}
+
+			if (!caster.InSkillUseRange(skill, targetPos))
+			{
+				caster.ServerMessage(Localization.Get("Too far away."));
+				Send.ZC_SKILL_CAST_CANCEL(caster);
+				return;
+			}
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -44,29 +54,29 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 			caster.SetAttackState(true);
 
 			var hits = new List<SkillHitInfo>();
-			var forceId = ForceId.GetNew();
 
-			if (target != null)
+			var modifier = SkillModifier.Default;
+			if (caster.IsAbilityActive(AbilityId.Musketeer39) && !caster.IsBuffActive(BuffId.Musketeer_Snipe_UseStack_Buff))
+				modifier.ForcedHit = true;
+
+			var splashArea = new CircleF(targetPos, HitRadius);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+
+			foreach (var currentTarget in targets.LimitBySDR(caster, skill))
 			{
-				var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 22);
-				var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-				var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+				var skillHitResult = SCR_SkillHit(caster, currentTarget, skill, modifier);
+				currentTarget.TakeDamage(skillHitResult.Damage, caster);
 
-				foreach (var currentTarget in targets.LimitBySDR(caster, skill))
-				{
-					var skillHitResult = SCR_SkillHit(caster, currentTarget, skill);
-					currentTarget.TakeDamage(skillHitResult.Damage, caster);
-
-					var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, HitAniTime, TimeSpan.Zero);
-					skillHit.ForceId = forceId;
-					hits.Add(skillHit);
-				}
+				var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, HitAniTime, TimeSpan.Zero);
+				skillHit.ForceId = ForceId.GetNew();
+				skillHit.TargetIndex = (byte)hits.Count;
+				hits.Add(skillHit);
 			}
 
 			var targetHandle = target?.Handle ?? 0;
-			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, hits);
+			Send.ZC_SKILL_READY(caster, skill, 1, originPos, targetPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(targetPos), targetPos);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, targetPos, hits.Count > 0 ? hits[0].ForceId : ForceId.GetNew(), hits);
 
 			this.AddExposedStack(caster, skill);
 		}

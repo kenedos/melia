@@ -213,6 +213,11 @@ namespace Melia.Zone.Events
 		public Event<ReputationEventArgs> PlayerReputationChanged = new();
 
 		/// <summary>
+		/// Raised when a player clears an instance dungeon.
+		/// </summary>
+		public Event<PlayerDungeonEventArgs> PlayerClearedDungeon = new();
+
+		/// <summary>
 		/// Raised when a monster is about to disappear.
 		/// </summary>
 		/// <remarks>

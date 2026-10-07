@@ -40,6 +40,10 @@ public class SkillCalculationsScript : GeneralScript
 		var byOwner = 0f;
 		byOwner += skill.Owner.Properties.GetFloat(PropertyName.SR);
 
+		// Ability "Doppelsoeldner: Tough"
+		if (skill.Data.ClassName.StartsWith("Doppelsoeldner_") && skill.Owner.TryGetActiveAbilityLevel(AbilityId.Doppelsoeldner24, out var toughLevel))
+			byOwner += toughLevel;
+
 		return Math.Max(1, baseValue + byOwner);
 	}
 
@@ -296,6 +300,9 @@ public class SkillCalculationsScript : GeneralScript
 			var reduction = value * reductionRate;
 			value -= reduction;
 		}
+
+		if (skill.Data.AttackType == SkillAttackType.Magic && owner.IsBuffActive(BuffId.MalleusMaleficarum_Debuff))
+			value *= 2;
 
 		if (value < 1)
 			value = 0;

@@ -40,6 +40,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		private readonly object _hpLock = new();
 		private readonly object _pendingDropsLock = new();
 		private int _killed;
+		private int _overkillAmount;
 		private Character _dropBeneficiary;
 		private List<DropStack> _pendingDrops;
 		private Character _preRollBeneficiary;
@@ -395,6 +396,11 @@ namespace Melia.Zone.World.Actors.Monsters
 		private const float ShieldDamageRate = 5.0f;
 		private const float ShieldRegenRate = 0.05f;
 		private const float ShieldHpDamageRate = 0.5f;
+
+		/// <summary>
+		/// A killing hit of at least this many times the remaining HP is an overkill.
+		/// </summary>
+		private const float OverkillDamageRatio = 2f;
 		private const float BossShieldRate = 100;
 		private static readonly TimeSpan ShieldRefillDelay = TimeSpan.FromSeconds(15);
 
@@ -566,6 +572,14 @@ namespace Melia.Zone.World.Actors.Monsters
 			var currentHp = this.Hp;
 
 			this.ModifyHpSafe(-damage, out _, out _);
+
+			if (this.Hp == 0 && currentHp > 0 && damage >= currentHp * OverkillDamageRatio)
+			{
+				_overkillAmount = (int)Math.Clamp(Math.Floor(damage / currentHp * 100f), 100, 255);
+
+				if (CombatComponent.ResolveEffectiveAttacker(attacker) is Character overkiller)
+					overkiller.Components.Get<AchievementComponent>()?.AddOverkillPoints();
+			}
 
 			// Register hits before potentially killing the monster,
 			// so the damage can be factored into finding the top
@@ -785,7 +799,7 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			Send.ZC_SKILL_CAST_CANCEL(this);
 			Send.ZC_SKILL_DISABLE(this);
-			Send.ZC_DEAD(this);
+			Send.ZC_DEAD(this, null, true, _overkillAmount > 0, false, _overkillAmount);
 			this.IsDeathAnnounced = true;
 
 			if (this.Effects?.Count != 0)

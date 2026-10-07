@@ -9,6 +9,13 @@
 
 // custom/test.cs
 
+// custom/systems/daily_weekly_quests.cs
+// custom/systems/hunting_tasks.cs
+// custom/systems/world_boss.cs
+// custom/npcs/coin_exchange_shops.cs
+// custom/npcs/gem_recycler.cs
+// custom/npcs/quality_upgrader.cs
+
 custom/client/unclutter/main.cs
 custom/client/concise_sysmenu/main.cs
 custom/client/better_options/main.cs

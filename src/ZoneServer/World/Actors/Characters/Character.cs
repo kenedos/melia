@@ -724,6 +724,22 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
+		/// The level and stat properties a clone takes over from its original.
+		/// </summary>
+		private static readonly string[] CloneStatProperties =
+		{
+			PropertyName.Lv,
+			PropertyName.StatByLevel,
+			PropertyName.StatByBonus,
+			PropertyName.UsedStat,
+			PropertyName.STR_STAT,
+			PropertyName.CON_STAT,
+			PropertyName.INT_STAT,
+			PropertyName.MNA_STAT,
+			PropertyName.DEX_STAT,
+		};
+
+		/// <summary>
 		/// Clones the character within it's same appearance and
 		/// spawns it on the current map at a given position.
 		/// </summary>
@@ -747,19 +763,25 @@ namespace Melia.Zone.World.Actors.Characters
 
 			foreach (var item in this.Inventory.GetEquip())
 			{
-				var newItem = new Item(item.Value.Id, item.Value.Amount);
+				var newItem = item.Value is DummyEquipItem ? new Item(item.Value.Id, item.Value.Amount) : new Item(item.Value);
 				dummyCharacter.Inventory.SetEquipSilent(item.Key, newItem);
 			}
 
 			foreach (var job in this.Jobs.GetList())
 			{
-				dummyCharacter.Jobs.AddSilent(new Job(dummyCharacter, job.Id));
+				dummyCharacter.Jobs.AddSilent(new Job(dummyCharacter, job.Id, job.TotalExp, job.Circle, job.SkillPoints));
 			}
 
 			foreach (var skill in this.Skills.GetList())
 			{
 				var newSkill = new Skill(dummyCharacter, skill.Id, skill.Level);
 				dummyCharacter.Skills.AddSilent(newSkill);
+			}
+
+			foreach (var propertyName in CloneStatProperties)
+			{
+				if (this.Properties.TryGetFloat(propertyName, out var value))
+					dummyCharacter.Properties.SetFloat(propertyName, value);
 			}
 
 			dummyCharacter.InitProperties();

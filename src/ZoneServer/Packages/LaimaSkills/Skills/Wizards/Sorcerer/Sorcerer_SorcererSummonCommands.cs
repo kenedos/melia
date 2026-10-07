@@ -27,6 +27,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 	{
 		private const string OrderScriptKey = "Melia.OrderScript";
 		private const string OrderCancellationKey = "Melia.OrderCancellation";
+		private const float FamiliarSplashRange = 35f;
+		private const int FamiliarSplashChancePerLevel = 5;
 
 		/// <summary>
 		/// Gets all valid sorcerer summons for the caster (main boss card summon and evocation summon).
@@ -438,6 +440,17 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 
 							var hitInfo = new HitInfo(caster, target, familiarSkill, skillHitResult, TimeSpan.Zero);
 							Send.ZC_HIT_INFO(caster, target, hitInfo);
+
+							if (caster.TryGetActiveAbilityLevel(AbilityId.Sorcerer1, out var splashLevel) && GameRandom.Get().Next(100) < splashLevel * FamiliarSplashChancePerLevel)
+							{
+								foreach (var splashTarget in caster.Map.GetAttackableEnemiesInPosition(caster, target.Position, FamiliarSplashRange).Where(e => e != target))
+								{
+									var splashResult = SCR_SkillHit(caster, splashTarget, familiarSkill);
+									splashTarget.TakeDamage(splashResult.Damage, caster);
+
+									Send.ZC_HIT_INFO(caster, splashTarget, new HitInfo(caster, splashTarget, familiarSkill, splashResult, TimeSpan.Zero));
+								}
+							}
 						}
 
 						// Kill the bat

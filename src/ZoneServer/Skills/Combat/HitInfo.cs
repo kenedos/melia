@@ -87,9 +87,9 @@ namespace Melia.Zone.Skills.Combat
 		public TimeSpan HitDelay { get; set; }
 
 		/// <summary>
-		/// Gets or sets the hit's unknown float 1.
+		/// Gets or sets the seconds between the lines a multi-hit is split into.
 		/// </summary>
-		public float UnkFloat1 { get; set; } = 0f;
+		public float MultiHitInterval { get; set; } = 0f;
 
 		/// <summary>
 		/// Gets or sets the share of the attack's damage this hit deals, for

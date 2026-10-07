@@ -411,6 +411,29 @@ public class CombatCalculationsScript : GeneralScript
 	/// <returns></returns>
 	[ScriptableFunction]
 	public float SCR_CalculateHeal(ICombatEntity caster, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		=> this.CalculateHealValue(caster, target, skill, modifier, skillHitResult, true);
+
+	/// <summary>
+	/// Returns the healing value of skill casted by caster on target,
+	/// without the part based on the target's max HP.
+	/// </summary>
+	/// <param name="caster"></param>
+	/// <param name="target"></param>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_CalculateHealDamageBonus(ICombatEntity caster, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		=> this.CalculateHealValue(caster, target, skill, modifier, skillHitResult, false);
+
+	/// <summary>
+	/// Returns the healing value of skill casted by caster on target.
+	/// </summary>
+	/// <param name="caster"></param>
+	/// <param name="target"></param>
+	/// <param name="skill"></param>
+	/// <param name="includeTargetMaxHp"></param>
+	/// <returns></returns>
+	private float CalculateHealValue(ICombatEntity caster, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult, bool includeTargetMaxHp)
 	{
 		var SCR_GetRandomAtk = ScriptableFunctions.Combat.Get("SCR_GetRandomAtk");
 
@@ -421,7 +444,7 @@ public class CombatCalculationsScript : GeneralScript
 		var bySkillFactor = skill.Properties.GetFloat(PropertyName.SkillFactor);
 
 		var healPowerRatio = Math.Min(1f, byHealPower / 1000f);
-		var byMaxHp = (target.MaxHp * 0.05f * healPowerRatio);
+		var byMaxHp = includeTargetMaxHp ? target.MaxHp * 0.05f * healPowerRatio : 0f;
 
 		var healAmount = (float)Math.Floor(byMaxHp + ((byHealPower * bySkillFactor) / 100f) + byAtk);
 
@@ -1137,8 +1160,10 @@ public class CombatCalculationsScript : GeneralScript
 		var critHitRate = attacker.Properties.GetFloat(PropertyName.CRTHR);
 		critHitRate += modifier.BonusCritChance;
 
+		var minCritChance = Math.Max(modifier.MinCritChance, TemplarSkillHelper.GetMoraleMinCrit(attacker));
+
 		if (critHitRate <= 0)
-			return modifier.MinCritChance;
+			return minCritChance;
 		if (critDodgeRate <= 0)
 			return 100f;
 
@@ -1148,7 +1173,7 @@ public class CombatCalculationsScript : GeneralScript
 
 		critChance = Math2.Clamp(0f, 100f, critChance);
 
-		return Math.Max(modifier.MinCritChance, critChance);
+		return Math.Max(minCritChance, critChance);
 	}
 
 	/// <summary>

@@ -179,7 +179,8 @@ namespace Melia.Zone.World
 		{
 			foreach (var character in ZoneServer.Instance.World.GetCharacters())
 			{
-				if (character.Connection.Account.Variables.Perm.GetBool("Melia.DisableBellSound", false))
+				var account = character.Connection?.Account;
+				if (account == null || account.Variables.Perm.GetBool("Melia.DisableBellSound", false))
 					continue;
 
 				Send.ZC_PLAY_SOUND(character, "chapel_bell_sound_01");

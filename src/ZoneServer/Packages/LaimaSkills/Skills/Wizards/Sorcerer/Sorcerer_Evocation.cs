@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -15,6 +16,7 @@ using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 {
@@ -192,50 +194,24 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 				.Where(e => owner.CanDamage(e))
 				.ToList();
 
-			if (enemies.Count > 0)
-			{
-				// Calculate and apply damage
-				foreach (var enemy in enemies)
-				{
-					var damage = SCR_CalculateSkillDamage(owner, enemy, skill);
-					var hitResult = SCR_ApplyDamage(owner, enemy, skill, damage);
+			var hits = new List<SkillHitInfo>();
 
-					// Play hit effect
-					Send.ZC_NORMAL.PlayEffect(enemy, "F_explosion_medium", 1f);
-				}
+			foreach (var enemy in enemies.LimitBySDR(owner, skill))
+			{
+				var skillHitResult = SCR_SkillHit(owner, enemy, skill);
+				enemy.TakeDamage(skillHitResult.Damage, owner);
+
+				hits.Add(new SkillHitInfo(owner, enemy, skill, skillHitResult, TimeSpan.Zero, TimeSpan.Zero));
 			}
+
+			if (hits.Count > 0)
+				Send.ZC_SKILL_HIT_INFO(owner, hits);
 
 			// Play explosion effect at summon position
 			Send.ZC_NORMAL.SkillProjectile(owner, pos, "F_explosion_large", 1.5f, "None", 0, 0, TimeSpan.Zero);
 
 			// Kill the summon
 			summon.Kill(owner);
-		}
-
-		/// <summary>
-		/// Helper method to calculate skill damage.
-		/// </summary>
-		private float SCR_CalculateSkillDamage(ICombatEntity attacker, ICombatEntity target, Skill skill)
-		{
-			// Basic damage calculation - should be expanded based on actual game formulas
-			var atk = attacker.Properties.GetFloat(PropertyName.MATK);
-			var def = target.Properties.GetFloat(PropertyName.MDEF);
-			var skillFactor = skill.Level * 0.5f + 1.0f;
-
-			return Math.Max(1, (atk - def) * skillFactor);
-		}
-
-		/// <summary>
-		/// Helper method to apply damage.
-		/// </summary>
-		private SkillHitResult SCR_ApplyDamage(ICombatEntity attacker, ICombatEntity target, Skill skill, float damage)
-		{
-			var hitResult = new SkillHitResult();
-			hitResult.Damage = damage;
-
-			target.TakeDamage(damage, attacker);
-
-			return hitResult;
 		}
 	}
 }

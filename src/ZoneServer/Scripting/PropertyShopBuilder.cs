@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Melia.Shared.Game.Const;
+using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Scripting
 {
@@ -22,13 +24,71 @@ namespace Melia.Zone.Scripting
 		/// purchases and report the balance to the client.
 		/// </summary>
 		public string CurrencyProperty { get; }
+
+		/// <summary>
+		/// Id of the inventory item spent instead of the account property,
+		/// or 0.
+		/// </summary>
+		public int CurrencyItemId { get; }
+
+		/// <summary>
+		/// Name of the permanent account variable spent instead of the
+		/// account property, or null.
+		/// </summary>
+		public string CurrencyVariable { get; }
+
 		public List<PropertyShopItem> Items { get; } = new();
 
-		public PropertyShop(string name, string pointName, string currencyProperty)
+		public PropertyShop(string name, string pointName, string currencyProperty, int currencyItemId = 0, string currencyVariable = null)
 		{
 			this.Name = name;
 			this.PointName = pointName;
 			this.CurrencyProperty = currencyProperty;
+			this.CurrencyItemId = currencyItemId;
+			this.CurrencyVariable = currencyVariable;
+		}
+
+		/// <summary>
+		/// Returns the character's balance of this shop's currency.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <returns></returns>
+		public int GetBalance(Character character)
+		{
+			if (this.CurrencyItemId != 0)
+				return character.Inventory.CountItem(this.CurrencyItemId);
+
+			var account = character.Connection.Account;
+
+			if (this.CurrencyVariable != null)
+				return account.Variables.Perm.GetInt(this.CurrencyVariable, 0);
+
+			return (int)account.Properties.GetFloat(this.CurrencyProperty);
+		}
+
+		/// <summary>
+		/// Spends the given amount of this shop's currency if the character
+		/// has enough of it. Returns false if they don't.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="amount"></param>
+		/// <returns></returns>
+		public bool TrySpend(Character character, int amount)
+		{
+			if (amount < 0 || this.GetBalance(character) < amount)
+				return false;
+
+			if (this.CurrencyItemId != 0)
+				return character.Inventory.Remove(this.CurrencyItemId, amount, InventoryItemRemoveMsg.Used) == amount;
+
+			var account = character.Connection.Account;
+
+			if (this.CurrencyVariable != null)
+				account.Variables.Perm.SetInt(this.CurrencyVariable, this.GetBalance(character) - amount);
+			else
+				character.ModifyAccountProperty(this.CurrencyProperty, -amount);
+
+			return true;
 		}
 
 		public void AddItem(string className, int itemId, int amount, int price)
@@ -59,13 +119,44 @@ namespace Melia.Zone.Scripting
 	/// </summary>
 	public static class PropertyShops
 	{
+		/// <summary>
+		/// Prefix of the temporary character variables that map a UI shop
+		/// alias to the shop it serves.
+		/// </summary>
+		public const string AliasVariablePrefix = "Melia.PropertyShop.Alias.";
+
 		private static readonly Dictionary<string, PropertyShop> _shops = new(StringComparer.OrdinalIgnoreCase);
 
 		public static PropertyShop Create(string name, string pointName, string currencyProperty, Action<PropertyShop> configure)
+			=> Register(new PropertyShop(name, pointName, currencyProperty), configure);
+
+		/// <summary>
+		/// Creates a shop that charges an inventory item as its currency.
+		/// </summary>
+		public static PropertyShop CreateWithItem(string name, string pointName, int currencyItemId, Action<PropertyShop> configure)
 		{
-			var shop = new PropertyShop(name, pointName, currencyProperty);
+			if (currencyItemId <= 0)
+				throw new ArgumentOutOfRangeException(nameof(currencyItemId), "Currency item id must be greater than zero.");
+
+			return Register(new PropertyShop(name, pointName, null, currencyItemId: currencyItemId), configure);
+		}
+
+		/// <summary>
+		/// Creates a shop that charges a permanent account variable as its
+		/// currency.
+		/// </summary>
+		public static PropertyShop CreateWithVariable(string name, string pointName, string currencyVariable, Action<PropertyShop> configure)
+		{
+			if (string.IsNullOrWhiteSpace(currencyVariable))
+				throw new ArgumentException("Currency variable name required.", nameof(currencyVariable));
+
+			return Register(new PropertyShop(name, pointName, null, currencyVariable: currencyVariable), configure);
+		}
+
+		private static PropertyShop Register(PropertyShop shop, Action<PropertyShop> configure)
+		{
 			configure(shop);
-			_shops[name] = shop;
+			_shops[shop.Name] = shop;
 			return shop;
 		}
 
@@ -85,5 +176,15 @@ namespace Melia.Zone.Scripting
 
 		public static bool TryGet(string name, out PropertyShop shop)
 			=> _shops.TryGetValue(name, out shop);
+
+		/// <summary>
+		/// Returns the shop the character opened under the given name,
+		/// resolving a UI alias first.
+		/// </summary>
+		public static bool TryGet(Character character, string name, out PropertyShop shop)
+		{
+			var realName = character.Variables.Temp.GetString(AliasVariablePrefix + name, null);
+			return _shops.TryGetValue(realName ?? name, out shop);
+		}
 	}
 }

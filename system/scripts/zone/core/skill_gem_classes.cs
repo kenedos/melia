@@ -56,5 +56,9 @@ public static class SkillGemConst
 		"Rogue",
 		"Squire",
 		"Schwarzereiter",
+		"Templer",
+		"PlagueDoctor",
+		"Cannoneer",
+		"Druid",
 	};
 }

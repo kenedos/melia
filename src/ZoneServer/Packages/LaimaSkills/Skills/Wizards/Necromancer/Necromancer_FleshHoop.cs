@@ -7,6 +7,7 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 
@@ -19,15 +20,25 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 	[SkillHandler(SkillId.Necromancer_FleshHoop)]
 	public class Necromancer_FleshHoopOverride : IForceGroundSkillHandler
 	{
+		private const int CorpsePartsCost = 5;
 		private const float BuffDurationMs = 16000f;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
+			if (!NecromancerSkillHelper.HasCorpseParts(caster, CorpsePartsCost))
+			{
+				caster.ServerMessage(Localization.Get("Not enough corpse parts."));
+				return;
+			}
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
 				return;
 			}
+
+			NecromancerSkillHelper.SpendCorpseParts(caster, CorpsePartsCost);
+
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 

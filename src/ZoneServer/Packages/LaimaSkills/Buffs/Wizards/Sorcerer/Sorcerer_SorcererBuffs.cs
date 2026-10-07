@@ -3,6 +3,9 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
+using Melia.Zone.Skills;
+using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
@@ -89,39 +92,39 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Sorcerer
 	}
 
 	/// <summary>
-	/// Handler for the Summoning_Overwork_Buff applied to summons.
+	/// Handler for the Summoning_Overwork_Buff, which raises the demon's damage
+	/// while draining its HP and the summoner's SP.
 	/// </summary>
-	/// <remarks>
-	/// Provides bonuses but may have drawbacks.
-	/// </remarks>
 	[Package("laima-skills")]
 	[BuffHandler(BuffId.Summoning_Overwork_Buff)]
 	public class Summoning_Overwork_BuffOverride : BuffHandler
 	{
-		public override void OnActivate(Buff buff, ActivationType activationType)
-		{
-			// Overwork provides attack bonuses based on ability level
-			var abilityLevel = buff.NumArg1;
-			var atkBonus = 100f * abilityLevel;
-
-			AddPropertyModifier(buff, buff.Target, PropertyName.PATK_BM, atkBonus);
-			AddPropertyModifier(buff, buff.Target, PropertyName.MATK_BM, atkBonus);
-		}
+		private const float DamageRatePerLevel = 0.03f;
+		private const float HpDrainRate = 0.03f;
+		private const float BaseSpCost = 40f;
+		private const float SpCostPerLevel = 0.75f;
 
 		public override void WhileActive(Buff buff)
 		{
-			// Overwork may drain HP over time as a drawback
-			if (buff.Target is Summon summon)
+			if (buff.Target is not Summon summon || summon.IsDead)
+				return;
+
+			if (buff.Caster is Character caster && !caster.TrySpendSp(BaseSpCost + caster.Level * SpCostPerLevel))
 			{
-				var hpDrain = summon.Properties.GetFloat(PropertyName.MHP) * 0.01f;
-				summon.TakeDamage(hpDrain, summon);
+				summon.StopBuff(buff.Id);
+				return;
 			}
+
+			summon.TakeDamage(summon.Properties.GetFloat(PropertyName.MHP) * HpDrainRate, summon);
 		}
 
-		public override void OnEnd(Buff buff)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Summoning_Overwork_Buff)]
+		public void OnAttackBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
-			RemovePropertyModifier(buff, buff.Target, PropertyName.PATK_BM);
-			RemovePropertyModifier(buff, buff.Target, PropertyName.MATK_BM);
+			if (!attacker.TryGetBuff(BuffId.Summoning_Overwork_Buff, out var buff))
+				return;
+
+			modifier.DamageMultiplier += buff.NumArg1 * DamageRatePerLevel;
 		}
 	}
 

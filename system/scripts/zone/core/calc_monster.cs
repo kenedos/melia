@@ -63,7 +63,9 @@ public class MonsterCalculationsFunctionsScript : GeneralScript
 		var properties = monster.Properties;
 
 		var baseValue = (float)monster.Data.PhysicalAttackMin;
-		if (monster.Properties.Overrides.TryGetFloat(PropertyName.MINPATK, out var overrideValue))
+		if (monster.Properties.Has(PropertyName.FixedAttack))
+			baseValue = monster.Properties.GetFloat(PropertyName.FixedAttack);
+		else if (monster.Properties.Overrides.TryGetFloat(PropertyName.MINPATK, out var overrideValue))
 			baseValue = overrideValue;
 
 		var value = baseValue;
@@ -93,7 +95,9 @@ public class MonsterCalculationsFunctionsScript : GeneralScript
 		var properties = monster.Properties;
 
 		var baseValue = (float)monster.Data.PhysicalAttackMax;
-		if (monster.Properties.Overrides.TryGetFloat(PropertyName.MAXPATK, out var overrideValue))
+		if (monster.Properties.Has(PropertyName.FixedAttack))
+			baseValue = monster.Properties.GetFloat(PropertyName.FixedAttack);
+		else if (monster.Properties.Overrides.TryGetFloat(PropertyName.MAXPATK, out var overrideValue))
 			baseValue = overrideValue;
 
 		var value = baseValue;
@@ -123,7 +127,9 @@ public class MonsterCalculationsFunctionsScript : GeneralScript
 		var properties = monster.Properties;
 
 		var baseValue = (float)monster.Data.MagicalAttackMin;
-		if (monster.Properties.Overrides.TryGetFloat(PropertyName.MINMATK, out var overrideValue))
+		if (monster.Properties.Has(PropertyName.FixedAttack))
+			baseValue = monster.Properties.GetFloat(PropertyName.FixedAttack);
+		else if (monster.Properties.Overrides.TryGetFloat(PropertyName.MINMATK, out var overrideValue))
 			baseValue = overrideValue;
 
 		var value = baseValue;
@@ -153,7 +159,9 @@ public class MonsterCalculationsFunctionsScript : GeneralScript
 		var properties = monster.Properties;
 
 		var baseValue = (float)monster.Data.MagicalAttackMax;
-		if (monster.Properties.Overrides.TryGetFloat(PropertyName.MAXMATK, out var overrideValue))
+		if (monster.Properties.Has(PropertyName.FixedAttack))
+			baseValue = monster.Properties.GetFloat(PropertyName.FixedAttack);
+		else if (monster.Properties.Overrides.TryGetFloat(PropertyName.MAXMATK, out var overrideValue))
 			baseValue = overrideValue;
 
 		var value = baseValue;
@@ -183,7 +191,9 @@ public class MonsterCalculationsFunctionsScript : GeneralScript
 		var properties = monster.Properties;
 
 		var baseValue = (float)monster.Data.PhysicalDefense;
-		if (monster.Properties.Overrides.TryGetFloat(PropertyName.DEF, out var overrideValue))
+		if (monster.Properties.Has(PropertyName.FixedDefence))
+			baseValue = monster.Properties.GetFloat(PropertyName.FixedDefence);
+		else if (monster.Properties.Overrides.TryGetFloat(PropertyName.DEF, out var overrideValue))
 			baseValue = overrideValue;
 
 		var value = baseValue;
@@ -210,7 +220,9 @@ public class MonsterCalculationsFunctionsScript : GeneralScript
 		var properties = monster.Properties;
 
 		var baseValue = (float)monster.Data.MagicalDefense;
-		if (monster.Properties.Overrides.TryGetFloat(PropertyName.MDEF, out var overrideValue))
+		if (monster.Properties.Has(PropertyName.FixedDefence))
+			baseValue = monster.Properties.GetFloat(PropertyName.FixedDefence);
+		else if (monster.Properties.Overrides.TryGetFloat(PropertyName.MDEF, out var overrideValue))
 			baseValue = overrideValue;
 
 		var value = baseValue;

@@ -290,7 +290,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.AutoUpdate(PropertyName.Klaida_Atk, [PropertyName.Klaida_Atk_BM]);
 
 			// Generic Damage Bonus
-			this.AutoUpdate(PropertyName.Add_Damage_Atk, [PropertyName.Add_Damage_Atk_BM]);
+			this.AutoUpdate(PropertyName.Add_Damage_Atk, [PropertyName.Add_Damage_Atk_BM, PropertyName.MINPATK, PropertyName.MAXPATK, PropertyName.MINMATK, PropertyName.MAXMATK]);
 
 			// Elemental-Type Resistances
 			this.AutoUpdate(PropertyName.ResFire, [PropertyName.ResFire_BM]);

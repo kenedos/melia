@@ -1035,13 +1035,13 @@ namespace Melia.Zone.Scripting.Dialogues
 		/// </summary>
 		public void OpenPropertyShop(string shopName, string currencyProperty, string shopPointName, string uiShopName = null)
 		{
-			if (!PropertyShops.TryGet(shopName, out _))
+			if (!PropertyShops.TryGet(shopName, out var shop))
 				return;
 
 			var conn = this.Player.Connection;
 
 			// Push the current point balance so the UI header shows it
-			var balance = (int)conn.Account.Properties.GetFloat(currencyProperty);
+			var balance = shop.CurrencyProperty == null ? shop.GetBalance(this.Player) : (int)conn.Account.Properties.GetFloat(currencyProperty);
 			Send.ZC_SHOP_POINT_UPDATE(conn, shopPointName, balance);
 
 			// If an alias is supplied, alias the current shop's data into
@@ -1049,7 +1049,10 @@ namespace Melia.Zone.Scripting.Dialogues
 			// correct title while serving our per-weapon item list.
 			var openName = uiShopName ?? shopName;
 			if (uiShopName != null && uiShopName != shopName)
+			{
+				this.Player.Variables.Temp.SetString(PropertyShops.AliasVariablePrefix + uiShopName, shopName);
 				Send.ZC_EXEC_CLIENT_SCP(conn, $"M_CPS_ALIAS('{uiShopName}','{shopName}')");
+			}
 
 			// Open the property-shop UI. The shopInfo is already cached
 			// client-side from the earlier SendPropertyShop stream.
