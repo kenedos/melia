@@ -42,12 +42,15 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </summary>
 		/// <param name="cooldownId"></param>
 		/// <param name="duration"></param>
-		public Cooldown Start(CooldownId cooldownId, TimeSpan duration)
+		/// <param name="clientId">Id to tell the client instead of the cooldown id, if not 0.</param>
+		public Cooldown Start(CooldownId cooldownId, TimeSpan duration, int clientId = 0)
 		{
 			if (this.ExtraCooldown > TimeSpan.Zero)
 				duration += this.ExtraCooldown;
 
 			var cooldown = new Cooldown(cooldownId, duration);
+			if (clientId != 0)
+				cooldown.ClientId = clientId;
 
 			lock (_syncLock)
 			{
@@ -55,6 +58,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				{
 					cooldown = existingCooldown;
 					cooldown.Change(duration);
+					if (clientId != 0)
+						cooldown.ClientId = clientId;
 				}
 				else
 				{
@@ -89,7 +94,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				duration *= (1 - cdrRate);
 			}
 
-			return this.Start(skill.CooldownGroup, duration);
+			return this.Start(skill.CooldownGroup, duration, skill.CooldownClientId);
 		}
 
 
@@ -189,25 +194,29 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public bool Remove(CooldownId cooldownId)
 		{
 			var isRemoved = false;
+			var clientId = (int)cooldownId;
 			lock (_syncLock)
 			{
+				if (_cooldowns.TryGetValue(cooldownId, out var existing))
+					clientId = existing.ClientId;
+
 				isRemoved = _cooldowns.Remove(cooldownId);
 			}
 
 			if (this.Entity is Character character)
-				Send.ZC_COOLDOWN_CHANGED(character, cooldownId);
+				Send.ZC_COOLDOWN_CHANGED(character, clientId);
 
 			return isRemoved;
 		}
 
 		public void RemoveAll()
 		{
-			var removedCooldowns = new List<CooldownId>();
+			var removedCooldowns = new List<int>();
 			lock (_syncLock)
 			{
 				foreach (var cooldown in _cooldowns.Values)
 				{
-					removedCooldowns.Add(cooldown.Id);
+					removedCooldowns.Add(cooldown.ClientId);
 				}
 				_cooldowns.Clear();
 			}
@@ -380,6 +389,12 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public CooldownId Id { get; }
 
 		/// <summary>
+		/// Returns the id the client is told this cooldown by, which is the
+		/// skill id for skills the client treats by skill rather than group.
+		/// </summary>
+		public int ClientId { get; set; }
+
+		/// <summary>
 		/// Returns the cooldown's total duration.
 		/// </summary>
 		public TimeSpan Duration { get; private set; }
@@ -424,6 +439,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public Cooldown(CooldownId id, TimeSpan remaining, TimeSpan duration, DateTime startTime)
 		{
 			this.Id = id;
+			this.ClientId = (int)id;
 			this.Duration = duration;
 			this.Remaining = remaining;
 			this.StartTime = startTime;

@@ -264,6 +264,18 @@ namespace Melia.Zone.Skills
 		public CooldownId CooldownGroup => this.CooldownData.Id;
 
 		/// <summary>
+		/// Gets or sets whether the skill is lent by a monster form, whose
+		/// cooldowns the client reads by skill id rather than group.
+		/// </summary>
+		public bool IsFormSkill { get; set; }
+
+		/// <summary>
+		/// Returns the id the client is told the skill's cooldown by, or 0
+		/// for the cooldown group's own id.
+		/// </summary>
+		public int CooldownClientId => this.IsFormSkill ? (int)this.Id : 0;
+
+		/// <summary>
 		/// Returns reference to the skill's overheat data from the file
 		/// database.
 		/// </summary>
@@ -574,7 +586,7 @@ namespace Melia.Zone.Skills
 				this.OverheatTimeRemaining = TimeSpan.Zero;
 				overheated = true;
 
-				var cooldown = this.Owner.StartCooldown(this.CooldownGroup, this.Properties.CoolDown);
+				var cooldown = this.Owner.Components.Get<CooldownComponent>()?.Start(this.CooldownGroup, this.Properties.CoolDown, this.CooldownClientId);
 				cooldown.OnCooldownChanged += this.OnCooldownChanged;
 			}
 
@@ -635,7 +647,7 @@ namespace Melia.Zone.Skills
 			if (!this.Owner.Components.TryGet<CooldownComponent>(out var cooldownComponent))
 				return;
 
-			cooldownComponent.Start(this.CooldownGroup, cooldownTime);
+			cooldownComponent.Start(this.CooldownGroup, cooldownTime, this.CooldownClientId);
 
 			this.OverheatCounter = 0;
 			this.OverheatTimeRemaining = TimeSpan.Zero;

@@ -61,7 +61,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Druid
 			}
 
 			var duration = caster.IsAbilityActive(AbilityId.Druid27) ? WolfSpiritDuration : skill.Properties.CaptionTime;
-			caster.StartBuff(BuffId.Lycanthropy_Buff, skill.Level, 0, duration, caster, skill.Id);
+			caster.StartBuff(BuffId.Lycanthropy_Buff, skill.Level, 1, duration, caster, skill.Id);
 		}
 	}
 }

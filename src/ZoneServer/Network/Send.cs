@@ -1044,7 +1044,7 @@ namespace Melia.Zone.Network
 			using var packet = Packet.Rent(Op.ZC_COOLDOWN_CHANGED);
 
 			packet.PutLong(character.ObjectId);
-			packet.PutInt((int)cooldown.Id);
+			packet.PutInt(cooldown.ClientId);
 			if (Versions.Protocol > 500)
 				packet.PutInt((int)cooldown.Remaining.TotalMilliseconds);
 			packet.PutInt((int)cooldown.Duration.TotalMilliseconds);
@@ -1059,12 +1059,12 @@ namespace Melia.Zone.Network
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="cooldown"></param>
-		public static void ZC_COOLDOWN_CHANGED(Character character, CooldownId cooldown)
+		public static void ZC_COOLDOWN_CHANGED(Character character, int cooldown)
 		{
 			using var packet = Packet.Rent(Op.ZC_COOLDOWN_CHANGED);
 
 			packet.PutLong(character.ObjectId);
-			packet.PutInt((int)cooldown);
+			packet.PutInt(cooldown);
 			if (Versions.Protocol > 500)
 				packet.PutInt((int)TimeSpan.Zero.TotalMilliseconds);
 			packet.PutInt((int)TimeSpan.Zero.TotalMilliseconds);
@@ -1396,7 +1396,7 @@ namespace Melia.Zone.Network
 			{
 				foreach (var cooldown in cooldowns)
 				{
-					packet.PutInt((int)cooldown.Id);
+					packet.PutInt(cooldown.ClientId);
 					if (Versions.Protocol > 500)
 						packet.PutInt((int)cooldown.Remaining.TotalMilliseconds);
 					packet.PutInt((int)cooldown.Duration.TotalMilliseconds);

@@ -151,9 +151,6 @@ namespace Melia.Zone.Skills
 			// shooting.
 			this.Create(new RFloatProperty(PropertyName.EnableShootMove, () => this.Skill.Data.EnableCastMove ? 0f : 1f));
 
-			this.Create(new RFloatProperty(PropertyName.EnableSkillCancel, () => this.Skill.Data.CastInterruptible ? 1f : 0f));
-			this.Create(new RFloatProperty(PropertyName.CancelSkill, () => this.Skill.Data.CastInterruptible ? 1f : 0f));
-
 			this.Create(PropertyName.CaptionTime, "SCR_Get_CaptionTime");
 			this.Create(PropertyName.CaptionRatio, "SCR_Get_CaptionRatio");
 			this.Create(PropertyName.CaptionRatio2, "SCR_Get_CaptionRatio2");

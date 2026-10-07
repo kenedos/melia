@@ -42,7 +42,7 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Druid
 				DruidSkillHelper.AddFormSkills(buff, character, DruidSkillHelper.WolfSkills, (int)buff.NumArg1);
 
 			if (activationType == ActivationType.Start)
-				target.AddEffect(EffectName, new TransmuteEffect(MonsterId.Lycanthrope, BuffId.Lycanthropy_Buff));
+				target.AddEffect(EffectName, new TransmuteEffect(MonsterId.Lycanthrope));
 
 			UpdatePropertyModifier(buff, target, PropertyName.MHP_RATE_BM, 1);
 			UpdatePropertyModifier(buff, target, PropertyName.MSPD_BM, MoveSpeedBonus);

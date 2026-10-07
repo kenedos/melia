@@ -177,7 +177,11 @@ namespace Melia.Zone.Skills.Helpers
 			var formSkillIds = skillIds.Append(SkillId.Common_StateClear).ToArray();
 
 			foreach (var skillId in formSkillIds)
-				character.Skills.Add(CreateLentSkill(character, skillId, level), true);
+			{
+				var skill = CreateLentSkill(character, skillId, level);
+				skill.IsFormSkill = true;
+				character.Skills.Add(skill, true);
+			}
 
 			foreach (var skillId in formSkillIds)
 				Send.ZC_NORMAL.ApplyBuff(character, buff.Data.ClassName, skillId, true);

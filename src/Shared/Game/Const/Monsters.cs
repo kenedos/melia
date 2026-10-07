@@ -20,6 +20,7 @@ namespace Melia.Shared.Game.Const
 		public const int GuardianHighBubeSpear = 58532;
 		public const int Homunculus = 58571;
 		public const int SkeletonArcher = 58534;
+		public const int Lycanthrope = 58603;
 		public const int Velheider = 60001;
 		public const int MissionGate = 147384;
 		public const int DirtyPole = 103016;

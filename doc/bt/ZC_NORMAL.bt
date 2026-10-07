@@ -222,6 +222,17 @@ switch (NormalOpToStr(type))
         break;
     }
 
+    case "Transmutation":
+    {
+        int handle;
+        int monsterId; // 0 reverts the actor
+        int buffId;    // Buff the form is bound to, 0 for none
+        int i1;
+        if (monsterId > 0)
+            byte b1;
+        break;
+    }
+
     case "UpdateSkillEffect":
     {
         int characterHandle;
